@@ -2,25 +2,20 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 
 interface SettingsPanelProps {
   focusDuration: number;
   breakDuration: number;
-  enableSound: boolean;
   onUpdateFocusDuration: (value: number) => void;
   onUpdateBreakDuration: (value: number) => void;
-  onToggleSound: (enabled: boolean) => void;
 }
 
 const SettingsPanel: React.FC<SettingsPanelProps> = ({
   focusDuration,
   breakDuration,
-  enableSound,
   onUpdateFocusDuration,
   onUpdateBreakDuration,
-  onToggleSound,
 }) => {
   return (
     <Card className="mt-6">
@@ -57,15 +52,6 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
             value={[breakDuration]}
             onValueChange={(values) => onUpdateBreakDuration(values[0])}
             className="py-4"
-          />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <Label htmlFor="sound-toggle">Sound Notification</Label>
-          <Switch
-            id="sound-toggle"
-            checked={enableSound}
-            onCheckedChange={onToggleSound}
           />
         </div>
       </CardContent>

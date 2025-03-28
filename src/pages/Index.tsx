@@ -55,10 +55,8 @@ const Index = () => {
         <SettingsPanel 
           focusDuration={settings.focusDuration}
           breakDuration={settings.breakDuration}
-          enableSound={settings.enableSound}
           onUpdateFocusDuration={(value) => updateSettings({ focusDuration: value })}
           onUpdateBreakDuration={(value) => updateSettings({ breakDuration: value })}
-          onToggleSound={(enabled) => updateSettings({ enableSound: enabled })}
         />
       </div>
     </div>
