@@ -8,6 +8,7 @@ interface TimerSettings {
   focusDuration: number; // in minutes
   breakDuration: number; // in minutes
   enableSound: boolean;
+  volume?: number; // Sound volume (0 to 1)
 }
 
 export function useTimer() {
@@ -18,6 +19,7 @@ export function useTimer() {
     focusDuration: 25,
     breakDuration: 5,
     enableSound: true,
+    volume: 1,
   });
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const intervalRef = useRef<number | null>(null);
@@ -25,7 +27,17 @@ export function useTimer() {
   // Initialize audio element
   useEffect(() => {
     audioRef.current = new Audio('/beep.mp3');
+    if (audioRef.current && settings.volume !== undefined) {
+      audioRef.current.volume = settings.volume;
+    }
   }, []);
+  
+  // Update volume when settings change
+  useEffect(() => {
+    if (audioRef.current && settings.volume !== undefined) {
+      audioRef.current.volume = settings.volume;
+    }
+  }, [settings.volume]);
   
   // Timer logic
   useEffect(() => {
