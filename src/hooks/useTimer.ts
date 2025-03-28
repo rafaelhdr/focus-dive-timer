@@ -20,6 +20,7 @@ export function useTimer() {
     enableSound: true,
   });
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const intervalRef = useRef<number | null>(null);
   
   // Initialize audio element
   useEffect(() => {
@@ -28,10 +29,9 @@ export function useTimer() {
   
   // Timer logic
   useEffect(() => {
-    let interval: number | undefined;
-    
     if (isActive && timeLeft > 0) {
-      interval = setInterval(() => {
+      // Use window.setInterval instead of setInterval to ensure proper typing
+      intervalRef.current = window.setInterval(() => {
         setTimeLeft((prevTime) => prevTime - 1);
       }, 1000);
     } else if (isActive && timeLeft === 0) {
@@ -55,7 +55,12 @@ export function useTimer() {
       toast(`Time's up! ${nextMode === 'focus' ? 'Focus time' : 'Break time'} started.`);
     }
     
-    return () => clearInterval(interval);
+    return () => {
+      if (intervalRef.current !== null) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
   }, [isActive, timeLeft, mode, settings]);
   
   // Start/pause timer

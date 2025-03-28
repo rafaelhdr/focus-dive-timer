@@ -38,19 +38,12 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -127,10 +120,9 @@
   transition: all 0.3s ease;
 }
 
-.focus-mode {
-  background: linear-gradient(135deg, hsl(var(--primary)/0.9), hsl(var(--primary)/0.7));
+.dark .timer-container {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-.break-mode {
-  background: linear-gradient(135deg, hsl(150 80% 42% / 0.9), hsl(150 80% 42% / 0.7));
-}
+/* Removed the redundant .focus-mode and .break-mode classes as they're now set directly in the Timer component with Tailwind classes */
+

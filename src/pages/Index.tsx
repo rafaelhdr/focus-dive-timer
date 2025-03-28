@@ -3,6 +3,7 @@ import React from 'react';
 import Timer from '@/components/Timer';
 import TimerControls from '@/components/TimerControls';
 import SettingsPanel from '@/components/SettingsPanel';
+import ThemeToggle from '@/components/ThemeToggle';
 import { useTimer } from '@/hooks/useTimer';
 
 const Index = () => {
@@ -18,8 +19,11 @@ const Index = () => {
   } = useTimer();
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4">
-      <header className="mb-8 text-center">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 transition-colors duration-300">
+      <header className="mb-8 text-center relative w-full max-w-md">
+        <div className="absolute right-0 top-0">
+          <ThemeToggle />
+        </div>
         <h1 className="text-3xl md:text-4xl font-bold mb-2">Focus Dive</h1>
         <p className="text-muted-foreground">Deep work. Timed breaks. Stay productive.</p>
       </header>
