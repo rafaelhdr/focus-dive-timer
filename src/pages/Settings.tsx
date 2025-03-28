@@ -22,7 +22,10 @@ const Settings = () => {
     if (audioRef.current) {
       audioRef.current.volume = currentVolume;
     }
-  }, []);
+    
+    // Sync local volume state with settings when they load
+    setCurrentVolume(volume);
+  }, [volume]);
 
   // Update audio volume when it changes
   React.useEffect(() => {
@@ -38,12 +41,10 @@ const Settings = () => {
 
   const handleSaveVolume = async () => {
     await saveSoundSettings(enableSound, currentVolume);
-    updateSettings({ volume: currentVolume });
   };
 
   const handleToggleSound = async (enabled: boolean) => {
     await saveSoundSettings(enabled, currentVolume);
-    updateSettings({ enableSound: enabled });
   };
 
   const playTestSound = () => {
@@ -125,7 +126,7 @@ const Settings = () => {
               <Button 
                 onClick={handleSaveVolume} 
                 className="flex-1"
-                disabled={!enableSound || volume === currentVolume || isLoading}
+                disabled={!enableSound || isLoading}
               >
                 {isLoading ? 'Saving...' : 'Save Volume'}
               </Button>

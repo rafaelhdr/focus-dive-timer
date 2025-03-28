@@ -25,6 +25,7 @@ export function useTimer() {
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const intervalRef = useRef<number | null>(null);
+  const preferencesLoadedRef = useRef(false);
   
   // Initialize audio element
   useEffect(() => {
@@ -37,14 +38,26 @@ export function useTimer() {
   // Load preferences from API on mount
   useEffect(() => {
     const loadPreferences = async () => {
+      if (preferencesLoadedRef.current) return;
+      
       setIsLoading(true);
       try {
+        console.log('Loading preferences from API...');
         const preferences = await fetchPreferences();
-        setSettings(prev => ({
-          ...prev,
-          enableSound: preferences.focus_beep_enabled,
-          volume: preferences.focus_beep_volume / 100, // Convert from 0-100 to 0-1
-        }));
+        console.log('Got preferences:', preferences);
+        
+        setSettings(prev => {
+          const updatedSettings = {
+            ...prev,
+            enableSound: preferences.focus_beep_enabled,
+            volume: preferences.focus_beep_volume / 100, // Convert from 0-100 to 0-1
+          };
+          
+          console.log('Updated settings:', updatedSettings);
+          return updatedSettings;
+        });
+        
+        preferencesLoadedRef.current = true;
       } catch (error) {
         console.error('Failed to load preferences:', error);
         toast.error('Failed to load preferences');
@@ -130,6 +143,7 @@ export function useTimer() {
   const saveSoundSettings = useCallback(async (enableSound: boolean, volume: number) => {
     setIsLoading(true);
     try {
+      console.log('Saving sound settings:', { enableSound, volume });
       const success = await savePreferences({
         focus_beep_enabled: enableSound,
         focus_beep_volume: Math.round(volume * 100), // Convert from 0-1 to 0-100
@@ -137,6 +151,12 @@ export function useTimer() {
       
       if (success) {
         toast.success('Sound settings saved');
+        // Update local settings to ensure consistency
+        setSettings(prev => ({
+          ...prev,
+          enableSound,
+          volume,
+        }));
       } else {
         toast.error('Failed to save settings');
       }

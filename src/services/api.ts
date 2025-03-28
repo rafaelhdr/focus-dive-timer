@@ -8,11 +8,23 @@ export interface Preferences {
 
 export const fetchPreferences = async (): Promise<Preferences> => {
   try {
-    const response = await fetch(`${API_URL}/preferences`);
+    console.log('Fetching preferences from:', `${API_URL}/preferences`);
+    const response = await fetch(`${API_URL}/preferences`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // Adding cache control to prevent browser caching issues
+      cache: 'no-cache',
+    });
+    
     if (!response.ok) {
-      throw new Error('Failed to fetch preferences');
+      throw new Error(`Failed to fetch preferences: ${response.status}`);
     }
-    return await response.json();
+    
+    const data = await response.json();
+    console.log('Fetched preferences:', data);
+    return data;
   } catch (error) {
     console.error('Error fetching preferences:', error);
     // Return default preferences if API call fails
@@ -25,6 +37,7 @@ export const fetchPreferences = async (): Promise<Preferences> => {
 
 export const savePreferences = async (preferences: Preferences): Promise<boolean> => {
   try {
+    console.log('Saving preferences to:', `${API_URL}/preferences`, preferences);
     const response = await fetch(`${API_URL}/preferences`, {
       method: 'PUT',
       headers: {
@@ -34,9 +47,10 @@ export const savePreferences = async (preferences: Preferences): Promise<boolean
     });
     
     if (!response.ok) {
-      throw new Error('Failed to save preferences');
+      throw new Error(`Failed to save preferences: ${response.status}`);
     }
     
+    console.log('Preferences saved successfully');
     return true;
   } catch (error) {
     console.error('Error saving preferences:', error);
