@@ -1,11 +1,52 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React from 'react';
+import Timer from '@/components/Timer';
+import TimerControls from '@/components/TimerControls';
+import SettingsPanel from '@/components/SettingsPanel';
+import { useTimer } from '@/hooks/useTimer';
 
 const Index = () => {
+  const { 
+    isActive, 
+    mode, 
+    formattedTime, 
+    settings,
+    toggleTimer, 
+    resetTimer, 
+    toggleMode, 
+    updateSettings 
+  } = useTimer();
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4">
+      <header className="mb-8 text-center">
+        <h1 className="text-3xl md:text-4xl font-bold mb-2">Focus Dive</h1>
+        <p className="text-muted-foreground">Deep work. Timed breaks. Stay productive.</p>
+      </header>
+
+      <div className="w-full max-w-md">
+        <Timer 
+          time={formattedTime} 
+          mode={mode} 
+          isActive={isActive} 
+        />
+
+        <TimerControls 
+          isActive={isActive}
+          mode={mode}
+          onToggleTimer={toggleTimer}
+          onReset={resetTimer}
+          onToggleMode={toggleMode}
+        />
+
+        <SettingsPanel 
+          focusDuration={settings.focusDuration}
+          breakDuration={settings.breakDuration}
+          enableSound={settings.enableSound}
+          onUpdateFocusDuration={(value) => updateSettings({ focusDuration: value })}
+          onUpdateBreakDuration={(value) => updateSettings({ breakDuration: value })}
+          onToggleSound={(enabled) => updateSettings({ enableSound: enabled })}
+        />
       </div>
     </div>
   );
