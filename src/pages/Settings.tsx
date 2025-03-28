@@ -1,5 +1,5 @@
 
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Volume2, Volume, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,13 +9,12 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ThemeToggle from '@/components/ThemeToggle';
 import { useTimer } from '@/hooks/useTimer';
-import { toast } from 'sonner';
 
 const Settings = () => {
-  const { settings, updateSettings } = useTimer();
+  const { settings, updateSettings, saveSoundSettings, isLoading } = useTimer();
   const { enableSound, volume = 1 } = settings;
   const [currentVolume, setCurrentVolume] = useState(volume);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
 
   // Initialize audio element
   React.useEffect(() => {
@@ -37,14 +36,14 @@ const Settings = () => {
     setCurrentVolume(newVolume);
   };
 
-  const handleSaveVolume = () => {
+  const handleSaveVolume = async () => {
+    await saveSoundSettings(enableSound, currentVolume);
     updateSettings({ volume: currentVolume });
-    toast.success('Volume settings saved');
   };
 
-  const handleToggleSound = (enabled: boolean) => {
+  const handleToggleSound = async (enabled: boolean) => {
+    await saveSoundSettings(enabled, currentVolume);
     updateSettings({ enableSound: enabled });
-    toast.success(`Sound notifications ${enabled ? 'enabled' : 'disabled'}`);
   };
 
   const playTestSound = () => {
@@ -92,6 +91,7 @@ const Settings = () => {
                 id="sound-toggle"
                 checked={enableSound}
                 onCheckedChange={handleToggleSound}
+                disabled={isLoading}
               />
             </div>
 
@@ -110,7 +110,7 @@ const Settings = () => {
                 value={[currentVolume]}
                 onValueChange={handleVolumeChange}
                 className="py-4"
-                disabled={!enableSound}
+                disabled={!enableSound || isLoading}
               />
             </div>
 
@@ -118,16 +118,16 @@ const Settings = () => {
               <Button 
                 onClick={playTestSound} 
                 className="flex-1"
-                disabled={!enableSound}
+                disabled={!enableSound || isLoading}
               >
                 Test Sound
               </Button>
               <Button 
                 onClick={handleSaveVolume} 
                 className="flex-1"
-                disabled={!enableSound || volume === currentVolume}
+                disabled={!enableSound || volume === currentVolume || isLoading}
               >
-                Save Volume
+                {isLoading ? 'Saving...' : 'Save Volume'}
               </Button>
             </div>
           </CardContent>

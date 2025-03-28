@@ -1,6 +1,7 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { toast } from 'sonner';
+import { fetchPreferences, savePreferences } from '@/services/api';
 
 type TimerMode = 'focus' | 'break';
 
@@ -21,6 +22,7 @@ export function useTimer() {
     enableSound: true,
     volume: 1,
   });
+  const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const intervalRef = useRef<number | null>(null);
   
@@ -30,6 +32,28 @@ export function useTimer() {
     if (audioRef.current && settings.volume !== undefined) {
       audioRef.current.volume = settings.volume;
     }
+  }, []);
+  
+  // Load preferences from API on mount
+  useEffect(() => {
+    const loadPreferences = async () => {
+      setIsLoading(true);
+      try {
+        const preferences = await fetchPreferences();
+        setSettings(prev => ({
+          ...prev,
+          enableSound: preferences.focus_beep_enabled,
+          volume: preferences.focus_beep_volume / 100, // Convert from 0-100 to 0-1
+        }));
+      } catch (error) {
+        console.error('Failed to load preferences:', error);
+        toast.error('Failed to load preferences');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadPreferences();
   }, []);
   
   // Update volume when settings change
@@ -102,6 +126,28 @@ export function useTimer() {
     );
   };
   
+  // Save sound preferences to API
+  const saveSoundSettings = useCallback(async (enableSound: boolean, volume: number) => {
+    setIsLoading(true);
+    try {
+      const success = await savePreferences({
+        focus_beep_enabled: enableSound,
+        focus_beep_volume: Math.round(volume * 100), // Convert from 0-1 to 0-100
+      });
+      
+      if (success) {
+        toast.success('Sound settings saved');
+      } else {
+        toast.error('Failed to save settings');
+      }
+    } catch (error) {
+      toast.error('Error saving settings');
+      console.error('Error saving sound settings:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+  
   // Update timer settings
   const updateSettings = (newSettings: Partial<TimerSettings>) => {
     setSettings(prev => {
@@ -132,10 +178,12 @@ export function useTimer() {
     mode,
     timeLeft,
     settings,
+    isLoading,
     formattedTime: formatTime(timeLeft),
     toggleTimer,
     resetTimer,
     toggleMode,
     updateSettings,
+    saveSoundSettings,
   };
 }
