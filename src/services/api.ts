@@ -6,14 +6,30 @@ export interface Preferences {
   focus_beep_volume: number;
 }
 
+// Function to get or create a session ID
+const getSessionId = (): string => {
+  let sessionId = localStorage.getItem('focus_dive_session_id');
+  if (!sessionId) {
+    sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    localStorage.setItem('focus_dive_session_id', sessionId);
+  }
+  return sessionId;
+};
+
+// Common headers for all API requests
+const getCommonHeaders = () => {
+  return {
+    'Content-Type': 'application/json',
+    'X-Session-ID': getSessionId(),
+  };
+};
+
 export const fetchPreferences = async (): Promise<Preferences> => {
   try {
     console.log('Fetching preferences from:', `${API_URL}/preferences`);
     const response = await fetch(`${API_URL}/preferences`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getCommonHeaders(),
       // Adding cache control to prevent browser caching issues
       cache: 'no-cache',
     });
@@ -40,9 +56,7 @@ export const savePreferences = async (preferences: Preferences): Promise<boolean
     console.log('Saving preferences to:', `${API_URL}/preferences`, preferences);
     const response = await fetch(`${API_URL}/preferences`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getCommonHeaders(),
       body: JSON.stringify(preferences),
     });
     
