@@ -1,0 +1,85 @@
+
+import { useEffect, useRef, useCallback } from 'react';
+import { io, Socket } from 'socket.io-client';
+import { API_URL } from '@/config/env';
+
+interface TimerData {
+  timerEndsAt: number | null;
+  currentTimer: 'focus' | 'break';
+}
+
+export function useTimerSocket() {
+  const socketRef = useRef<Socket | null>(null);
+  const socketInitializedRef = useRef(false);
+
+  // Initialize socket connection
+  useEffect(() => {
+    if (socketInitializedRef.current) return;
+
+    console.log('Initializing WebSocket connection to:', `${API_URL}/timer`);
+    socketRef.current = io(`${API_URL}/timer`, {
+      withCredentials: true,
+    });
+
+    socketRef.current.on('connect', () => {
+      console.log('WebSocket connected successfully');
+      // Request current timer state from server
+      socketRef.current?.emit('get_timer');
+    });
+
+    socketRef.current.on('connect_error', (error) => {
+      console.error('WebSocket connection error:', error);
+    });
+
+    socketRef.current.on('disconnect', (reason) => {
+      console.log('WebSocket disconnected:', reason);
+    });
+
+    socketInitializedRef.current = true;
+
+    // Cleanup on unmount
+    return () => {
+      console.log('Cleaning up WebSocket connection');
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+        socketInitializedRef.current = false;
+      }
+    };
+  }, []);
+
+  // Subscribe to timer updates
+  const subscribeToTimerUpdates = useCallback((callback: (data: TimerData) => void) => {
+    if (!socketRef.current) return;
+
+    console.log('Subscribing to timer updates');
+    socketRef.current.on('timer_updated', (data: TimerData) => {
+      console.log('Received timer update:', data);
+      callback(data);
+    });
+
+    return () => {
+      socketRef.current?.off('timer_updated');
+    };
+  }, []);
+
+  // Send timer updates to server
+  const updateTimer = useCallback((endsAt: number | null, mode: 'focus' | 'break') => {
+    if (!socketRef.current) {
+      console.warn('Cannot update timer: WebSocket not connected');
+      return;
+    }
+
+    console.log('Updating timer on server:', { timerEndsAt: endsAt, currentTimer: mode });
+    socketRef.current.emit('timer_data', {
+      timerEndsAt: endsAt,
+      currentTimer: mode
+    });
+  }, []);
+
+  return {
+    socket: socketRef.current,
+    subscribeToTimerUpdates,
+    updateTimer,
+  };
+}

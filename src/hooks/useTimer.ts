@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { toast } from 'sonner';
 import { fetchPreferences, savePreferences } from '@/services/api';
+import { useTimerSocket } from './useTimerSocket';
 
 type TimerMode = 'focus' | 'break';
 
@@ -26,6 +27,10 @@ export function useTimer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const intervalRef = useRef<number | null>(null);
   const preferencesLoadedRef = useRef(false);
+  const timerEndTimeRef = useRef<number | null>(null);
+  
+  // Initialize WebSocket communication
+  const { subscribeToTimerUpdates, updateTimer } = useTimerSocket();
   
   // Initialize audio element
   useEffect(() => {
@@ -68,6 +73,30 @@ export function useTimer() {
     
     loadPreferences();
   }, []);
+
+  // Subscribe to timer updates from server
+  useEffect(() => {
+    const unsubscribe = subscribeToTimerUpdates((data) => {
+      if (data.timerEndsAt === null) return;
+      
+      const currentTime = Date.now();
+      const endTime = data.timerEndsAt;
+      const secondsLeft = Math.max(0, Math.floor((endTime - currentTime) / 1000));
+      
+      // Only update if there's an active timer or it's a different mode
+      if (secondsLeft > 0 || mode !== data.currentTimer) {
+        setMode(data.currentTimer);
+        setTimeLeft(secondsLeft);
+        timerEndTimeRef.current = endTime;
+        
+        if (secondsLeft > 0 && !isActive) {
+          setIsActive(true);
+        }
+      }
+    });
+    
+    return unsubscribe;
+  }, [subscribeToTimerUpdates, mode, isActive]);
   
   // Update volume when settings change
   useEffect(() => {
@@ -79,15 +108,29 @@ export function useTimer() {
   // Timer logic
   useEffect(() => {
     if (isActive && timeLeft > 0) {
+      // Calculate end time if not already set
+      if (timerEndTimeRef.current === null) {
+        timerEndTimeRef.current = Date.now() + timeLeft * 1000;
+        // Send initial timer state to server
+        updateTimer(timerEndTimeRef.current, mode);
+      }
+      
       // Use window.setInterval instead of setInterval to ensure proper typing
       intervalRef.current = window.setInterval(() => {
-        setTimeLeft((prevTime) => prevTime - 1);
+        const currentTime = Date.now();
+        const endTime = timerEndTimeRef.current || currentTime;
+        const secondsLeft = Math.max(0, Math.floor((endTime - currentTime) / 1000));
+        
+        setTimeLeft(secondsLeft);
       }, 1000);
     } else if (isActive && timeLeft === 0) {
       // When timer ends
       if (settings.enableSound && audioRef.current) {
         audioRef.current.play().catch(err => console.error("Error playing sound:", err));
       }
+      
+      // Reset end time reference
+      timerEndTimeRef.current = null;
       
       // Switch modes
       const nextMode = mode === 'focus' ? 'break' : 'focus';
@@ -100,8 +143,20 @@ export function useTimer() {
       
       setTimeLeft(nextDuration);
       
+      // Calculate and set new end time
+      const newEndTime = Date.now() + nextDuration * 1000;
+      timerEndTimeRef.current = newEndTime;
+      
+      // Update server with new timer state
+      updateTimer(newEndTime, nextMode);
+      
       // Notify the user
       toast(`Time's up! ${nextMode === 'focus' ? 'Focus time' : 'Break time'} started.`);
+    } else if (!isActive) {
+      // If timer is paused, clear the end time reference
+      timerEndTimeRef.current = null;
+      // Inform server timer is paused
+      updateTimer(null, mode);
     }
     
     return () => {
@@ -110,21 +165,31 @@ export function useTimer() {
         intervalRef.current = null;
       }
     };
-  }, [isActive, timeLeft, mode, settings]);
+  }, [isActive, timeLeft, mode, settings, updateTimer]);
   
   // Start/pause timer
   const toggleTimer = () => {
+    if (!isActive) {
+      // Starting the timer - calculate end time
+      timerEndTimeRef.current = Date.now() + timeLeft * 1000;
+      updateTimer(timerEndTimeRef.current, mode);
+    } else {
+      // Pausing the timer
+      timerEndTimeRef.current = null;
+      updateTimer(null, mode);
+    }
     setIsActive(!isActive);
   };
   
   // Reset timer to current mode's full duration
   const resetTimer = () => {
     setIsActive(false);
-    setTimeLeft(
-      mode === 'focus' 
-        ? settings.focusDuration * 60 
-        : settings.breakDuration * 60
-    );
+    const newDuration = mode === 'focus' 
+      ? settings.focusDuration * 60 
+      : settings.breakDuration * 60;
+    setTimeLeft(newDuration);
+    timerEndTimeRef.current = null;
+    updateTimer(null, mode);
   };
   
   // Manually change mode
@@ -132,11 +197,12 @@ export function useTimer() {
     const nextMode = mode === 'focus' ? 'break' : 'focus';
     setMode(nextMode);
     setIsActive(false);
-    setTimeLeft(
-      nextMode === 'focus' 
-        ? settings.focusDuration * 60 
-        : settings.breakDuration * 60
-    );
+    const newDuration = nextMode === 'focus' 
+      ? settings.focusDuration * 60 
+      : settings.breakDuration * 60;
+    setTimeLeft(newDuration);
+    timerEndTimeRef.current = null;
+    updateTimer(null, nextMode);
   };
   
   // Save sound preferences to API
