@@ -32,6 +32,7 @@ export const fetchPreferences = async (): Promise<Preferences> => {
       headers: getCommonHeaders(),
       // Adding cache control to prevent browser caching issues
       cache: 'no-cache',
+      credentials: 'include',
     });
     
     if (!response.ok) {
@@ -58,6 +59,7 @@ export const savePreferences = async (preferences: Preferences): Promise<boolean
       method: 'PUT',
       headers: getCommonHeaders(),
       body: JSON.stringify(preferences),
+      credentials: 'include',
     });
     
     if (!response.ok) {
