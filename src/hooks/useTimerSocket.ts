@@ -54,13 +54,22 @@ export function useTimerSocket() {
     if (!socketRef.current) return;
 
     console.log('Subscribing to timer updates');
+    
+    // Subscribe to timer_updated events
     socketRef.current.on('timer_updated', (data: TimerData) => {
       console.log('Received timer update:', data);
+      callback(data);
+    });
+    
+    // Also handle initial timer state response
+    socketRef.current.on('timer_state', (data: TimerData) => {
+      console.log('Received initial timer state:', data);
       callback(data);
     });
 
     return () => {
       socketRef.current?.off('timer_updated');
+      socketRef.current?.off('timer_state');
     };
   }, []);
 
@@ -77,6 +86,17 @@ export function useTimerSocket() {
       currentTimer: mode,
       state: state
     });
+  }, []);
+
+  // Request current timer state from server
+  const getTimerState = useCallback(() => {
+    if (!socketRef.current) {
+      console.warn('Cannot get timer state: WebSocket not connected');
+      return;
+    }
+    
+    console.log('Requesting current timer state from server');
+    socketRef.current.emit('get_timer');
   }, []);
 
   // Force reset timer on the server
@@ -98,5 +118,6 @@ export function useTimerSocket() {
     subscribeToTimerUpdates,
     updateTimer,
     resetTimer,
+    getTimerState,
   };
 }
