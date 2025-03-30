@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { toast } from 'sonner';
-import { fetchPreferences, savePreferences } from '@/services/api';
+import { fetchPreferences, savePreferences, triggerTimerEvent } from '@/services/api';
 import { useTimerSocket } from './useTimerSocket';
 
 type TimerMode = 'focus' | 'break';
@@ -113,6 +113,10 @@ export function useTimer() {
         timerEndTimeRef.current = Date.now() + timeLeft * 1000;
         // Send initial timer state to server
         updateTimer(timerEndTimeRef.current, mode);
+        
+        // Trigger timer start event
+        triggerTimerEvent('start', mode === 'focus' ? 'focus' : 'relax')
+          .catch(err => console.error("Failed to trigger timer start:", err));
       }
       
       // Use window.setInterval instead of setInterval to ensure proper typing
@@ -128,6 +132,10 @@ export function useTimer() {
       if (settings.enableSound && audioRef.current) {
         audioRef.current.play().catch(err => console.error("Error playing sound:", err));
       }
+      
+      // Trigger stop event for the current mode before switching
+      triggerTimerEvent('stop', mode === 'focus' ? 'focus' : 'relax')
+        .catch(err => console.error("Failed to trigger timer stop:", err));
       
       // Reset end time reference
       timerEndTimeRef.current = null;
@@ -150,10 +158,20 @@ export function useTimer() {
       // Update server with new timer state
       updateTimer(newEndTime, nextMode);
       
+      // Trigger start event for the next mode
+      triggerTimerEvent('start', nextMode === 'focus' ? 'focus' : 'relax')
+        .catch(err => console.error("Failed to trigger timer start:", err));
+      
       // Notify the user
       toast(`Time's up! ${nextMode === 'focus' ? 'Focus time' : 'Break time'} started.`);
     } else if (!isActive) {
       // If timer is paused, clear the end time reference
+      if (timerEndTimeRef.current !== null) {
+        // Only trigger stop if we're actually stopping an active timer
+        triggerTimerEvent('stop', mode === 'focus' ? 'focus' : 'relax')
+          .catch(err => console.error("Failed to trigger timer stop:", err));
+      }
+      
       timerEndTimeRef.current = null;
       // Inform server timer is paused
       updateTimer(null, mode);
@@ -173,8 +191,15 @@ export function useTimer() {
       // Starting the timer - calculate end time
       timerEndTimeRef.current = Date.now() + timeLeft * 1000;
       updateTimer(timerEndTimeRef.current, mode);
+      
+      // Trigger start event
+      triggerTimerEvent('start', mode === 'focus' ? 'focus' : 'relax')
+        .catch(err => console.error("Failed to trigger timer start:", err));
     } else {
       // Pausing the timer
+      triggerTimerEvent('stop', mode === 'focus' ? 'focus' : 'relax')
+        .catch(err => console.error("Failed to trigger timer stop:", err));
+      
       timerEndTimeRef.current = null;
       updateTimer(null, mode);
     }
@@ -183,6 +208,12 @@ export function useTimer() {
   
   // Reset timer to current mode's full duration
   const resetTimer = () => {
+    if (isActive) {
+      // Only trigger stop if we're resetting an active timer
+      triggerTimerEvent('stop', mode === 'focus' ? 'focus' : 'relax')
+        .catch(err => console.error("Failed to trigger timer stop:", err));
+    }
+    
     setIsActive(false);
     const newDuration = mode === 'focus' 
       ? settings.focusDuration * 60 
@@ -194,6 +225,12 @@ export function useTimer() {
   
   // Manually change mode
   const toggleMode = () => {
+    if (isActive) {
+      // If timer is active, stop the current mode
+      triggerTimerEvent('stop', mode === 'focus' ? 'focus' : 'relax')
+        .catch(err => console.error("Failed to trigger timer stop:", err));
+    }
+    
     const nextMode = mode === 'focus' ? 'break' : 'focus';
     setMode(nextMode);
     setIsActive(false);

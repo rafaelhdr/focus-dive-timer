@@ -1,4 +1,3 @@
-
 import { API_URL } from '@/config/env';
 
 export interface Preferences {
@@ -70,6 +69,32 @@ export const savePreferences = async (preferences: Preferences): Promise<boolean
     return true;
   } catch (error) {
     console.error('Error saving preferences:', error);
+    return false;
+  }
+};
+
+// New function to trigger timer events on the server
+export const triggerTimerEvent = async (
+  action: 'start' | 'stop',
+  type: 'focus' | 'relax'
+): Promise<boolean> => {
+  try {
+    console.log(`Triggering timer event: ${action} ${type}`);
+    const response = await fetch(`${API_URL}/timer/trigger`, {
+      method: 'POST',
+      headers: getCommonHeaders(),
+      body: JSON.stringify({ action, type }),
+      credentials: 'include',
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to trigger timer event: ${response.status}`);
+    }
+    
+    console.log('Timer event triggered successfully');
+    return true;
+  } catch (error) {
+    console.error('Error triggering timer event:', error);
     return false;
   }
 };
