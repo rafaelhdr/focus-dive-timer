@@ -89,8 +89,10 @@ export function useTimer() {
         setTimeLeft(secondsLeft);
         timerEndTimeRef.current = endTime;
         
-        if (secondsLeft > 0 && !isActive) {
+        if (secondsLeft > 0 && data.state === 'running' && !isActive) {
           setIsActive(true);
+        } else if (data.state === 'paused' && isActive) {
+          setIsActive(false);
         }
       }
     });
@@ -112,7 +114,7 @@ export function useTimer() {
       if (timerEndTimeRef.current === null) {
         timerEndTimeRef.current = Date.now() + timeLeft * 1000;
         // Send initial timer state to server
-        updateTimer(timerEndTimeRef.current, mode);
+        updateTimer(timerEndTimeRef.current, mode, 'running');
         
         // Trigger timer start event
         triggerTimerEvent('start', mode === 'focus' ? 'focus' : 'relax')
@@ -156,7 +158,7 @@ export function useTimer() {
       timerEndTimeRef.current = newEndTime;
       
       // Update server with new timer state
-      updateTimer(newEndTime, nextMode);
+      updateTimer(newEndTime, nextMode, 'running');
       
       // Trigger start event for the next mode
       triggerTimerEvent('start', nextMode === 'focus' ? 'focus' : 'relax')
@@ -174,7 +176,7 @@ export function useTimer() {
       
       timerEndTimeRef.current = null;
       // Inform server timer is paused
-      updateTimer(null, mode);
+      updateTimer(null, mode, 'paused');
     }
     
     return () => {
@@ -190,7 +192,7 @@ export function useTimer() {
     if (!isActive) {
       // Starting the timer - calculate end time
       timerEndTimeRef.current = Date.now() + timeLeft * 1000;
-      updateTimer(timerEndTimeRef.current, mode);
+      updateTimer(timerEndTimeRef.current, mode, 'running');
       
       // Trigger start event
       triggerTimerEvent('start', mode === 'focus' ? 'focus' : 'relax')
@@ -201,7 +203,7 @@ export function useTimer() {
         .catch(err => console.error("Failed to trigger timer stop:", err));
       
       timerEndTimeRef.current = null;
-      updateTimer(null, mode);
+      updateTimer(null, mode, 'paused');
     }
     setIsActive(!isActive);
   };
@@ -220,7 +222,7 @@ export function useTimer() {
       : settings.breakDuration * 60;
     setTimeLeft(newDuration);
     timerEndTimeRef.current = null;
-    updateTimer(null, mode);
+    updateTimer(null, mode, 'paused');
   };
   
   // Manually change mode
@@ -239,7 +241,7 @@ export function useTimer() {
       : settings.breakDuration * 60;
     setTimeLeft(newDuration);
     timerEndTimeRef.current = null;
-    updateTimer(null, nextMode);
+    updateTimer(null, nextMode, 'paused');
   };
   
   // Save sound preferences to API

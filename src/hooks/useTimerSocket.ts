@@ -6,6 +6,7 @@ import { API_URL } from '@/config/env';
 interface TimerData {
   timerEndsAt: number | null;
   currentTimer: 'focus' | 'break';
+  state: 'running' | 'paused';
 }
 
 export function useTimerSocket() {
@@ -64,16 +65,17 @@ export function useTimerSocket() {
   }, []);
 
   // Send timer updates to server
-  const updateTimer = useCallback((endsAt: number | null, mode: 'focus' | 'break') => {
+  const updateTimer = useCallback((endsAt: number | null, mode: 'focus' | 'break', state: 'running' | 'paused' = 'paused') => {
     if (!socketRef.current) {
       console.warn('Cannot update timer: WebSocket not connected');
       return;
     }
 
-    console.log('Updating timer on server:', { timerEndsAt: endsAt, currentTimer: mode });
+    console.log('Updating timer on server:', { timerEndsAt: endsAt, currentTimer: mode, state });
     socketRef.current.emit('timer_data', {
       timerEndsAt: endsAt,
-      currentTimer: mode
+      currentTimer: mode,
+      state: state
     });
   }, []);
 
