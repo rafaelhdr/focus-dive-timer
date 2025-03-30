@@ -1,0 +1,53 @@
+
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Clock, Slack, Settings } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+
+const Navigation: React.FC = () => {
+  const location = useLocation();
+  
+  return (
+    <div className="fixed top-0 left-0 right-0 bg-background border-b border-border z-10">
+      <div className="container max-w-4xl mx-auto flex justify-between items-center py-2">
+        <div className="flex items-center">
+          <Link to="/" className="text-lg font-bold mr-4">Focus Dive</Link>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link to="/">
+            <Button 
+              variant={location.pathname === '/' ? 'default' : 'ghost'} 
+              size="sm"
+              className="gap-2"
+            >
+              <Clock className="h-4 w-4" />
+              <span className="hidden sm:inline">Timer</span>
+            </Button>
+          </Link>
+          <Link to="/block-distractions">
+            <Button 
+              variant={location.pathname === '/block-distractions' ? 'default' : 'ghost'} 
+              size="sm"
+              className="gap-2"
+            >
+              <Slack className="h-4 w-4" />
+              <span className="hidden sm:inline">Block Distractions</span>
+            </Button>
+          </Link>
+          <Link to="/settings">
+            <Button 
+              variant={location.pathname === '/settings' ? 'default' : 'ghost'} 
+              size="sm"
+              className="gap-2"
+            >
+              <Settings className="h-4 w-4" />
+              <span className="hidden sm:inline">Settings</span>
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Navigation;
