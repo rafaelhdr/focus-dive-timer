@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { toast } from 'sonner';
 import { fetchPreferences, savePreferences, triggerTimerEvent } from '@/services/api';
@@ -30,7 +29,7 @@ export function useTimer() {
   const timerEndTimeRef = useRef<number | null>(null);
   
   // Initialize WebSocket communication
-  const { subscribeToTimerUpdates, updateTimer } = useTimerSocket();
+  const { subscribeToTimerUpdates, updateTimer, resetTimer } = useTimerSocket();
   
   // Initialize audio element
   useEffect(() => {
@@ -77,7 +76,14 @@ export function useTimer() {
   // Subscribe to timer updates from server
   useEffect(() => {
     const unsubscribe = subscribeToTimerUpdates((data) => {
-      if (data.timerEndsAt === null) return;
+      if (data.timerEndsAt === null) {
+        // If server says timer is reset/stopped
+        if (timerEndTimeRef.current !== null) {
+          timerEndTimeRef.current = null;
+          setIsActive(false);
+        }
+        return;
+      }
       
       const currentTime = Date.now();
       const endTime = data.timerEndsAt;
@@ -209,7 +215,7 @@ export function useTimer() {
   };
   
   // Reset timer to current mode's full duration
-  const resetTimer = () => {
+  const resetTimerHandler = () => {
     if (isActive) {
       // Only trigger stop if we're resetting an active timer
       triggerTimerEvent('stop', mode === 'focus' ? 'focus' : 'relax')
@@ -223,8 +229,9 @@ export function useTimer() {
     setTimeLeft(newDuration);
     timerEndTimeRef.current = null;
     
-    // Explicitly set timerEndsAt to null when resetting
-    updateTimer(null, mode, 'paused');
+    console.log('Resetting timer completely...');
+    // Reset timer on the server using the resetTimer function
+    resetTimer();
   };
   
   // Manually change mode
@@ -308,7 +315,7 @@ export function useTimer() {
     isLoading,
     formattedTime: formatTime(timeLeft),
     toggleTimer,
-    resetTimer,
+    resetTimer: resetTimerHandler,
     toggleMode,
     updateSettings,
     saveSoundSettings,

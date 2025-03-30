@@ -79,9 +79,24 @@ export function useTimerSocket() {
     });
   }, []);
 
+  // Force reset timer on the server
+  const resetTimer = useCallback(() => {
+    if (!socketRef.current) {
+      console.warn('Cannot reset timer: WebSocket not connected');
+      return;
+    }
+
+    console.log('Resetting timer on server');
+    socketRef.current.emit('reset_timer');
+    
+    // Also update with explicit null values to ensure reset
+    updateTimer(null, 'focus', 'paused');
+  }, [updateTimer]);
+
   return {
     socket: socketRef.current,
     subscribeToTimerUpdates,
     updateTimer,
+    resetTimer,
   };
 }
