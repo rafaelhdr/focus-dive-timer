@@ -222,6 +222,8 @@ export function useTimer() {
       : settings.breakDuration * 60;
     setTimeLeft(newDuration);
     timerEndTimeRef.current = null;
+    
+    // Explicitly set timerEndsAt to null when resetting
     updateTimer(null, mode, 'paused');
   };
   
