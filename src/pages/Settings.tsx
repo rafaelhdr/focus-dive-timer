@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Volume2, Volume, VolumeX } from 'lucide-react';
+import { Slack, Volume2, Volume, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
