@@ -7,7 +7,7 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
-    allowedHosts: ['focusdive.rafaelhdr.com.br'],
+    allowedHosts: ['focusdive.rafaelhdr.com.br', 'fd.rafaelhdr.com.br'],
     port: 8080,
   },
   plugins: [
