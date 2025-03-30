@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Slack, Volume2, Volume, VolumeX } from 'lucide-react';
+import { Volume2, Volume, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
@@ -126,24 +127,6 @@ const Settings = () => {
                 </Button>
               </div>
             </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <Slack className="h-5 w-5" />
-                Integrations
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-4">Connect to external services to enhance your focus experience</p>
-            </CardContent>
-            <CardFooter className="flex justify-end border-t px-6 py-4">
-              <Button variant="outline" className="gap-2">
-                <Slack className="h-4 w-4" />
-                Block Distractions
-              </Button>
-            </CardFooter>
           </Card>
         </div>
       </div>

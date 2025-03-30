@@ -29,7 +29,7 @@ const Index = () => {
             <ThemeToggle />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Focus Dive</h1>
-          <p className="text-muted-foreground">Deep work. Timed breaks. Stay productive.</p>
+          <p className="text-muted-foreground">Block Distractions and Deep Work</p>
         </header>
 
         <div className="w-full max-w-md">

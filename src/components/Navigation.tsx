@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Clock, Slack, Settings } from 'lucide-react';
+import { Clock, Settings, Link2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Navigation: React.FC = () => {
@@ -30,8 +30,8 @@ const Navigation: React.FC = () => {
               size="sm"
               className="gap-2"
             >
-              <Slack className="h-4 w-4" />
-              <span className="hidden sm:inline">Block Distractions</span>
+              <Link2 className="h-4 w-4" />
+              <span className="hidden sm:inline">Integrations</span>
             </Button>
           </Link>
           <Link to="/settings">
