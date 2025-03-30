@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Volume2, Volume, VolumeX } from 'lucide-react';
+import { ArrowLeft, Volume2, Volume, VolumeX, Slack } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import ThemeToggle from '@/components/ThemeToggle';
 import { useTimer } from '@/hooks/useTimer';
 
@@ -78,7 +78,7 @@ const Settings = () => {
         <p className="text-muted-foreground">Customize your Focus Dive experience</p>
       </header>
 
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md space-y-6">
         <Card>
           <CardHeader>
             <CardTitle className="text-xl">Sound Settings</CardTitle>
@@ -132,6 +132,23 @@ const Settings = () => {
               </Button>
             </div>
           </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Slack className="h-5 w-5" />
+              Integrations
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-4">Connect to external services to enhance your focus experience</p>
+          </CardContent>
+          <CardFooter className="flex justify-end border-t px-6 py-4">
+            <Link to="/block-distractions">
+              <Button>Block Distractions</Button>
+            </Link>
+          </CardFooter>
         </Card>
       </div>
     </div>

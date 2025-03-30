@@ -6,7 +6,7 @@ import TimerControls from '@/components/TimerControls';
 import SettingsPanel from '@/components/SettingsPanel';
 import ThemeToggle from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
-import { Settings as SettingsIcon } from 'lucide-react';
+import { Settings as SettingsIcon, Slack } from 'lucide-react';
 import { useTimer } from '@/hooks/useTimer';
 
 const Index = () => {
@@ -25,6 +25,12 @@ const Index = () => {
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 transition-colors duration-300">
       <header className="mb-8 text-center relative w-full max-w-md">
         <div className="absolute right-0 top-0 flex items-center gap-2">
+          <Link to="/block-distractions">
+            <Button variant="ghost" size="icon" title="Block Distractions">
+              <Slack className="h-5 w-5" />
+              <span className="sr-only">Block Distractions</span>
+            </Button>
+          </Link>
           <Link to="/settings">
             <Button variant="ghost" size="icon">
               <SettingsIcon className="h-5 w-5" />
