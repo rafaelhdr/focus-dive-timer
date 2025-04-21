@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { triggerTimerEvent } from '@/services/api';
 import { useTimerSocket } from './useTimerSocket';
+import { TimerData } from './types';
 
 type TimerMode = 'focus' | 'break';
 
@@ -18,52 +19,23 @@ export function useTimerState({ focusDuration, breakDuration }: UseTimerStatePro
   const timerEndTimeRef = useRef<number | null>(null);
   
   // Initialize WebSocket communication
-  const { subscribeToTimerUpdates, updateTimer, resetTimer, getTimerState } = useTimerSocket();
-  
-  // Subscribe to timer updates from server
+  const { socket, updateTimer, resetTimer } = useTimerSocket();
+
   useEffect(() => {
-    // Request the current timer state on mount
-    getTimerState();
-    
-    const unsubscribe = subscribeToTimerUpdates((data) => {
-      console.log('Processing timer update:', data);
-      
-      if (data.timerEndsAt === null) {
-        // If server says timer is reset/stopped
-        if (timerEndTimeRef.current !== null || isActive) {
-          timerEndTimeRef.current = null;
-          setIsActive(false);
-          
-          // Set the appropriate duration based on mode
-          const newDuration = data.currentTimer === 'focus' 
-            ? focusDuration * 60 
-            : breakDuration * 60;
-          
-          setTimeLeft(newDuration);
+    if (socket) {
+      socket.on('timer_state', (data: TimerData) => {
+        console.log('Received timer state update update here:', data);
+        setMode(data.mode);
+        setIsActive(data.isRunning);
+        if (data.timerEndsAt) {
+          const currentTime = Date.now();
+          const endTime = data.timerEndsAt;
+          const secondsLeft = Math.max(0, Math.floor((endTime - currentTime) / 1000));
+          setTimeLeft(secondsLeft);
         }
-        return;
-      }
-      
-      const currentTime = Date.now();
-      const endTime = data.timerEndsAt;
-      const secondsLeft = Math.max(0, Math.floor((endTime - currentTime) / 1000));
-      
-      console.log(`Timer update: ${data.currentTimer} mode, ${secondsLeft}s left, state: ${data.state}`);
-      
-      // Update timer state based on server data
-      setMode(data.currentTimer);
-      setTimeLeft(secondsLeft);
-      timerEndTimeRef.current = endTime;
-      
-      if (data.state === 'running' && (!isActive || secondsLeft > 0)) {
-        setIsActive(true);
-      } else if (data.state === 'paused' && isActive) {
-        setIsActive(false);
-      }
-    });
-    
-    return unsubscribe;
-  }, [subscribeToTimerUpdates, getTimerState, focusDuration, breakDuration, isActive]);
+      });
+    }
+  }, [socket]);
   
   // Timer logic
   useEffect(() => {
@@ -72,7 +44,7 @@ export function useTimerState({ focusDuration, breakDuration }: UseTimerStatePro
       if (timerEndTimeRef.current === null) {
         timerEndTimeRef.current = Date.now() + timeLeft * 1000;
         // Send initial timer state to server
-        updateTimer(timerEndTimeRef.current, mode, 'running');
+        updateTimer(timerEndTimeRef.current, mode, true);
         
         // Trigger timer start event
         triggerTimerEvent('start', mode === 'focus' ? 'focus' : 'relax')
@@ -100,7 +72,7 @@ export function useTimerState({ focusDuration, breakDuration }: UseTimerStatePro
       
       timerEndTimeRef.current = null;
       // Inform server timer is paused
-      updateTimer(null, mode, 'paused');
+      updateTimer(null, mode, false);
     }
     
     return () => {
@@ -116,7 +88,7 @@ export function useTimerState({ focusDuration, breakDuration }: UseTimerStatePro
     if (!isActive) {
       // Starting the timer - calculate end time
       timerEndTimeRef.current = Date.now() + timeLeft * 1000;
-      updateTimer(timerEndTimeRef.current, mode, 'running');
+      updateTimer(timerEndTimeRef.current, mode, true);
       
       // Trigger start event
       triggerTimerEvent('start', mode === 'focus' ? 'focus' : 'relax')
@@ -127,7 +99,7 @@ export function useTimerState({ focusDuration, breakDuration }: UseTimerStatePro
         .catch(err => console.error("Failed to trigger timer stop:", err));
       
       timerEndTimeRef.current = null;
-      updateTimer(null, mode, 'paused');
+      updateTimer(null, mode, false);
     }
     setIsActive(!isActive);
   };
@@ -168,7 +140,7 @@ export function useTimerState({ focusDuration, breakDuration }: UseTimerStatePro
       : breakDuration * 60;
     setTimeLeft(newDuration);
     timerEndTimeRef.current = null;
-    updateTimer(null, nextMode, 'paused');
+    updateTimer(null, nextMode, false);
   };
   
   return {

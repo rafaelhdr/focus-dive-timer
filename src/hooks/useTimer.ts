@@ -23,6 +23,8 @@ export function useTimer() {
       // Notify the user
       const nextMode = mode === 'focus' ? 'break' : 'focus';
       toast(`Time's up! ${nextMode === 'focus' ? 'Focus time' : 'Break time'} started.`);
+      toggleTimer();
+      toggleMode();
     }
     
     prevTimeLeftRef.current = timeLeft;

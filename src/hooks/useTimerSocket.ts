@@ -2,12 +2,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { API_URL } from '@/config/env';
-
-interface TimerData {
-  timerEndsAt: number | null;
-  currentTimer: 'focus' | 'break';
-  state: 'running' | 'paused';
-}
+import { TimerData } from './types';
 
 export function useTimerSocket() {
   const socketRef = useRef<Socket | null>(null);
@@ -26,6 +21,7 @@ export function useTimerSocket() {
       console.log('WebSocket connected successfully');
       // Request current timer state from server
       socketRef.current?.emit('get_timer');
+      console.log("socketRef.current?.emit", socketRef.current?.emit)
     });
 
     socketRef.current.on('connect_error', (error) => {
@@ -74,17 +70,17 @@ export function useTimerSocket() {
   }, []);
 
   // Send timer updates to server
-  const updateTimer = useCallback((endsAt: number | null, mode: 'focus' | 'break', state: 'running' | 'paused' = 'paused') => {
+  const updateTimer = useCallback((timerEndsAt: number | null, mode: 'focus' | 'break', isRunning: boolean) => {
     if (!socketRef.current) {
       console.warn('Cannot update timer: WebSocket not connected');
       return;
     }
 
-    console.log('Updating timer on server:', { timerEndsAt: endsAt, currentTimer: mode, state });
+    console.log('Updating timer on server:', { timerEndsAt, mode, isRunning });
     socketRef.current.emit('timer_data', {
-      timerEndsAt: endsAt,
-      currentTimer: mode,
-      state: state
+      timerEndsAt,
+      mode,
+      isRunning,
     });
   }, []);
 
@@ -110,7 +106,7 @@ export function useTimerSocket() {
     socketRef.current.emit('reset_timer');
     
     // Also update with explicit null values to ensure reset
-    updateTimer(null, 'focus', 'paused');
+    updateTimer(null, 'focus', false);
   }, [updateTimer]);
 
   return {
