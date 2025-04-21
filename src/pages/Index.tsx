@@ -6,6 +6,7 @@ import SettingsPanel from '@/components/SettingsPanel';
 import ThemeToggle from '@/components/ThemeToggle';
 import Navigation from '@/components/Navigation';
 import { useTimer } from '@/hooks/useTimer';
+import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
 
 const Index = () => {
   const { 
@@ -29,7 +30,12 @@ const Index = () => {
             <ThemeToggle />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Focus Dive</h1>
-          <p className="text-muted-foreground">Block Distractions and Deep Work</p>
+          <div className="flex items-center justify-center gap-2">
+            <p className="text-muted-foreground">
+              Block Distractions and Deep Work
+            </p>
+            <IntegrationsInfoDialog />
+          </div>
         </header>
 
         <div className="w-full max-w-md">
