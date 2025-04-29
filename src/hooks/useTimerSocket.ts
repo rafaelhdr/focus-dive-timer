@@ -4,7 +4,9 @@ import { io, Socket } from 'socket.io-client';
 import { API_URL } from '@/config/env';
 import { TimerData } from './types';
 
-export function useTimerSocket() {
+export function useTimerSocket({
+    onGetTimerData,
+  }) {
   const socketRef = useRef<Socket | null>(null);
   const socketInitializedRef = useRef(false);
 
@@ -21,7 +23,6 @@ export function useTimerSocket() {
       console.log('WebSocket connected successfully');
       // Request current timer state from server
       socketRef.current?.emit('get_timer');
-      console.log("socketRef.current?.emit", socketRef.current?.emit)
     });
 
     socketRef.current.on('connect_error', (error) => {
@@ -30,6 +31,11 @@ export function useTimerSocket() {
 
     socketRef.current.on('disconnect', (reason) => {
       console.log('WebSocket disconnected:', reason);
+    });
+
+    socketRef.current.on('timer_state', (data: TimerData) => {
+      console.log('Received timer state:', data);
+      onGetTimerData(data);
     });
 
     socketInitializedRef.current = true;
@@ -111,6 +117,7 @@ export function useTimerSocket() {
 
   return {
     socket: socketRef.current,
+    isSocketConnected: socketInitializedRef.current,
     subscribeToTimerUpdates,
     updateTimer,
     resetTimer,

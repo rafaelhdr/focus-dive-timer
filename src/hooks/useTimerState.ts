@@ -17,28 +17,27 @@ export function useTimerState({ focusDuration, breakDuration }: UseTimerStatePro
   const [timeLeft, setTimeLeft] = useState(focusDuration * 60); // default in seconds
   const intervalRef = useRef<number | null>(null);
   const timerEndTimeRef = useRef<number | null>(null);
+
+  const onGetTimerData = (data: TimerData) => {
+    setMode(data.mode);
+    setIsActive(data.isRunning);
+    if (data.timerEndsAt) {
+      const currentTime = Date.now();
+      const endTime = data.timerEndsAt;
+      const secondsLeft = Math.max(0, Math.floor((endTime - currentTime) / 1000));
+      setTimeLeft(secondsLeft);
+    }
+  }
   
   // Initialize WebSocket communication
-  const { socket, updateTimer, resetTimer } = useTimerSocket();
-
-  useEffect(() => {
-    if (socket) {
-      socket.on('timer_state', (data: TimerData) => {
-        console.log('Received timer state update update here:', data);
-        setMode(data.mode);
-        setIsActive(data.isRunning);
-        if (data.timerEndsAt) {
-          const currentTime = Date.now();
-          const endTime = data.timerEndsAt;
-          const secondsLeft = Math.max(0, Math.floor((endTime - currentTime) / 1000));
-          setTimeLeft(secondsLeft);
-        }
-      });
-    }
-  }, [socket]);
+  const { isSocketConnected, updateTimer, resetTimer } = useTimerSocket({onGetTimerData});
   
   // Timer logic
   useEffect(() => {
+    if (!isSocketConnected) {
+      console.warn('WebSocket not connected.');
+      return;
+    }
     if (isActive && timeLeft > 0) {
       // Calculate end time if not already set
       if (timerEndTimeRef.current === null) {
@@ -88,6 +87,8 @@ export function useTimerState({ focusDuration, breakDuration }: UseTimerStatePro
     if (!isActive) {
       // Starting the timer - calculate end time
       timerEndTimeRef.current = Date.now() + timeLeft * 1000;
+      setIsActive(true);
+      setTimeLeft(timeLeft);
       updateTimer(timerEndTimeRef.current, mode, true);
       
       // Trigger start event
