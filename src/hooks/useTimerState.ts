@@ -41,7 +41,8 @@ export function useTimerState({ focusDuration, breakDuration }: UseTimerStatePro
     if (isActive && timeLeft > 0) {
       // Calculate end time if not already set
       if (timerEndTimeRef.current === null) {
-        timerEndTimeRef.current = Date.now() + timeLeft * 1000;
+        // Add an extra second to avoid skipping (compensate for processing time)
+        timerEndTimeRef.current = Date.now() + (timeLeft * 1000) + 1000; 
         // Send initial timer state to server
         updateTimer(timerEndTimeRef.current, mode, true);
         
@@ -85,8 +86,8 @@ export function useTimerState({ focusDuration, breakDuration }: UseTimerStatePro
   // Start/pause timer
   const toggleTimer = () => {
     if (!isActive) {
-      // Starting the timer - calculate end time
-      timerEndTimeRef.current = Date.now() + timeLeft * 1000;
+      // Starting the timer - calculate end time with an extra second
+      timerEndTimeRef.current = Date.now() + (timeLeft * 1000) + 1000;
       setIsActive(true);
       setTimeLeft(timeLeft);
       updateTimer(timerEndTimeRef.current, mode, true);
