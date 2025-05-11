@@ -11,7 +11,7 @@ export function useTimer() {
     focusDuration: settings.focusDuration,
     breakDuration: settings.breakDuration,
   });
-  const { playSound } = useTimerSound(settings.enableSound, settings.volume);
+  const { playSound } = useTimerSound(settings.enableSound, settings.volume, settings.alarmSound);
   const prevTimeLeftRef = useRef(timeLeft);
 
   // Handle timer completion

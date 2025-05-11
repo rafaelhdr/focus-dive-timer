@@ -8,6 +8,7 @@ interface TimerSettings {
   breakDuration: number; // in minutes
   enableSound: boolean;
   volume?: number; // Sound volume (0 to 1)
+  alarmSound?: string; // ID of the alarm sound
 }
 
 export function useTimerSettings() {
@@ -16,6 +17,7 @@ export function useTimerSettings() {
     breakDuration: 5,
     enableSound: true,
     volume: 1,
+    alarmSound: 'minimalistic',
   });
   const [isLoading, setIsLoading] = useState(false);
   const preferencesLoadedRef = useRef(false);
@@ -36,6 +38,7 @@ export function useTimerSettings() {
             ...prev,
             enableSound: preferences.focus_beep_enabled,
             volume: preferences.focus_beep_volume / 100, // Convert from 0-100 to 0-1
+            alarmSound: preferences.alarm_sound || 'minimalistic',
           };
           
           console.log('Updated settings:', updatedSettings);
@@ -55,13 +58,14 @@ export function useTimerSettings() {
   }, []);
   
   // Save sound preferences to API
-  const saveSoundSettings = useCallback(async (enableSound: boolean, volume: number) => {
+  const saveSoundSettings = useCallback(async (enableSound: boolean, volume: number, alarmSound: string = 'minimalistic') => {
     setIsLoading(true);
     try {
-      console.log('Saving sound settings:', { enableSound, volume });
+      console.log('Saving sound settings:', { enableSound, volume, alarmSound });
       const success = await savePreferences({
         focus_beep_enabled: enableSound,
         focus_beep_volume: Math.round(volume * 100), // Convert from 0-1 to 0-100
+        alarm_sound: alarmSound,
       });
       
       if (success) {
@@ -71,6 +75,7 @@ export function useTimerSettings() {
           ...prev,
           enableSound,
           volume,
+          alarmSound,
         }));
       } else {
         toast.error('Failed to save settings');

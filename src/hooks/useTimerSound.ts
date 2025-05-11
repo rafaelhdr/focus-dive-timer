@@ -1,12 +1,23 @@
 
 import { useRef, useEffect } from 'react';
 
-export function useTimerSound(enabled: boolean = true, volume: number = 1) {
+// Available alarm sounds
+const ALARM_SOUNDS = {
+  minimalistic: '/alarm-beeps/minimalistic.mp3',
+  wooden: '/alarm-beeps/wooden.mp3',
+  snappy: '/alarm-beeps/snappy.mp3',
+  level: '/alarm-beeps/level.mp3',
+};
+
+type AlarmSoundType = keyof typeof ALARM_SOUNDS;
+
+export function useTimerSound(enabled: boolean = true, volume: number = 1, soundType: string = 'minimalistic') {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
   // Initialize audio element
   useEffect(() => {
-    audioRef.current = new Audio('/alarm-beeps/minimalistic.mp3');
+    const soundPath = ALARM_SOUNDS[soundType as AlarmSoundType] || ALARM_SOUNDS.minimalistic;
+    audioRef.current = new Audio(soundPath);
     return () => {
       // Cleanup
       if (audioRef.current) {
@@ -14,7 +25,7 @@ export function useTimerSound(enabled: boolean = true, volume: number = 1) {
         audioRef.current = null;
       }
     };
-  }, []);
+  }, [soundType]);
   
   // Update volume when settings change
   useEffect(() => {
@@ -25,6 +36,7 @@ export function useTimerSound(enabled: boolean = true, volume: number = 1) {
   
   const playSound = () => {
     if (enabled && audioRef.current) {
+      audioRef.current.currentTime = 0;
       audioRef.current.play().catch(err => 
         console.error("Error playing sound:", err)
       );

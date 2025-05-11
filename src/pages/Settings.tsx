@@ -9,23 +9,40 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import ThemeToggle from '@/components/ThemeToggle';
 import Navigation from '@/components/Navigation';
 import { useTimer } from '@/hooks/useTimer';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
+const ALARM_SOUNDS = [
+  { id: 'minimalistic', name: 'Minimalistic', path: '/alarm-beeps/minimalistic.mp3' },
+  { id: 'wooden', name: 'Wooden', path: '/alarm-beeps/wooden.mp3' },
+  { id: 'snappy', name: 'Snappy', path: '/alarm-beeps/snappy.mp3' },
+  { id: 'level', name: 'Level', path: '/alarm-beeps/level.mp3' },
+];
 
 const Settings = () => {
   const { settings, updateSettings, saveSoundSettings, isLoading } = useTimer();
-  const { enableSound, volume = 1 } = settings;
+  const { enableSound, volume = 1, alarmSound = 'minimalistic' } = settings;
   const [currentVolume, setCurrentVolume] = useState(volume);
+  const [currentSound, setCurrentSound] = useState(alarmSound);
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
 
   // Initialize audio element
   React.useEffect(() => {
-    audioRef.current = new Audio('/alarm-beeps/minimalistic.mp3');
+    const selectedSound = ALARM_SOUNDS.find(s => s.id === currentSound) || ALARM_SOUNDS[0];
+    audioRef.current = new Audio(selectedSound.path);
     if (audioRef.current) {
       audioRef.current.volume = currentVolume;
     }
     
     // Sync local volume state with settings when they load
     setCurrentVolume(volume);
-  }, [volume]);
+    setCurrentSound(alarmSound);
+  }, [volume, alarmSound]);
 
   // Update audio volume when it changes
   React.useEffect(() => {
@@ -34,17 +51,25 @@ const Settings = () => {
     }
   }, [currentVolume]);
 
+  // Update audio source when sound changes
+  React.useEffect(() => {
+    const selectedSound = ALARM_SOUNDS.find(s => s.id === currentSound) || ALARM_SOUNDS[0];
+    if (audioRef.current) {
+      audioRef.current.src = selectedSound.path;
+    }
+  }, [currentSound]);
+
   const handleVolumeChange = (values: number[]) => {
     const newVolume = values[0];
     setCurrentVolume(newVolume);
   };
 
-  const handleSaveVolume = async () => {
-    await saveSoundSettings(enableSound, currentVolume);
+  const handleSaveSettings = async () => {
+    await saveSoundSettings(enableSound, currentVolume, currentSound);
   };
 
   const handleToggleSound = async (enabled: boolean) => {
-    await saveSoundSettings(enabled, currentVolume);
+    await saveSoundSettings(enabled, currentVolume, currentSound);
   };
 
   const playTestSound = () => {
@@ -92,6 +117,28 @@ const Settings = () => {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="alarm-sound" className="flex items-center gap-2">
+                  Alarm Sound
+                </Label>
+                <Select
+                  value={currentSound}
+                  onValueChange={setCurrentSound}
+                  disabled={!enableSound || isLoading}
+                >
+                  <SelectTrigger id="alarm-sound" className="w-full">
+                    <SelectValue placeholder="Select a sound" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ALARM_SOUNDS.map(sound => (
+                      <SelectItem key={sound.id} value={sound.id}>
+                        {sound.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="volume-slider" className="flex items-center gap-2">
                     {getVolumeIcon()} Volume
@@ -119,11 +166,11 @@ const Settings = () => {
                   Test Sound
                 </Button>
                 <Button 
-                  onClick={handleSaveVolume} 
+                  onClick={handleSaveSettings} 
                   className="flex-1"
-                  disabled={!enableSound || isLoading}
+                  disabled={isLoading}
                 >
-                  {isLoading ? 'Saving...' : 'Save Volume'}
+                  {isLoading ? 'Saving...' : 'Save Settings'}
                 </Button>
               </div>
             </CardContent>
