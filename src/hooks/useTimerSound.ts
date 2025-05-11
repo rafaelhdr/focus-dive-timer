@@ -6,7 +6,7 @@ export function useTimerSound(enabled: boolean = true, volume: number = 1) {
   
   // Initialize audio element
   useEffect(() => {
-    audioRef.current = new Audio('/beep.mp3');
+    audioRef.current = new Audio('/alarm-beeps/minimalistic.mp3');
     return () => {
       // Cleanup
       if (audioRef.current) {

@@ -18,7 +18,7 @@ const Settings = () => {
 
   // Initialize audio element
   React.useEffect(() => {
-    audioRef.current = new Audio('/beep.mp3');
+    audioRef.current = new Audio('/alarm-beeps/minimalistic.mp3');
     if (audioRef.current) {
       audioRef.current.volume = currentVolume;
     }
