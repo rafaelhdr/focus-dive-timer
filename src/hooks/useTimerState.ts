@@ -42,7 +42,9 @@ export function useTimerState({ focusDuration, breakDuration }: UseTimerStatePro
   // Update document title based on timer state
   useEffect(() => {
     if (isActive) {
-      document.title = `${formatTime(timeLeft)} FD`;
+      // Update to show remaining time followed by focus type (Focus/Break)
+      const focusType = mode === 'focus' ? 'Focus' : 'Break';
+      document.title = `${formatTime(timeLeft)} ${focusType}`;
     } else {
       document.title = 'Focus Dive';
     }
@@ -50,7 +52,7 @@ export function useTimerState({ focusDuration, breakDuration }: UseTimerStatePro
     return () => {
       document.title = 'Focus Dive'; // Reset title on unmount
     };
-  }, [isActive, timeLeft]);
+  }, [isActive, timeLeft, mode]);
   
   // Timer logic
   useEffect(() => {
