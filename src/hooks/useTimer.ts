@@ -7,7 +7,7 @@ import { useTimerSound } from './useTimerSound';
 
 export function useTimer() {
   const { settings, updateSettings, saveSoundSettings } = useTimerSettings();
-  const { isActive, mode, timeLeft, toggleTimer, resetTimer, toggleMode } = useTimerState({
+  const { isActive, mode, timeLeft, toggleTimer, resetTimer, toggleMode, formatTime } = useTimerState({
     focusDuration: settings.focusDuration,
     breakDuration: settings.breakDuration,
   });
@@ -29,13 +29,6 @@ export function useTimer() {
     
     prevTimeLeftRef.current = timeLeft;
   }, [timeLeft, mode, playSound]);
-
-  // Format time as MM:SS
-  const formatTime = (timeInSeconds: number): string => {
-    const minutes = Math.floor(timeInSeconds / 60);
-    const seconds = timeInSeconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  };
   
   return {
     isActive,

@@ -174,5 +174,6 @@ export function useTimerState({ focusDuration, breakDuration }: UseTimerStatePro
     toggleTimer,
     resetTimer: resetTimerHandler,
     toggleMode,
+    formatTime,
   };
 }

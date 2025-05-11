@@ -3,15 +3,25 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Clock, Settings, Link2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTimer } from '@/hooks/useTimer';
 
 const Navigation: React.FC = () => {
   const location = useLocation();
+  const { isActive, formattedTime, mode } = useTimer();
   
   return (
     <div className="fixed top-0 left-0 right-0 bg-background border-b border-border z-10">
       <div className="container max-w-4xl mx-auto flex justify-between items-center py-2">
         <div className="flex items-center">
-          <Link to="/" className="text-lg font-bold mr-4">Focus Dive</Link>
+          {isActive ? (
+            <div className="text-lg font-bold mr-4">
+              <span className={mode === 'focus' ? "text-primary" : "text-emerald-500"}>
+                {formattedTime} {mode === 'focus' ? 'Focus' : 'Break'}
+              </span>
+            </div>
+          ) : (
+            <Link to="/" className="text-lg font-bold mr-4">Focus Dive</Link>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <Link to="/">
