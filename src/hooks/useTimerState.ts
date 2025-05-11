@@ -32,6 +32,26 @@ export function useTimerState({ focusDuration, breakDuration }: UseTimerStatePro
   // Initialize WebSocket communication
   const { isSocketConnected, updateTimer, resetTimer } = useTimerSocket({onGetTimerData});
   
+  // Format time for display
+  const formatTime = (timeInSeconds: number): string => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = timeInSeconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
+  
+  // Update document title based on timer state
+  useEffect(() => {
+    if (isActive) {
+      document.title = `${formatTime(timeLeft)} FD`;
+    } else {
+      document.title = 'Focus Dive';
+    }
+    
+    return () => {
+      document.title = 'Focus Dive'; // Reset title on unmount
+    };
+  }, [isActive, timeLeft]);
+  
   // Timer logic
   useEffect(() => {
     if (!isSocketConnected) {
