@@ -72,7 +72,8 @@ const Login = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {currentStep === 'email' ? (
+          {/* Email Form - visible when currentStep is 'email', hidden otherwise */}
+          <div style={{ display: currentStep === 'email' ? 'block' : 'none' }}>
             <Form {...emailForm}>
               <form onSubmit={emailForm.handleSubmit(onEmailSubmit)} className="space-y-4">
                 <FormField
@@ -117,7 +118,10 @@ const Login = () => {
                 </Button>
               </form>
             </Form>
-          ) : (
+          </div>
+
+          {/* Verification Form - visible when currentStep is 'verification', hidden otherwise */}
+          <div style={{ display: currentStep === 'verification' ? 'block' : 'none' }}>
             <Form {...verificationForm}>
               <form onSubmit={verificationForm.handleSubmit(onVerificationSubmit)} className="space-y-4">
                 <FormField
@@ -166,7 +170,7 @@ const Login = () => {
                 </Button>
               </form>
             </Form>
-          )}
+          </div>
         </CardContent>
         <CardFooter className="flex justify-center text-sm text-muted-foreground">
           <p>We'll create an account for you if you don't have one.</p>
