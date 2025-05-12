@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Clock, Settings, Link2 } from 'lucide-react';
+import { Clock, Settings, Link2, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTimer } from '@/hooks/useTimer';
 
@@ -53,6 +53,16 @@ const Navigation: React.FC = () => {
             >
               <Settings className="h-4 w-4" />
               <span className="hidden sm:inline">Settings</span>
+            </Button>
+          </Link>
+          <Link to="/login">
+            <Button 
+              variant={location.pathname === '/login' ? 'default' : 'ghost'} 
+              size="sm"
+              className="gap-2"
+            >
+              <UserRound className="h-4 w-4" />
+              <span className="hidden sm:inline">Login</span>
             </Button>
           </Link>
         </div>
