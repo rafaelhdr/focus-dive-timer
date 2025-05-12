@@ -57,7 +57,8 @@ export const fetchPreferences = async (): Promise<Preferences> => {
     // Return default preferences if API call fails
     return {
       focus_beep_enabled: true,
-      focus_beep_volume: 100
+      focus_beep_volume: 100,
+      alarm_sound: 'minimalistic'
     };
   }
 };
