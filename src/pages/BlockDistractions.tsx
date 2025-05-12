@@ -5,22 +5,30 @@ import { checkSlackConnection } from '@/services/slackService';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle, Slack } from 'lucide-react';
+import { CheckCircle, Slack, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Navigation from '@/components/Navigation';
 import ThemeToggle from '@/components/ThemeToggle';
+import { useAuth } from '@/contexts/AuthContext';
+import { Link } from 'react-router-dom';
+import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
 
 const BlockDistractions = () => {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const { auth } = useAuth();
 
   useEffect(() => {
     const checkConnection = async () => {
       try {
         setIsLoading(true);
-        const connected = await checkSlackConnection();
-        setIsConnected(connected);
+        if (auth.isAuthenticated) {
+          const connected = await checkSlackConnection();
+          setIsConnected(connected);
+        } else {
+          setIsConnected(false);
+        }
       } catch (error) {
         console.error('Error checking Slack connection:', error);
         toast({
@@ -34,7 +42,7 @@ const BlockDistractions = () => {
     };
 
     checkConnection();
-  }, [toast]);
+  }, [toast, auth.isAuthenticated]);
 
   const handleSlackConnect = () => {
     window.location.href = SLACK_AUTH_URL;
@@ -46,7 +54,8 @@ const BlockDistractions = () => {
       
       <div className="pt-16 container max-w-4xl">
         <header className="mb-8 text-center relative w-full">
-          <div className="absolute right-0 top-0">
+          <div className="absolute right-0 top-0 flex items-center">
+            <IntegrationsInfoDialog />
             <ThemeToggle />
           </div>
           <h1 className="text-3xl font-bold mb-2">Block Distractions</h1>
@@ -54,6 +63,21 @@ const BlockDistractions = () => {
             Connect your Slack account to automatically update your status during focus sessions.
           </p>
         </header>
+
+        {!auth.isAuthenticated && (
+          <Alert className="mb-6 bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-900">
+            <Info className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <AlertTitle>Authentication Required</AlertTitle>
+            <AlertDescription className="flex flex-col gap-2">
+              <p>You need to be logged in to use the integrations.</p>
+              <Link to="/login" className="self-start">
+                <Button size="sm" variant="outline" className="mt-1">
+                  Go to Login
+                </Button>
+              </Link>
+            </AlertDescription>
+          </Alert>
+        )}
 
         <Card className="mb-8">
           <CardHeader>
@@ -81,10 +105,19 @@ const BlockDistractions = () => {
             ) : (
               <div className="text-center py-4">
                 <p className="mb-4">Connect your Slack account to enable automatic status updates.</p>
-                <Button onClick={handleSlackConnect} className="gap-2">
+                <Button 
+                  onClick={handleSlackConnect} 
+                  className="gap-2" 
+                  disabled={!auth.isAuthenticated}
+                >
                   <Slack className="h-4 w-4" />
                   Connect to Slack
                 </Button>
+                {!auth.isAuthenticated && (
+                  <p className="text-sm text-muted-foreground mt-3">
+                    Please login to enable this integration
+                  </p>
+                )}
               </div>
             )}
           </CardContent>
