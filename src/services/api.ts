@@ -1,4 +1,6 @@
+
 import { API_URL } from '@/config/env';
+import { getAccessToken, addAuthHeader } from './authApi';
 
 export interface Preferences {
   focus_beep_enabled: boolean;
@@ -17,10 +19,18 @@ const getSessionId = (): string => {
 
 // Common headers for all API requests
 const getCommonHeaders = () => {
-  return {
+  const headers = {
     'Content-Type': 'application/json',
     'X-Session-ID': getSessionId(),
   };
+  
+  // Add auth header if user is logged in
+  const accessToken = getAccessToken();
+  if (accessToken) {
+    headers['Authorization'] = `Bearer ${accessToken}`;
+  }
+  
+  return headers;
 };
 
 export const fetchPreferences = async (): Promise<Preferences> => {
@@ -73,7 +83,7 @@ export const savePreferences = async (preferences: Preferences): Promise<boolean
   }
 };
 
-// New function to trigger timer events on the server
+// Trigger timer events on the server
 export const triggerTimerEvent = async (
   action: 'start' | 'stop',
   type: 'focus' | 'relax'

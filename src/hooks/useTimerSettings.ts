@@ -38,7 +38,8 @@ export function useTimerSettings() {
             ...prev,
             enableSound: preferences.focus_beep_enabled,
             volume: preferences.focus_beep_volume / 100, // Convert from 0-100 to 0-1
-            alarmSound: preferences.alarm_sound || 'minimalistic',
+            // Use previous alarm sound if not provided in preferences
+            alarmSound: prev.alarmSound || 'minimalistic',
           };
           
           console.log('Updated settings:', updatedSettings);
@@ -65,7 +66,6 @@ export function useTimerSettings() {
       const success = await savePreferences({
         focus_beep_enabled: enableSound,
         focus_beep_volume: Math.round(volume * 100), // Convert from 0-1 to 0-100
-        alarm_sound: alarmSound,
       });
       
       if (success) {
