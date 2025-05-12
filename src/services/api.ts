@@ -5,6 +5,7 @@ import { getAccessToken, addAuthHeader } from './authApi';
 export interface Preferences {
   focus_beep_enabled: boolean;
   focus_beep_volume: number;
+  alarm_sound: string;
 }
 
 // Function to get or create a session ID
