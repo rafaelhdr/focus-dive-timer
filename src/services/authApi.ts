@@ -108,15 +108,17 @@ export const getAccessToken = (): string | null => {
 };
 
 // Store authentication tokens
-export const storeAuthTokens = (accessToken: string, refreshToken: string): void => {
+export const storeAuthTokens = (accessToken: string, refreshToken: string, email: string): void => {
   localStorage.setItem('focus_dive_access_token', accessToken);
   localStorage.setItem('focus_dive_refresh_token', refreshToken);
+  localStorage.setItem('focus_dive_user_email', email);
 };
 
 // Clear authentication tokens
 export const clearAuthTokens = (): void => {
   localStorage.removeItem('focus_dive_access_token');
   localStorage.removeItem('focus_dive_refresh_token');
+  localStorage.removeItem('focus_dive_user_email');
 };
 
 // Add authorization header to requests
@@ -127,4 +129,3 @@ export const addAuthHeader = (headers: Record<string, string>): Record<string, s
   }
   return headers;
 };
-

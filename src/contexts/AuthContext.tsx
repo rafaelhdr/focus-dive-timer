@@ -73,7 +73,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const response = await verifyToken(email, token);
       if (response.success && response.access_token && response.refresh_token) {
-        storeAuthTokens(response.access_token, response.refresh_token);
+        storeAuthTokens(response.access_token, response.refresh_token, email);
         setAuth({
           isAuthenticated: true,
           accessToken: response.access_token,
@@ -122,4 +122,3 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
-

@@ -1,13 +1,24 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Clock, Settings, Link2, UserRound } from 'lucide-react';
+import { Clock, Settings, Link2, UserRound, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTimer } from '@/hooks/useTimer';
+import { useAuth } from '@/contexts/AuthContext';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const Navigation: React.FC = () => {
   const location = useLocation();
   const { isActive, formattedTime, mode } = useTimer();
+  const { auth, logout } = useAuth();
   const showTimer = location.pathname !== '/' && isActive;
   
   return (
@@ -55,16 +66,46 @@ const Navigation: React.FC = () => {
               <span className="hidden sm:inline">Settings</span>
             </Button>
           </Link>
-          <Link to="/login">
-            <Button 
-              variant={location.pathname === '/login' ? 'default' : 'ghost'} 
-              size="sm"
-              className="gap-2"
-            >
-              <UserRound className="h-4 w-4" />
-              <span className="hidden sm:inline">Login</span>
-            </Button>
-          </Link>
+          
+          {auth.isAuthenticated ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-primary text-primary-foreground">
+                      <UserRound className="h-4 w-4" />
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem disabled className="flex justify-between">
+                  <span>Email</span>
+                  <span className="text-muted-foreground text-xs">
+                    {localStorage.getItem('focus_dive_user_email') || 'User'}
+                  </span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={logout} className="text-red-500 cursor-pointer">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link to="/login">
+              <Button 
+                variant={location.pathname === '/login' ? 'default' : 'ghost'} 
+                size="sm"
+                className="gap-2"
+              >
+                <UserRound className="h-4 w-4" />
+                <span className="hidden sm:inline">Login</span>
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     </div>
