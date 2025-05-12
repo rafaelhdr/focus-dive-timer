@@ -41,6 +41,7 @@ export const loginWithEmail = async (email: string): Promise<AuthLoginResponse> 
       method: 'POST',
       headers: getCommonHeaders(),
       body: JSON.stringify({ email }),
+      credentials: 'include',
     });
     
     const data = await response.json();
@@ -71,6 +72,7 @@ export const verifyToken = async (email: string, token: string): Promise<AuthVer
       method: 'POST',
       headers: getCommonHeaders(),
       body: JSON.stringify({ email, token }),
+      credentials: 'include',
     });
     
     const data = await response.json();
