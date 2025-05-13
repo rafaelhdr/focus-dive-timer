@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import { Mail, ArrowRight, Loader2 } from 'lucide-react';
+import { Mail, ArrowRight, Loader2, ArrowLeft } from 'lucide-react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -64,6 +64,12 @@ const Login = () => {
     <div className="flex min-h-screen items-center justify-center px-4 py-12">
       <Card className="w-full max-w-md">
         <CardHeader>
+          <Link to="/" className="absolute left-4 top-4">
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <ArrowLeft className="h-4 w-4" />
+              <span className="sr-only">Back to Timer</span>
+            </Button>
+          </Link>
           <CardTitle>Sign in to Focus Dive</CardTitle>
           <CardDescription>
             {currentStep === 'email'
