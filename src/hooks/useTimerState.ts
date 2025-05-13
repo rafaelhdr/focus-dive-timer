@@ -19,7 +19,7 @@ export function useTimerState({ focusDuration, breakDuration }: UseTimerStatePro
   const timerEndTimeRef = useRef<number | null>(null);
 
   const onGetTimerData = (data: TimerData) => {
-    setMode(data.mode);
+    if (data.mode !== null) setMode(data.mode);
     setIsActive(data.isRunning);
     if (data.timerEndsAt) {
       const currentTime = Date.now();
