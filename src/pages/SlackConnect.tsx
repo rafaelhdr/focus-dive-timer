@@ -6,10 +6,12 @@ import { API_URL } from '@/config/env';
 import { Button } from '@/components/ui/button';
 import { Home } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { useAuth } from '@/contexts/AuthContext';
 
 const SlackConnect = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { auth } = useAuth();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('Connecting to Slack...');
 
@@ -39,13 +41,20 @@ const SlackConnect = () => {
           return;
         }
 
-        // Send the code to our backend
+        // Send the code to our backend with proper authorization header
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+          'X-Session-ID': localStorage.getItem('focus_dive_session_id') || '',
+        };
+
+        // Add Authorization header if user is authenticated
+        if (auth.accessToken) {
+          headers['Authorization'] = `Bearer ${auth.accessToken}`;
+        }
+
         const response = await fetch(`${API_URL}/slack/connect`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Session-ID': localStorage.getItem('focus_dive_session_id') || '',
-          },
+          headers,
           body: JSON.stringify({ code }),
           credentials: 'include',
         });
@@ -73,7 +82,7 @@ const SlackConnect = () => {
     };
 
     connectToSlack();
-  }, [toast]);
+  }, [toast, auth.accessToken]);
 
   return (
     <div className="h-screen flex flex-col items-center justify-center p-4">

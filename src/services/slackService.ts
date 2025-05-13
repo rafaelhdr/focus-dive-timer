@@ -1,5 +1,6 @@
 
 import { API_URL } from "@/config/env";
+import { getAccessToken } from "./authApi";
 
 /**
  * Check if the user is connected to Slack
@@ -7,11 +8,19 @@ import { API_URL } from "@/config/env";
  */
 export const checkSlackConnection = async (): Promise<boolean> => {
   try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'X-Session-ID': localStorage.getItem('focus_dive_session_id') || '',
+    };
+    
+    // Add Authorization header if user is authenticated
+    const accessToken = getAccessToken();
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+
     const response = await fetch(`${API_URL}/slack/status`, {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Session-ID': localStorage.getItem('focus_dive_session_id') || '',
-      },
+      headers,
       credentials: 'include',
     });
 
