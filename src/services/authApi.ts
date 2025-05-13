@@ -1,4 +1,3 @@
-
 import { API_URL } from '@/config/env';
 
 // Types for auth responses
@@ -92,6 +91,38 @@ export const verifyToken = async (email: string, token: string): Promise<AuthVer
     return {
       success: false,
       message: error.message || 'Failed to verify token',
+    };
+  }
+};
+
+// Refresh access token using refresh token
+export const refreshAccessToken = async (refreshToken: string): Promise<AuthVerifyResponse> => {
+  try {
+    console.log('Refreshing access token');
+    const response = await fetch(`${API_URL}/auth/refresh-token`, {
+      method: 'POST',
+      headers: getCommonHeaders(),
+      body: JSON.stringify({ refresh_token: refreshToken }),
+      credentials: 'include',
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to refresh token');
+    }
+    
+    console.log('Token refresh successful');
+    return {
+      success: true,
+      access_token: data.access_token,
+      refresh_token: data.refresh_token || refreshToken, // Use new refresh token if provided
+    };
+  } catch (error: any) {
+    console.error('Token refresh failed:', error);
+    return {
+      success: false,
+      message: error.message || 'Failed to refresh token',
     };
   }
 };
