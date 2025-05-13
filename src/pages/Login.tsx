@@ -64,12 +64,6 @@ const Login = () => {
     <div className="flex min-h-screen items-center justify-center px-4 py-12">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <Link to="/" className="absolute left-4 top-4">
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <ArrowLeft className="h-4 w-4" />
-              <span className="sr-only">Back to Timer</span>
-            </Button>
-          </Link>
           <CardTitle>Sign in to Focus Dive</CardTitle>
           <CardDescription>
             {currentStep === 'email'
@@ -178,8 +172,14 @@ const Login = () => {
             </Form>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-center text-sm text-muted-foreground">
-          <p>We'll create an account for you if you don't have one.</p>
+        <CardFooter className="flex flex-col gap-4">
+          <p className="text-sm text-muted-foreground">We'll create an account for you if you don't have one.</p>
+          <Link to="/" className="w-full">
+            <Button variant="outline" className="w-full">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Timer
+            </Button>
+          </Link>
         </CardFooter>
       </Card>
     </div>
