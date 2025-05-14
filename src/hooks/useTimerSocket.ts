@@ -1,8 +1,8 @@
-
 import { useEffect, useRef, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { API_URL } from '@/config/env';
 import { TimerData } from './types';
+import { getAccessToken } from '@/services/authApi';
 
 export function useTimerSocket({
     onGetTimerData,
@@ -13,10 +13,19 @@ export function useTimerSocket({
   // Initialize socket connection
   useEffect(() => {
     if (socketInitializedRef.current) return;
-
+    
+    // Get authentication token
+    const accessToken = getAccessToken();
+    
     console.log('Initializing WebSocket connection to:', `${API_URL}/timer`);
     socketRef.current = io(`${API_URL}/timer`, {
       withCredentials: true,
+      auth: {
+        token: accessToken
+      },
+      extraHeaders: {
+        Authorization: accessToken ? `Bearer ${accessToken}` : ''
+      }
     });
 
     socketRef.current.on('connect', () => {
