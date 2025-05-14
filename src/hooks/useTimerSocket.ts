@@ -20,11 +20,8 @@ export function useTimerSocket({
     console.log('Initializing WebSocket connection to:', `${API_URL}/timer`);
     socketRef.current = io(`${API_URL}/timer`, {
       withCredentials: true,
-      auth: {
+      query: {
         token: accessToken
-      },
-      extraHeaders: {
-        Authorization: accessToken ? `Bearer ${accessToken}` : ''
       }
     });
 
