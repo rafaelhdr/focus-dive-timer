@@ -82,7 +82,6 @@ const Navigation: React.FC = () => {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem disabled className="flex justify-between">
-                  <span>Email</span>
                   <span className="text-muted-foreground text-xs">
                     {localStorage.getItem('focus_dive_user_email') || 'User'}
                   </span>
