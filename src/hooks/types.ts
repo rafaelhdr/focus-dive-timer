@@ -6,5 +6,5 @@ export interface TimerData {
 
   // Optional properties
   remainingTime?: number;  // in seconds
-  timerEndsAt?: number;    // TODO
+  timerEndsAt?: number;    // Timestamp when timer will end
 }

@@ -1,4 +1,3 @@
-
 import { API_URL } from '@/config/env';
 import { getAccessToken, addAuthHeader } from './authApi';
 
@@ -67,7 +66,7 @@ export const fetchPreferences = async (): Promise<Preferences> => {
   }
 };
 
-export const savePreferences = async (preferences: Preferences): Promise<boolean> => {
+export const savePreferences = async (preferences: Partial<Preferences>): Promise<boolean> => {
   try {
     console.log('Saving preferences to:', `${API_URL}/preferences`, preferences);
     const response = await fetch(`${API_URL}/preferences`, {
