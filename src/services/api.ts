@@ -6,6 +6,8 @@ export interface Preferences {
   focus_beep_enabled: boolean;
   focus_beep_volume: number;
   alarm_sound: string;
+  autostart_break?: boolean;
+  autostart_focus?: boolean;
 }
 
 // Function to get or create a session ID
@@ -58,7 +60,9 @@ export const fetchPreferences = async (): Promise<Preferences> => {
     return {
       focus_beep_enabled: true,
       focus_beep_volume: 100,
-      alarm_sound: 'minimalistic'
+      alarm_sound: 'minimalistic',
+      autostart_break: true,
+      autostart_focus: true
     };
   }
 };

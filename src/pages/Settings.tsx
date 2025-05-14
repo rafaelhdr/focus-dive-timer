@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
-import { Volume2, Volume, VolumeX } from 'lucide-react';
+import { Volume2, Volume, VolumeX, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import ThemeToggle from '@/components/ThemeToggle';
 import Navigation from '@/components/Navigation';
 import { useTimer } from '@/hooks/useTimer';
@@ -25,10 +26,19 @@ const ALARM_SOUNDS = [
 ];
 
 const Settings = () => {
-  const { settings, updateSettings, saveSoundSettings, isLoading } = useTimer();
-  const { enableSound, volume = 1, alarmSound = 'minimalistic' } = settings;
+  const { settings, updateSettings, saveSoundSettings, saveTimerSettings, isLoading } = useTimer();
+  const { 
+    enableSound, 
+    volume = 1, 
+    alarmSound = 'minimalistic',
+    autostartBreak = true,
+    autostartFocus = true 
+  } = settings;
+  
   const [currentVolume, setCurrentVolume] = useState(volume);
   const [currentSound, setCurrentSound] = useState(alarmSound);
+  const [currentAutostartBreak, setCurrentAutostartBreak] = useState(autostartBreak);
+  const [currentAutostartFocus, setCurrentAutostartFocus] = useState(autostartFocus);
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
 
   // Initialize audio element
@@ -39,10 +49,12 @@ const Settings = () => {
       audioRef.current.volume = currentVolume;
     }
     
-    // Sync local volume state with settings when they load
+    // Sync local state with settings when they load
     setCurrentVolume(volume);
     setCurrentSound(alarmSound);
-  }, [volume, alarmSound]);
+    setCurrentAutostartBreak(autostartBreak);
+    setCurrentAutostartFocus(autostartFocus);
+  }, [volume, alarmSound, autostartBreak, autostartFocus]);
 
   // Update audio volume when it changes
   React.useEffect(() => {
@@ -70,6 +82,10 @@ const Settings = () => {
 
   const handleToggleSound = async (enabled: boolean) => {
     await saveSoundSettings(enabled, currentVolume, currentSound);
+  };
+
+  const handleSaveTimerSettings = async () => {
+    await saveTimerSettings(currentAutostartBreak, currentAutostartFocus);
   };
 
   const playTestSound = () => {
@@ -173,6 +189,47 @@ const Settings = () => {
                   {isLoading ? 'Saving...' : 'Save Settings'}
                 </Button>
               </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl flex items-center gap-2">
+                <Clock className="h-5 w-5" /> Timer Settings
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="autostart-break" 
+                  checked={currentAutostartBreak}
+                  onCheckedChange={(checked) => setCurrentAutostartBreak(checked === true)}
+                  disabled={isLoading}
+                />
+                <Label htmlFor="autostart-break" className="cursor-pointer">
+                  Autostart break when focus finishes
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="autostart-focus" 
+                  checked={currentAutostartFocus}
+                  onCheckedChange={(checked) => setCurrentAutostartFocus(checked === true)}
+                  disabled={isLoading}
+                />
+                <Label htmlFor="autostart-focus" className="cursor-pointer">
+                  Autostart focus when break finishes
+                </Label>
+              </div>
+              
+              <Button 
+                onClick={handleSaveTimerSettings} 
+                className="w-full"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Saving...' : 'Save Timer Settings'}
+              </Button>
             </CardContent>
           </Card>
         </div>

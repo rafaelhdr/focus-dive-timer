@@ -9,9 +9,16 @@ type TimerMode = 'focus' | 'break';
 interface UseTimerStateProps {
   focusDuration: number;
   breakDuration: number;
+  autostartBreak?: boolean;
+  autostartFocus?: boolean;
 }
 
-export function useTimerState({ focusDuration, breakDuration }: UseTimerStateProps) {
+export function useTimerState({ 
+  focusDuration, 
+  breakDuration,
+  autostartBreak = true,
+  autostartFocus = true
+}: UseTimerStateProps) {
   const [isActive, setIsActive] = useState(false);
   const [mode, setMode] = useState<TimerMode>('focus');
   const [timeLeft, setTimeLeft] = useState(focusDuration * 60); // default in seconds

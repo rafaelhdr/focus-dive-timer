@@ -6,10 +6,12 @@ import { useTimerSettings } from './useTimerSettings';
 import { useTimerSound } from './useTimerSound';
 
 export function useTimer() {
-  const { settings, updateSettings, saveSoundSettings } = useTimerSettings();
+  const { settings, updateSettings, saveSoundSettings, saveTimerSettings } = useTimerSettings();
   const { isActive, mode, timeLeft, toggleTimer, resetTimer, toggleMode, formatTime } = useTimerState({
     focusDuration: settings.focusDuration,
     breakDuration: settings.breakDuration,
+    autostartBreak: settings.autostartBreak,
+    autostartFocus: settings.autostartFocus,
   });
   const { playSound } = useTimerSound(settings.enableSound, settings.volume, settings.alarmSound);
   const prevTimeLeftRef = useRef(timeLeft);
@@ -23,12 +25,19 @@ export function useTimer() {
       // Notify the user
       const nextMode = mode === 'focus' ? 'break' : 'focus';
       toast(`Time's up! ${nextMode === 'focus' ? 'Focus time' : 'Break time'} started.`);
-      toggleTimer();
-      toggleMode();
+      
+      // Auto-toggle to next mode based on settings
+      if ((mode === 'focus' && settings.autostartBreak) || (mode === 'break' && settings.autostartFocus)) {
+        toggleTimer();
+        toggleMode();
+      } else {
+        // Just toggle mode without starting the timer
+        toggleMode();
+      }
     }
     
     prevTimeLeftRef.current = timeLeft;
-  }, [timeLeft, mode, playSound]);
+  }, [timeLeft, mode, playSound, settings.autostartBreak, settings.autostartFocus]);
   
   return {
     isActive,
@@ -42,5 +51,6 @@ export function useTimer() {
     toggleMode,
     updateSettings,
     saveSoundSettings,
+    saveTimerSettings,
   };
 }

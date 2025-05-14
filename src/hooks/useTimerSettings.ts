@@ -9,6 +9,8 @@ interface TimerSettings {
   enableSound: boolean;
   volume?: number; // Sound volume (0 to 1)
   alarmSound?: string; // ID of the alarm sound
+  autostartBreak: boolean; // Autostart break after focus
+  autostartFocus: boolean; // Autostart focus after break
 }
 
 export function useTimerSettings() {
@@ -18,6 +20,8 @@ export function useTimerSettings() {
     enableSound: true,
     volume: 1,
     alarmSound: 'minimalistic',
+    autostartBreak: true,
+    autostartFocus: true,
   });
   const [isLoading, setIsLoading] = useState(false);
   const preferencesLoadedRef = useRef(false);
@@ -39,6 +43,8 @@ export function useTimerSettings() {
             enableSound: preferences.focus_beep_enabled,
             volume: preferences.focus_beep_volume / 100, // Convert from 0-100 to 0-1
             alarmSound: prev.alarmSound || 'minimalistic',
+            autostartBreak: preferences.autostart_break !== undefined ? preferences.autostart_break : true,
+            autostartFocus: preferences.autostart_focus !== undefined ? preferences.autostart_focus : true,
           };
           
           console.log('Updated settings:', updatedSettings);
@@ -87,6 +93,35 @@ export function useTimerSettings() {
       setIsLoading(false);
     }
   }, []);
+
+  // Save autostart preferences
+  const saveTimerSettings = useCallback(async (autostartBreak: boolean, autostartFocus: boolean) => {
+    setIsLoading(true);
+    try {
+      console.log('Saving timer settings:', { autostartBreak, autostartFocus });
+      const success = await savePreferences({
+        autostart_break: autostartBreak,
+        autostart_focus: autostartFocus,
+      });
+      
+      if (success) {
+        toast.success('Timer settings saved');
+        // Update local settings to ensure consistency
+        setSettings(prev => ({
+          ...prev,
+          autostartBreak,
+          autostartFocus,
+        }));
+      } else {
+        toast.error('Failed to save settings');
+      }
+    } catch (error) {
+      toast.error('Error saving settings');
+      console.error('Error saving timer settings:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
   
   // Update timer settings
   const updateSettings = (newSettings: Partial<TimerSettings>) => {
@@ -98,5 +133,6 @@ export function useTimerSettings() {
     isLoading,
     updateSettings,
     saveSoundSettings,
+    saveTimerSettings,
   };
 }
