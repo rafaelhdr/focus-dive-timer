@@ -8,6 +8,8 @@ import { triggerTimerEvent } from "@/services/api";
 import { toast } from "sonner";
 import { useSettingsStore } from "./settingsStore";
 
+const TEST_TIMER = false; // Set to true for testing purposes
+
 interface TimerState {
   // Timer state
   isActive: boolean;
@@ -36,9 +38,10 @@ const getDurationInSeconds = (
   mode: "focus" | "break",
 ): number => {
   const { settings } = useSettingsStore.getState();
+  const toMinutesMultiplier = TEST_TIMER ? 1 : 60;
   return mode === "focus"
-    ? settings.focusDuration * 60
-    : settings.breakDuration * 60;
+    ? settings.focusDuration * toMinutesMultiplier
+    : settings.breakDuration * toMinutesMultiplier;
 };
 
 // Create the Zustand store
@@ -50,7 +53,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
     // Initial state
     isActive: false,
     mode: "focus",
-    timeLeft: 25 * 60, // Default: 25 minutes in seconds
+    timeLeft: 25 * (TEST_TIMER ? 1 : 60), // Default to 25 minutes in seconds
     timerEndTime: null,
     
     // Socket state
