@@ -1,24 +1,26 @@
 
 import { useEffect, useRef } from "react";
 import { useTimerStore as useTimerStoreRaw } from "@/store/timerStore";
+import { useSettingsStore } from "@/store/settingsStore";
 
-// Custom hook to initialize the timer store and provide access to it
+// Custom hook to initialize both timer stores and provide access to them
 export function useTimerStore() {
   const isInitialized = useRef(false);
   
-  // Select all the parts of the store we need
-  const store = useTimerStoreRaw(state => state);
+  // Select all the parts of the stores we need
+  const timerStore = useTimerStoreRaw(state => state);
+  const settingsStore = useSettingsStore(state => state);
   
-  // Initialize the store on first render
+  // Initialize the stores on first render
   useEffect(() => {
     if (!isInitialized.current) {
-      console.log("Initializing timer store...");
+      console.log("Initializing timer stores...");
       
       // Initialize WebSocket connection
-      store.initSocket();
+      timerStore.initSocket();
       
       // Load settings from API
-      store.loadSettings();
+      settingsStore.loadSettings();
       
       isInitialized.current = true;
     }
@@ -29,5 +31,13 @@ export function useTimerStore() {
     };
   }, []);
   
-  return store;
+  // Return combined timer store and settings store
+  return {
+    ...timerStore,
+    settings: settingsStore.settings,
+    isLoading: settingsStore.isLoading,
+    updateSettings: settingsStore.updateSettings,
+    saveSoundSettings: settingsStore.saveSoundSettings,
+    saveTimerSettings: settingsStore.saveTimerSettings,
+  };
 }

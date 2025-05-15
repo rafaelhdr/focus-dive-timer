@@ -4,18 +4,9 @@ import { io, Socket } from "socket.io-client";
 import { API_URL } from "@/config/env";
 import { TimerData } from "@/hooks/types";
 import { getAccessToken } from "@/services/authApi";
-import { triggerTimerEvent, fetchPreferences, savePreferences } from "@/services/api";
+import { triggerTimerEvent } from "@/services/api";
 import { toast } from "sonner";
-
-interface TimerSettings {
-  focusDuration: number; // in minutes
-  breakDuration: number; // in minutes
-  enableSound: boolean;
-  volume: number; // Sound volume (0 to 1)
-  alarmSound: string; // ID of the alarm sound
-  autostartBreak: boolean; // Autostart break after focus
-  autostartFocus: boolean; // Autostart focus after break
-}
+import { useSettingsStore } from "./settingsStore";
 
 interface TimerState {
   // Timer state
@@ -23,10 +14,6 @@ interface TimerState {
   mode: "focus" | "break";
   timeLeft: number; // in seconds
   timerEndTime: number | null;
-
-  // Settings
-  settings: TimerSettings;
-  isLoading: boolean;
 
   // Socket state
   socket: Socket | null;
@@ -37,12 +24,6 @@ interface TimerState {
   resetTimer: () => void;
   toggleMode: () => void;
   formatTime: (timeInSeconds: number) => string;
-
-  // Methods for settings
-  updateSettings: (newSettings: Partial<TimerSettings>) => void;
-  saveSoundSettings: (enableSound: boolean, volume: number, alarmSound: string) => Promise<void>;
-  saveTimerSettings: (autostartBreak: boolean, autostartFocus: boolean) => Promise<void>;
-  loadSettings: () => Promise<void>;
   
   // Socket methods
   initSocket: () => void;
@@ -50,11 +31,11 @@ interface TimerState {
   resetTimerOnServer: () => void;
 }
 
-// Helper function to get the duration based on the current mode
+// Helper function to get the duration based on the current mode from settings
 const getDurationInSeconds = (
   mode: "focus" | "break",
-  settings: TimerSettings
 ): number => {
+  const { settings } = useSettingsStore.getState();
   return mode === "focus"
     ? settings.focusDuration * 60
     : settings.breakDuration * 60;
@@ -71,18 +52,6 @@ export const useTimerStore = create<TimerState>((set, get) => {
     mode: "focus",
     timeLeft: 25 * 60, // Default: 25 minutes in seconds
     timerEndTime: null,
-    
-    // Settings with defaults
-    settings: {
-      focusDuration: 25,
-      breakDuration: 5,
-      enableSound: true,
-      volume: 1,
-      alarmSound: "minimalistic",
-      autostartBreak: true,
-      autostartFocus: true,
-    },
-    isLoading: false,
     
     // Socket state
     socket: null,
@@ -181,10 +150,13 @@ export const useTimerStore = create<TimerState>((set, get) => {
                     intervalRef = null;
                   }
                   
+                  // Get settings for sound and autostart
+                  const { settings } = useSettingsStore.getState();
+                  
                   // Play sound if enabled
-                  if (state.settings.enableSound) {
-                    const audioElement = new Audio(`/alarm-beeps/${state.settings.alarmSound}.mp3`);
-                    audioElement.volume = state.settings.volume;
+                  if (settings.enableSound) {
+                    const audioElement = new Audio(`/alarm-beeps/${settings.alarmSound}.mp3`);
+                    audioElement.volume = settings.volume;
                     audioElement.play().catch(err => console.error("Error playing sound:", err));
                   }
                   
@@ -195,11 +167,11 @@ export const useTimerStore = create<TimerState>((set, get) => {
                   toast(`Time's up! ${nextMode === "focus" ? "Focus time" : "Break time"} started.`);
                   
                   // Handle auto-switching based on settings
-                  if ((state.mode === "focus" && state.settings.autostartBreak) || 
-                      (state.mode === "break" && state.settings.autostartFocus)) {
+                  if ((state.mode === "focus" && settings.autostartBreak) || 
+                      (state.mode === "break" && settings.autostartFocus)) {
                     // Auto-start the next timer
                     const newMode = nextMode;
-                    const newDuration = getDurationInSeconds(newMode, state.settings);
+                    const newDuration = getDurationInSeconds(newMode);
                     const newEndTime = Date.now() + newDuration * 1000 + 1000; // Add 1s buffer
                     
                     // Update state
@@ -236,7 +208,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
                   } else {
                     // Just switch mode without starting timer
                     const newMode = nextMode;
-                    const newDuration = getDurationInSeconds(newMode, state.settings);
+                    const newDuration = getDurationInSeconds(newMode);
                     
                     set({ 
                       mode: newMode,
@@ -253,7 +225,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
             }
           } else {
             // If no end time is provided, just set the default duration
-            const duration = getDurationInSeconds(data.mode || "focus", get().settings);
+            const duration = getDurationInSeconds(data.mode || "focus");
             set({ timeLeft: duration });
           }
         });
@@ -420,7 +392,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
       }
       
       // Calculate new duration based on current mode
-      const newDuration = getDurationInSeconds(state.mode, state.settings);
+      const newDuration = getDurationInSeconds(state.mode);
       
       // Update state
       set({
@@ -456,7 +428,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
       const newMode = state.mode === "focus" ? "break" : "focus";
       
       // Calculate new duration
-      const newDuration = getDurationInSeconds(newMode, state.settings);
+      const newDuration = getDurationInSeconds(newMode);
       
       // Update state
       set({
@@ -472,132 +444,5 @@ export const useTimerStore = create<TimerState>((set, get) => {
       // Update server
       get().updateTimerOnServer(null, newMode, false);
     },
-    
-    // Update settings
-    updateSettings: (newSettings) => {
-      set((state) => ({
-        settings: {
-          ...state.settings,
-          ...newSettings,
-        }
-      }));
-      
-      // If we update duration settings, also update timeLeft if timer is not active
-      const state = get();
-      if (!state.isActive) {
-        const newDuration = getDurationInSeconds(state.mode, {
-          ...state.settings,
-          ...newSettings,
-        });
-        set({ timeLeft: newDuration });
-      }
-    },
-    
-    // Load settings from API
-    loadSettings: async () => {
-      set({ isLoading: true });
-      
-      try {
-        console.log("Loading preferences from API...");
-        const preferences = await fetchPreferences();
-        console.log("Got preferences:", preferences);
-        
-        set((state) => ({
-          settings: {
-            ...state.settings,
-            enableSound: preferences.focus_beep_enabled,
-            volume: preferences.focus_beep_volume / 100, // Convert from 0-100 to 0-1
-            alarmSound: state.settings.alarmSound || "minimalistic",
-            autostartBreak: preferences.autostart_break !== undefined 
-              ? preferences.autostart_break 
-              : true,
-            autostartFocus: preferences.autostart_focus !== undefined 
-              ? preferences.autostart_focus 
-              : true,
-          }
-        }));
-      } catch (error) {
-        console.error("Failed to load preferences:", error);
-        toast.error("Failed to load preferences");
-      } finally {
-        set({ isLoading: false });
-      }
-    },
-    
-    // Save sound settings to API
-    saveSoundSettings: async (enableSound, volume, alarmSound) => {
-      set({ isLoading: true });
-      
-      try {
-        console.log("Saving sound settings:", { enableSound, volume, alarmSound });
-        const success = await savePreferences({
-          focus_beep_enabled: enableSound,
-          focus_beep_volume: Math.round(volume * 100), // Convert from 0-1 to 0-100
-          alarm_sound: alarmSound,
-          // Include autostart settings from current state to avoid overwriting them
-          autostart_break: get().settings.autostartBreak,
-          autostart_focus: get().settings.autostartFocus
-        });
-        
-        if (success) {
-          toast.success("Sound settings saved");
-          
-          // Update local settings to ensure consistency
-          set((state) => ({
-            settings: {
-              ...state.settings,
-              enableSound,
-              volume,
-              alarmSound,
-            }
-          }));
-        } else {
-          toast.error("Failed to save settings");
-        }
-      } catch (error) {
-        toast.error("Error saving settings");
-        console.error("Error saving sound settings:", error);
-      } finally {
-        set({ isLoading: false });
-      }
-    },
-    
-    // Save timer settings to API
-    saveTimerSettings: async (autostartBreak, autostartFocus) => {
-      set({ isLoading: true });
-      
-      try {
-        console.log("Saving timer settings:", { autostartBreak, autostartFocus });
-        const success = await savePreferences({
-          // Include current sound settings to avoid overwriting them
-          focus_beep_enabled: get().settings.enableSound,
-          focus_beep_volume: Math.round(get().settings.volume * 100),
-          alarm_sound: get().settings.alarmSound,
-          // Add the autostart settings
-          autostart_break: autostartBreak,
-          autostart_focus: autostartFocus,
-        });
-        
-        if (success) {
-          toast.success("Timer settings saved");
-          
-          // Update local settings to ensure consistency
-          set((state) => ({
-            settings: {
-              ...state.settings,
-              autostartBreak,
-              autostartFocus,
-            }
-          }));
-        } else {
-          toast.error("Failed to save settings");
-        }
-      } catch (error) {
-        toast.error("Error saving settings");
-        console.error("Error saving timer settings:", error);
-      } finally {
-        set({ isLoading: false });
-      }
-    }
   };
 });
