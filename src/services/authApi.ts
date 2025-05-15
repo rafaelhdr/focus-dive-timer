@@ -101,7 +101,7 @@ export const refreshAccessToken = async (refreshToken: string): Promise<AuthVeri
     console.log('Refreshing access token');
     const response = await fetch(`${API_URL}/auth/refresh-token`, {
       method: 'POST',
-      headers: getCommonHeaders(),
+      headers: getCommonHeaders(refreshToken),
       body: JSON.stringify({ refresh_token: refreshToken }),
       credentials: 'include',
     });
