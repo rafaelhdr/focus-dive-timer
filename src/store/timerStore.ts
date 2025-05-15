@@ -49,6 +49,106 @@ export const useTimerStore = create<TimerState>((set, get) => {
   // Interval reference for timer countdown
   let intervalRef: number | null = null;
   
+  // Helper function to handle timer completion
+  const handleTimerCompletion = () => {
+    // Clear the interval
+    if (intervalRef !== null) {
+      clearInterval(intervalRef);
+      intervalRef = null;
+    }
+    
+    const state = get();
+    
+    // Get settings for sound and autostart
+    const { settings } = useSettingsStore.getState();
+    
+    // Play sound if enabled
+    if (settings.enableSound) {
+      const audioElement = new Audio(`/alarm-beeps/${settings.alarmSound}.mp3`);
+      audioElement.volume = settings.volume;
+      audioElement.play().catch(err => console.error("Error playing sound:", err));
+    }
+    
+    // Determine next mode
+    const nextMode = state.mode === "focus" ? "break" : "focus";
+    
+    // Notify the user
+    toast(`Time's up! ${nextMode === "focus" ? "Focus time" : "Break time"} started.`);
+    
+    // Handle auto-switching based on settings
+    if ((state.mode === "focus" && settings.autostartBreak) || 
+        (state.mode === "break" && settings.autostartFocus)) {
+      // Auto-start the next timer
+      const newDuration = getDurationInSeconds(nextMode);
+      const newEndTime = Date.now() + newDuration * 1000 + 1000; // Add 1s buffer
+      
+      // Update state
+      set({ 
+        mode: nextMode,
+        timeLeft: newDuration,
+        timerEndTime: newEndTime,
+        isActive: true
+      });
+      
+      // Update server
+      get().updateTimerOnServer(newEndTime, nextMode, true);
+      
+      // Trigger API event
+      triggerTimerEvent("start", nextMode === "focus" ? "focus" : "relax")
+        .catch(err => console.error("Failed to trigger timer start:", err));
+        
+      // Start new interval
+      startTimerInterval();
+    } else {
+      // Just switch mode without starting timer
+      const newDuration = getDurationInSeconds(nextMode);
+      
+      set({ 
+        mode: nextMode,
+        timeLeft: newDuration,
+        timerEndTime: null,
+        isActive: false
+      });
+      
+      // Update server
+      get().updateTimerOnServer(null, nextMode, false);
+      
+      // Reset document title
+      document.title = "Focus Dive";
+    }
+  };
+  
+  // Helper function to start timer interval
+  const startTimerInterval = () => {
+    // Clear any existing interval first
+    if (intervalRef !== null) {
+      clearInterval(intervalRef);
+      intervalRef = null;
+    }
+    
+    // Start new interval
+    intervalRef = window.setInterval(() => {
+      const state = get();
+      const currentTime = Date.now();
+      const endTime = state.timerEndTime || currentTime;
+      const secondsLeft = Math.max(0, Math.floor((endTime - currentTime) / 1000));
+      
+      // Update time left
+      set({ timeLeft: secondsLeft });
+      
+      // Update document title
+      const focusType = state.mode === "focus" ? "Focus" : "Break";
+      document.title = `${get().formatTime(secondsLeft)} ${focusType}`;
+      
+      // Handle timer completion
+      if (secondsLeft === 0 && state.isActive) {
+        handleTimerCompletion();
+      }
+    }, 1000);
+    
+    return intervalRef;
+  };
+  
   return {
     // Initial state
     isActive: false,
@@ -131,100 +231,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
             
             // Start the countdown if timer is active
             if (data.isRunning) {
-              // Clear any existing interval
-              if (intervalRef !== null) {
-                clearInterval(intervalRef);
-              }
-              
-              // Start new interval
-              intervalRef = window.setInterval(() => {
-                const state = get();
-                const currentTime = Date.now();
-                const endTime = state.timerEndTime || currentTime;
-                const secondsLeft = Math.max(0, Math.floor((endTime - currentTime) / 1000));
-                
-                set({ timeLeft: secondsLeft });
-                
-                // Handle timer completion
-                if (secondsLeft === 0 && state.isActive) {
-                  // Clear interval
-                  if (intervalRef !== null) {
-                    clearInterval(intervalRef);
-                    intervalRef = null;
-                  }
-                  
-                  // Get settings for sound and autostart
-                  const { settings } = useSettingsStore.getState();
-                  
-                  // Play sound if enabled
-                  if (settings.enableSound) {
-                    const audioElement = new Audio(`/alarm-beeps/${settings.alarmSound}.mp3`);
-                    audioElement.volume = settings.volume;
-                    audioElement.play().catch(err => console.error("Error playing sound:", err));
-                  }
-                  
-                  // Determine next mode
-                  const nextMode = state.mode === "focus" ? "break" : "focus";
-                  
-                  // Notify the user
-                  toast(`Time's up! ${nextMode === "focus" ? "Focus time" : "Break time"} started.`);
-                  
-                  // Handle auto-switching based on settings
-                  if ((state.mode === "focus" && settings.autostartBreak) || 
-                      (state.mode === "break" && settings.autostartFocus)) {
-                    // Auto-start the next timer
-                    const newMode = nextMode;
-                    const newDuration = getDurationInSeconds(newMode);
-                    const newEndTime = Date.now() + newDuration * 1000 + 1000; // Add 1s buffer
-                    
-                    // Update state
-                    set({ 
-                      mode: newMode,
-                      timeLeft: newDuration,
-                      timerEndTime: newEndTime,
-                      isActive: true
-                    });
-                    
-                    // Update server
-                    get().updateTimerOnServer(newEndTime, newMode, true);
-                    
-                    // Trigger API event
-                    triggerTimerEvent("start", newMode === "focus" ? "focus" : "relax")
-                      .catch(err => console.error("Failed to trigger timer start:", err));
-                      
-                    // Start new interval
-                    intervalRef = window.setInterval(() => {
-                      const state = get();
-                      const currentTime = Date.now();
-                      const endTime = state.timerEndTime || currentTime;
-                      const secondsLeft = Math.max(0, Math.floor((endTime - currentTime) / 1000));
-                      
-                      set({ timeLeft: secondsLeft });
-                      
-                      // Handle subsequent timer completions
-                      if (secondsLeft === 0 && state.isActive) {
-                        // This will be handled in the next iteration
-                        clearInterval(intervalRef);
-                        intervalRef = null;
-                      }
-                    }, 1000);
-                  } else {
-                    // Just switch mode without starting timer
-                    const newMode = nextMode;
-                    const newDuration = getDurationInSeconds(newMode);
-                    
-                    set({ 
-                      mode: newMode,
-                      timeLeft: newDuration,
-                      timerEndTime: null,
-                      isActive: false
-                    });
-                    
-                    // Update server
-                    get().updateTimerOnServer(null, newMode, false);
-                  }
-                }
-              }, 1000);
+              startTimerInterval();
             }
           } else {
             // If no end time is provided, just set the default duration
@@ -253,6 +260,11 @@ export const useTimerStore = create<TimerState>((set, get) => {
               timeLeft: secondsLeft,
               timerEndTime: data.timerEndsAt
             });
+            
+            // Start interval if timer is active
+            if (data.isRunning) {
+              startTimerInterval();
+            }
           } else {
             // If timer is stopped, clear interval
             if (intervalRef !== null) {
@@ -261,6 +273,9 @@ export const useTimerStore = create<TimerState>((set, get) => {
             }
             
             set({ timerEndTime: null });
+            
+            // Reset document title
+            document.title = "Focus Dive";
           }
         });
         
@@ -313,12 +328,6 @@ export const useTimerStore = create<TimerState>((set, get) => {
         get().initSocket();
       }
       
-      // Clear any existing interval
-      if (intervalRef !== null) {
-        clearInterval(intervalRef);
-        intervalRef = null;
-      }
-      
       if (!state.isActive) {
         // Starting the timer
         const newEndTime = Date.now() + (state.timeLeft * 1000) + 1000; // Add 1s buffer
@@ -337,28 +346,15 @@ export const useTimerStore = create<TimerState>((set, get) => {
           .catch(err => console.error("Failed to trigger timer start:", err));
         
         // Start countdown interval
-        intervalRef = window.setInterval(() => {
-          const currentState = get();
-          const currentTime = Date.now();
-          const endTime = currentState.timerEndTime || currentTime;
-          const secondsLeft = Math.max(0, Math.floor((endTime - currentTime) / 1000));
-          
-          // Update time left
-          set({ timeLeft: secondsLeft });
-          
-          // Update document title
-          const focusType = currentState.mode === "focus" ? "Focus" : "Break";
-          document.title = `${get().formatTime(secondsLeft)} ${focusType}`;
-          
-          // Handle timer completion
-          if (secondsLeft === 0 && currentState.isActive) {
-            // This will be handled in the next iteration
-            clearInterval(intervalRef);
-            intervalRef = null;
-          }
-        }, 1000);
+        startTimerInterval();
       } else {
         // Pausing the timer
+        
+        // Clear interval
+        if (intervalRef !== null) {
+          clearInterval(intervalRef);
+          intervalRef = null;
+        }
         
         // Trigger API event
         triggerTimerEvent("stop", state.mode === "focus" ? "focus" : "relax")
