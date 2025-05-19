@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -7,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Home } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/contexts/AuthContext';
+import { getCommonHeaders } from '@/utils/apiUtils';
 
 const SlackConnect = () => {
   const navigate = useNavigate();
@@ -41,20 +41,10 @@ const SlackConnect = () => {
           return;
         }
 
-        // Send the code to our backend with proper authorization header
-        const headers: Record<string, string> = {
-          'Content-Type': 'application/json',
-          'X-Session-ID': localStorage.getItem('focus_dive_session_id') || '',
-        };
-
-        // Add Authorization header if user is authenticated
-        if (auth.accessToken) {
-          headers['Authorization'] = `Bearer ${auth.accessToken}`;
-        }
-
+        // Send the code to our backend with proper headers
         const response = await fetch(`${API_URL}/slack/connect`, {
           method: 'POST',
-          headers,
+          headers: getCommonHeaders(),
           body: JSON.stringify({ code }),
           credentials: 'include',
         });

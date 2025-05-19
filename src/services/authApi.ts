@@ -1,5 +1,5 @@
-
 import { API_URL } from '@/config/env';
+import { getCommonHeaders } from '@/utils/apiUtils';
 
 // Types for auth responses
 export interface AuthLoginResponse {
@@ -19,19 +19,6 @@ export interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
 }
-
-// Common headers for all API requests
-const getCommonHeaders = (token?: string) => {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-  
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-  
-  return headers;
-};
 
 // Login with email to request verification token
 export const loginWithEmail = async (email: string): Promise<AuthLoginResponse> => {
@@ -102,7 +89,7 @@ export const refreshAccessToken = async (refreshToken: string): Promise<AuthVeri
     console.log('Refreshing access token');
     const response = await fetch(`${API_URL}/auth/refresh-token`, {
       method: 'POST',
-      headers: getCommonHeaders(),
+      headers: getCommonHeaders(false), // Don't include auth header when refreshing
       body: JSON.stringify({ refresh_token: refreshToken }),
       credentials: 'include',
     });
@@ -158,7 +145,7 @@ export const clearAuthTokens = (): void => {
   localStorage.removeItem('focus_dive_user_email');
 };
 
-// Add authorization header to requests
+// Add authorization header to requests - keep this helper for backward compatibility
 export const addAuthHeader = (headers: Record<string, string>): Record<string, string> => {
   const accessToken = getAccessToken();
   if (accessToken) {

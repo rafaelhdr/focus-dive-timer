@@ -1,5 +1,6 @@
 import { API_URL } from '@/config/env';
-import { getAccessToken, addAuthHeader } from './authApi';
+import { getAccessToken } from './authApi';
+import { getCommonHeaders } from '@/utils/apiUtils';
 
 export interface Preferences {
   focus_beep_enabled: boolean;
@@ -8,32 +9,6 @@ export interface Preferences {
   autostart_break?: boolean;
   autostart_focus?: boolean;
 }
-
-// Function to get or create a session ID
-const getSessionId = (): string => {
-  let sessionId = localStorage.getItem('focus_dive_session_id');
-  if (!sessionId) {
-    sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-    localStorage.setItem('focus_dive_session_id', sessionId);
-  }
-  return sessionId;
-};
-
-// Common headers for all API requests
-const getCommonHeaders = () => {
-  const headers = {
-    'Content-Type': 'application/json',
-    'X-Session-ID': getSessionId(),
-  };
-  
-  // Add auth header if user is logged in
-  const accessToken = getAccessToken();
-  if (accessToken) {
-    headers['Authorization'] = `Bearer ${accessToken}`;
-  }
-  
-  return headers;
-};
 
 export const fetchPreferences = async (): Promise<Preferences> => {
   try {
