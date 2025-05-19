@@ -6,6 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { getIntegrationSettings, saveIntegrationSettings } from "@/services/integrationService";
+import { Card, CardContent } from "@/components/ui/card";
 
 // Available emoji options
 const emojiOptions = [
@@ -88,6 +89,12 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
     }
   };
 
+  // Get the icon for the currently selected emoji
+  const getSelectedEmojiIcon = (): string => {
+    const found = emojiOptions.find(emoji => emoji.value === selectedEmoji);
+    return found ? found.icon : "🧘";
+  };
+
   // Determine if form fields should be disabled
   const isFormDisabled = !isAuthenticated;
 
@@ -136,6 +143,24 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
             </div>
           ))}
         </RadioGroup>
+      </div>
+
+      {/* Preview section */}
+      <div>
+        <h3 className="text-lg font-medium mb-2">Preview</h3>
+        <p className="text-sm text-muted-foreground mb-3">
+          Here's how your status will appear in Slack during focus time:
+        </p>
+        <Card className="max-w-md border-slate-200">
+          <CardContent className="pt-4">
+            <div className="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800">
+              <div className="flex items-center justify-center w-8 h-8">
+                {getSelectedEmojiIcon()}
+              </div>
+              <span className="font-medium text-sm">{statusText || "Focus time"}</span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <Button
