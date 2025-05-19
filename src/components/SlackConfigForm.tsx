@@ -19,19 +19,21 @@ const emojiOptions = [
 
 interface SlackConfigFormProps {
   isConnected: boolean;
+  isAuthenticated: boolean;
 }
 
-const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected }) => {
+const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthenticated }) => {
   const [selectedEmoji, setSelectedEmoji] = useState<string>(":person_in_lotus_position:");
   const [statusText, setStatusText] = useState<string>("Focus time");
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const { toast } = useToast();
 
+  // Only load settings if user is both authenticated and connected to Slack
   useEffect(() => {
-    if (isConnected) {
+    if (isConnected && isAuthenticated) {
       loadSettings();
     }
-  }, [isConnected]);
+  }, [isConnected, isAuthenticated]);
 
   const loadSettings = async () => {
     try {
@@ -48,7 +50,7 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected }) => {
   };
 
   const handleSave = async () => {
-    if (!isConnected) return;
+    if (!isConnected || !isAuthenticated) return;
 
     setIsSaving(true);
     try {
@@ -81,9 +83,8 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected }) => {
     }
   };
 
-  if (!isConnected) {
-    return null;
-  }
+  // Determine if form fields should be disabled
+  const isFormDisabled = !isAuthenticated;
 
   return (
     <div className="space-y-6 py-4">
@@ -97,7 +98,7 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected }) => {
           value={statusText}
           onChange={(e) => setStatusText(e.target.value)}
           className="max-w-md"
-          disabled={!isConnected}
+          disabled={isFormDisabled}
         />
       </div>
 
@@ -109,11 +110,11 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected }) => {
         <RadioGroup
           value={selectedEmoji}
           onValueChange={setSelectedEmoji}
-          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mt-2"
+          className="flex flex-col space-y-2"
         >
           {emojiOptions.map((emoji) => (
             <div key={emoji.value} className="flex items-center space-x-2">
-              <RadioGroupItem value={emoji.value} id={emoji.value} />
+              <RadioGroupItem value={emoji.value} id={emoji.value} disabled={isFormDisabled} />
               <Label
                 htmlFor={emoji.value}
                 className="flex items-center space-x-2 cursor-pointer"
@@ -134,7 +135,7 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected }) => {
 
       <Button
         onClick={handleSave}
-        disabled={!isConnected || isSaving}
+        disabled={isFormDisabled || isSaving}
         className="mt-4"
       >
         {isSaving ? "Saving..." : "Save Slack Settings"}

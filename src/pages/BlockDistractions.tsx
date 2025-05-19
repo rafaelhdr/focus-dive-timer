@@ -105,24 +105,35 @@ const BlockDistractions = () => {
                   </AlertDescription>
                 </Alert>
                 
-                <SlackConfigForm isConnected={!!isConnected} />
+                <SlackConfigForm 
+                  isConnected={!!isConnected} 
+                  isAuthenticated={auth.isAuthenticated}
+                />
               </div>
             ) : (
-              <div className="text-center py-4">
-                <p className="mb-4">Connect your Slack account to enable automatic status updates.</p>
-                <Button 
-                  onClick={handleSlackConnect} 
-                  className="gap-2" 
-                  disabled={!auth.isAuthenticated}
-                >
-                  <Slack className="h-4 w-4" />
-                  Connect to Slack
-                </Button>
-                {!auth.isAuthenticated && (
-                  <p className="text-sm text-muted-foreground mt-3">
-                    Please login to enable this integration
-                  </p>
-                )}
+              <div>
+                <div className="text-center py-4 mb-8">
+                  <p className="mb-4">Connect your Slack account to enable automatic status updates.</p>
+                  <Button 
+                    onClick={handleSlackConnect} 
+                    className="gap-2" 
+                    disabled={!auth.isAuthenticated}
+                  >
+                    <Slack className="h-4 w-4" />
+                    Connect to Slack
+                  </Button>
+                  {!auth.isAuthenticated && (
+                    <p className="text-sm text-muted-foreground mt-3">
+                      Please login to enable this integration
+                    </p>
+                  )}
+                </div>
+                
+                {/* Always show the SlackConfigForm, but it will be disabled if not authenticated */}
+                <SlackConfigForm 
+                  isConnected={false} 
+                  isAuthenticated={auth.isAuthenticated}
+                />
               </div>
             )}
           </CardContent>
