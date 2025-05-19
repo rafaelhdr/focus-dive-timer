@@ -6,15 +6,14 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { getIntegrationSettings, saveIntegrationSettings } from "@/services/integrationService";
-import { Computer, Brain, Clock3 } from "lucide-react";
 
 // Available emoji options
 const emojiOptions = [
-  { value: ":person_in_lotus_position:", label: "Meditation", icon: null },
-  { value: ":computer:", label: "Computer", icon: <Computer className="h-5 w-5" /> },
-  { value: ":brain:", label: "Brain", icon: <Brain className="h-5 w-5" /> },
-  { value: ":no_mobile_phones:", label: "No Phones", icon: null },
-  { value: ":clock3:", label: "Clock", icon: <Clock3 className="h-5 w-5" /> },
+  { value: ":person_in_lotus_position:", label: "Meditation", icon: "🧘" },
+  { value: ":computer:", label: "Computer", icon: "💻" },
+  { value: ":brain:", label: "Brain", icon: "🧠" },
+  { value: ":no_mobile_phones:", label: "No Phones", icon: "📵" },
+  { value: ":clock3:", label: "Clock", icon: "🕒" },
 ];
 
 interface SlackConfigFormProps {
