@@ -4,10 +4,8 @@ import {
   loginWithEmail, 
   verifyToken, 
   refreshAccessToken,
-  isAuthenticated as checkIsAuth,
   storeAuthTokens,
   clearAuthTokens,
-  getAccessToken,
   AuthState
 } from '@/services/authApi';
 

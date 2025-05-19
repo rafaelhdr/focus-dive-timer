@@ -21,22 +21,17 @@ export const getSessionId = (): string => {
  * @returns Record containing headers for API requests
  */
 export const getCommonHeaders = (
-  includeAuth: boolean = true,
-  includeSession: boolean = true
+  token: string | null = null,
 ): Record<string, string> => {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
   
-  if (includeAuth) {
-    const accessToken = getAccessToken();
-    if (accessToken) {
-      headers['Authorization'] = `Bearer ${accessToken}`;
-    }
-  }
-  
-  if (includeSession) {
-    headers['X-Session-ID'] = getSessionId();
+  const accessToken = getAccessToken();
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  } else if (accessToken) {
+    headers['Authorization'] = `Bearer ${accessToken}`;
   }
   
   return headers;
