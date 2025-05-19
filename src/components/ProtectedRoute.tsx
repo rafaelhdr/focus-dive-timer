@@ -19,7 +19,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
-  if (!auth.isAuthenticated) {
+  // Always check for tokens in localStorage as fallback
+  if (!auth.isAuthenticated && 
+      !localStorage.getItem('focus_dive_access_token') && 
+      !localStorage.getItem('focus_dive_refresh_token')) {
     return <Navigate to="/login" replace />;
   }
 

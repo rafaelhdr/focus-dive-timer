@@ -1,3 +1,4 @@
+
 import { API_URL } from '@/config/env';
 
 // Types for auth responses
@@ -101,17 +102,17 @@ export const refreshAccessToken = async (refreshToken: string): Promise<AuthVeri
     console.log('Refreshing access token');
     const response = await fetch(`${API_URL}/auth/refresh-token`, {
       method: 'POST',
-      headers: getCommonHeaders(refreshToken),
+      headers: getCommonHeaders(),
       body: JSON.stringify({ refresh_token: refreshToken }),
       credentials: 'include',
     });
     
-    const data = await response.json();
-    
     if (!response.ok) {
-      throw new Error(data.message || 'Failed to refresh token');
+      const data = await response.json();
+      throw new Error(data.message || `Failed to refresh token (status: ${response.status})`);
     }
     
+    const data = await response.json();
     console.log('Token refresh successful');
     return {
       success: true,
@@ -136,6 +137,11 @@ export const isAuthenticated = (): boolean => {
 // Function to get the current access token
 export const getAccessToken = (): string | null => {
   return localStorage.getItem('focus_dive_access_token');
+};
+
+// Function to get the current refresh token
+export const getRefreshToken = (): string | null => {
+  return localStorage.getItem('focus_dive_refresh_token');
 };
 
 // Store authentication tokens
