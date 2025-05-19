@@ -12,6 +12,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
+import SlackConfigForm from '@/components/SlackConfigForm';
 
 const BlockDistractions = () => {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
@@ -95,13 +96,17 @@ const BlockDistractions = () => {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </div>
             ) : isConnected ? (
-              <Alert className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900">
-                <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-                <AlertTitle>Connected to Slack</AlertTitle>
-                <AlertDescription>
-                  Your Slack account is connected and ready to use with Focus Dive.
-                </AlertDescription>
-              </Alert>
+              <div>
+                <Alert className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900 mb-6">
+                  <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  <AlertTitle>Connected to Slack</AlertTitle>
+                  <AlertDescription>
+                    Your Slack account is connected and ready to use with Focus Dive.
+                  </AlertDescription>
+                </Alert>
+                
+                <SlackConfigForm isConnected={!!isConnected} />
+              </div>
             ) : (
               <div className="text-center py-4">
                 <p className="mb-4">Connect your Slack account to enable automatic status updates.</p>
