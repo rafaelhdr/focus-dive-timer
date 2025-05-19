@@ -49,15 +49,21 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault(); // Prevent default button behavior
+    
     if (!isConnected || !isAuthenticated) return;
 
     setIsSaving(true);
     try {
+      console.log("Saving settings:", { emoji: selectedEmoji, text: statusText });
+      
       const success = await saveIntegrationSettings({
         slack_dnd_emoji: selectedEmoji,
         slack_dnd_text: statusText,
       });
+
+      console.log("Save result:", success);
 
       if (success) {
         toast({
@@ -137,6 +143,7 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
         onClick={handleSave}
         disabled={isFormDisabled || isSaving}
         className="mt-4"
+        type="button"
       >
         {isSaving ? "Saving..." : "Save Slack Settings"}
       </Button>

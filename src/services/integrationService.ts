@@ -24,6 +24,7 @@ export const getIntegrationSettings = async (): Promise<SlackIntegrationSettings
     }
 
     const data = await response.json();
+    console.log('Loaded integration settings:', data);
     return data;
   } catch (error) {
     console.error('Error fetching integration settings:', error);
@@ -36,12 +37,17 @@ export const getIntegrationSettings = async (): Promise<SlackIntegrationSettings
  */
 export const saveIntegrationSettings = async (settings: SlackIntegrationSettings): Promise<boolean> => {
   try {
+    console.log('Saving integration settings with headers:', getCommonHeaders());
+    console.log('Settings to save:', settings);
+    
     const response = await fetch(`${API_URL}/integrations`, {
       method: 'PUT',
       headers: getCommonHeaders(),
       body: JSON.stringify(settings),
       credentials: 'include',
     });
+
+    console.log('Save settings response:', response.status, response.statusText);
 
     if (!response.ok) {
       console.error('Failed to save integration settings:', response.statusText);
