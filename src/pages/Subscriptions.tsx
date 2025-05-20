@@ -1,7 +1,7 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Users, Calendar, Siren, Info } from 'lucide-react';
+import { Check, Users, Calendar, Siren, Info, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -19,6 +19,33 @@ const SubscriptionsPage: React.FC = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [billingPeriod, setBillingPeriod] = React.useState<'monthly' | 'yearly'>('monthly');
+  const [hasSubscription, setHasSubscription] = useState<boolean>(false);
+  const [portalLoading, setPortalLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    const checkSubscription = async () => {
+      if (!auth.isAuthenticated) return;
+      
+      try {
+        const response = await fetch(`${API_URL}/subscriptions/has-subscription`, {
+          method: 'GET',
+          headers: getCommonHeaders(),
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to check subscription status');
+        }
+
+        const data = await response.json();
+        setHasSubscription(data.has_subscription);
+      } catch (error) {
+        console.error('Error checking subscription:', error);
+      }
+    };
+
+    checkSubscription();
+  }, [auth.isAuthenticated]);
 
   const handleSubscribe = async () => {
     if (!auth.isAuthenticated) {
@@ -58,6 +85,36 @@ const SubscriptionsPage: React.FC = () => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handlePortalSession = async () => {
+    if (!auth.isAuthenticated) return;
+    
+    setPortalLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/subscriptions/create-portal-session`, {
+        method: 'POST',
+        headers: getCommonHeaders(),
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create portal session');
+      }
+
+      const data = await response.json();
+      // Redirect to the portal URL
+      window.open(data.url, '_blank');
+    } catch (error) {
+      console.error('Error creating portal session:', error);
+      toast({
+        title: "Error",
+        description: "Could not access subscription management. Please try again later.",
+        variant: "destructive"
+      });
+    } finally {
+      setPortalLoading(false);
     }
   };
 
@@ -120,6 +177,22 @@ const SubscriptionsPage: React.FC = () => {
           </Alert>
         )}
 
+        {auth.isAuthenticated && hasSubscription && (
+          <div className="mb-8 text-center">
+            <Button 
+              onClick={handlePortalSession} 
+              variant="outline" 
+              disabled={portalLoading} 
+              className="gap-2"
+            >
+              {portalLoading ? "Loading..." : "Manage Subscription"} <ExternalLink className="h-4 w-4" />
+            </Button>
+            <p className="text-sm text-muted-foreground mt-2">
+              You have an active subscription. Use the button above to manage your subscription.
+            </p>
+          </div>
+        )}
+
         <div className="grid md:grid-cols-2 gap-8">
           {/* Premium Individual Plan */}
           <Card className="border-2 border-primary/20 flex flex-col h-full">
@@ -174,9 +247,9 @@ const SubscriptionsPage: React.FC = () => {
               <Button 
                 className="w-full" 
                 onClick={handleSubscribe}
-                disabled={isLoading || !auth.isAuthenticated}
+                disabled={isLoading || !auth.isAuthenticated || hasSubscription}
               >
-                {isLoading ? "Processing..." : `Subscribe ${billingPeriod === 'monthly' ? 'Monthly' : 'Yearly'}`}
+                {isLoading ? "Processing..." : hasSubscription ? "Already Subscribed" : `Subscribe ${billingPeriod === 'monthly' ? 'Monthly' : 'Yearly'}`}
               </Button>
             </CardFooter>
           </Card>

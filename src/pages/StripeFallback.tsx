@@ -1,139 +1,124 @@
 
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
-import Navigation from '@/components/Navigation';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
 import { API_URL } from '@/config/env';
 import { getCommonHeaders } from '@/utils/apiUtils';
+import { useToast } from '@/hooks/use-toast';
+import { CheckCircle, XCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Navigation from '@/components/Navigation';
 
 const StripeFallback: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(true);
-  const [status, setStatus] = useState<'success' | 'canceled' | 'processing'>('processing');
-  
-  const queryParams = new URLSearchParams(location.search);
-  const isSuccess = queryParams.get('success') === 'true';
-  const isCanceled = queryParams.get('canceled') === 'true';
-  const sessionId = queryParams.get('session_id');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isSuccess, setIsSuccess] = useState<boolean | null>(null);
+
+  const searchParams = new URLSearchParams(location.search);
+  const success = searchParams.get('success') === 'true';
+  const canceled = searchParams.get('canceled') === 'true';
+  const sessionId = searchParams.get('session_id');
 
   useEffect(() => {
-    // If canceled is true, show the error page
-    if (isCanceled) {
-      setStatus('canceled');
-      setIsLoading(false);
-      return;
-    }
-
-    // If we have a success flag and session ID, verify it with the backend
-    if (isSuccess && sessionId) {
-      verifySession();
-    } else {
-      // Invalid parameters
-      setStatus('canceled');
-      setIsLoading(false);
-    }
-  }, [isSuccess, isCanceled, sessionId]);
-
-  const verifySession = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(`${API_URL}/subscriptions/stripe-fallback`, {
-        method: 'POST',
-        headers: getCommonHeaders(),
-        credentials: 'include',
-        body: JSON.stringify({ session_id: sessionId }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to verify session');
+    const processCheckoutResult = async () => {
+      if (!sessionId && !canceled) return;
+      
+      setIsProcessing(true);
+      
+      if (canceled) {
+        setIsSuccess(false);
+        toast({
+          title: "Checkout Canceled",
+          description: "Your payment process was canceled.",
+          variant: "destructive"
+        });
+        setIsProcessing(false);
+        return;
       }
-
-      // If we get here, the session was verified successfully
-      setStatus('success');
-      toast({
-        title: "Payment Successful",
-        description: "Your subscription has been activated. Thank you!",
-      });
-    } catch (error) {
-      console.error('Error verifying session:', error);
-      setStatus('canceled');
-      toast({
-        title: "Verification Failed",
-        description: "We couldn't verify your payment. Please contact support.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      
+      if (sessionId) {
+        try {
+          const response = await fetch(`${API_URL}/subscriptions/stripe-fallback`, {
+            method: 'POST',
+            headers: getCommonHeaders(),
+            credentials: 'include',
+            body: JSON.stringify({ session_id: sessionId }),
+          });
+          
+          if (!response.ok) {
+            throw new Error('Failed to process checkout result');
+          }
+          
+          const data = await response.json();
+          setIsSuccess(true);
+          toast({
+            title: "Payment Successful",
+            description: "Your subscription has been activated successfully!",
+          });
+        } catch (error) {
+          console.error('Error processing checkout result:', error);
+          setIsSuccess(false);
+          toast({
+            title: "Error",
+            description: "Could not verify your payment. Please contact support.",
+            variant: "destructive"
+          });
+        } finally {
+          setIsProcessing(false);
+        }
+      }
+    };
+    
+    processCheckoutResult();
+  }, [sessionId, canceled, toast]);
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <div className="container max-w-3xl mx-auto pt-20 px-4 pb-16">
-        <Card className="border-2 border-primary/20">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">
-              {isLoading ? (
-                "Processing Payment"
-              ) : status === 'success' ? (
-                "Payment Successful!"
-              ) : (
-                "Payment Unsuccessful"
-              )}
-            </CardTitle>
-            <CardDescription>
-              {isLoading ? (
-                "Please wait while we verify your payment..."
-              ) : status === 'success' ? (
-                "Thank you for your subscription!"
-              ) : (
-                "Your payment was canceled or could not be processed."
-              )}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex justify-center py-8">
-            {isLoading ? (
-              <div className="flex flex-col items-center">
-                <Loader2 className="h-16 w-16 animate-spin text-primary mb-4" />
-                <p>Verifying your payment...</p>
+      <div className="container max-w-md mx-auto flex flex-col items-center justify-center min-h-[80vh] px-4">
+        <div className="text-center space-y-6 w-full">
+          {isProcessing ? (
+            <div className="text-center">
+              <div className="animate-pulse text-3xl mb-4">⏳</div>
+              <h1 className="text-2xl font-bold mb-2">Processing Your Payment</h1>
+              <p className="text-muted-foreground">Please wait while we verify your payment...</p>
+            </div>
+          ) : isSuccess === true ? (
+            <div className="p-6 border rounded-lg shadow-sm bg-background w-full">
+              <div className="flex justify-center mb-4">
+                <CheckCircle className="h-16 w-16 text-green-500" />
               </div>
-            ) : status === 'success' ? (
-              <div className="flex flex-col items-center">
-                <CheckCircle className="h-16 w-16 text-green-500 mb-4" />
-                <p className="text-lg">Your premium features are now active!</p>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center">
-                <XCircle className="h-16 w-16 text-red-500 mb-4" />
-                <p className="text-lg">Payment was not completed.</p>
-                <p className="mt-2 text-muted-foreground">
-                  You have not been charged. Please try again or contact support if you continue to experience issues.
-                </p>
-              </div>
-            )}
-          </CardContent>
-          <CardFooter className="flex justify-center gap-4">
-            <Button
-              onClick={() => navigate('/')}
-              variant="secondary"
-            >
-              Go to Home
-            </Button>
-            {status === 'canceled' && (
-              <Button
-                onClick={() => navigate('/subscriptions')}
-              >
-                Try Again
+              <h1 className="text-2xl font-bold mb-2">Payment Successful!</h1>
+              <p className="text-muted-foreground mb-6">
+                Your subscription has been activated successfully. Enjoy your premium features!
+              </p>
+              <Button onClick={() => navigate('/')} className="w-full">
+                Return to Dashboard
               </Button>
-            )}
-          </CardFooter>
-        </Card>
+            </div>
+          ) : isSuccess === false ? (
+            <div className="p-6 border rounded-lg shadow-sm bg-background w-full">
+              <div className="flex justify-center mb-4">
+                <XCircle className="h-16 w-16 text-red-500" />
+              </div>
+              <h1 className="text-2xl font-bold mb-2">Payment Not Completed</h1>
+              <p className="text-muted-foreground mb-6">
+                {canceled 
+                  ? "Your payment was canceled. You can try again whenever you're ready."
+                  : "We couldn't verify your payment. Please contact our support team for assistance."}
+              </p>
+              <div className="space-y-3">
+                <Button onClick={() => navigate('/subscriptions')} className="w-full">
+                  Return to Subscriptions
+                </Button>
+                <Button onClick={() => navigate('/')} variant="outline" className="w-full">
+                  Go to Dashboard
+                </Button>
+              </div>
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );
