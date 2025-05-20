@@ -5,6 +5,8 @@ import { Check, Users, Calendar, Siren, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { API_URL } from '@/config/env';
@@ -16,6 +18,7 @@ const PricingPage: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [billingPeriod, setBillingPeriod] = React.useState<'monthly' | 'yearly'>('monthly');
 
   const handleSubscribe = async () => {
     if (!auth.isAuthenticated) {
@@ -34,6 +37,9 @@ const PricingPage: React.FC = () => {
         method: 'POST',
         headers: getCommonHeaders(),
         credentials: 'include',
+        body: JSON.stringify({
+          lookup_key: billingPeriod === 'monthly' ? 'focusdive_premium_monthly' : 'focusdive_premium_yearly'
+        }),
       });
 
       if (!response.ok) {
@@ -120,10 +126,32 @@ const PricingPage: React.FC = () => {
             <CardHeader>
               <CardTitle className="text-2xl">Premium</CardTitle>
               <CardDescription>For individuals seeking enhanced focus</CardDescription>
+              
               <div className="mt-4">
-                <span className="text-4xl font-bold">$2</span>
-                <span className="text-muted-foreground ml-1">/month</span>
-                <div className="text-sm text-muted-foreground mt-1">or $20/year</div>
+                <RadioGroup 
+                  className="flex flex-col space-y-2 mt-2" 
+                  defaultValue="monthly" 
+                  onValueChange={(value) => setBillingPeriod(value as 'monthly' | 'yearly')}
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="monthly" id="monthly" />
+                    <Label htmlFor="monthly" className="cursor-pointer">
+                      <div className="flex flex-col">
+                        <span className="font-medium">Monthly</span>
+                        <span className="text-sm text-muted-foreground">$2/month</span>
+                      </div>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="yearly" id="yearly" />
+                    <Label htmlFor="yearly" className="cursor-pointer">
+                      <div className="flex flex-col">
+                        <span className="font-medium">Yearly <span className="text-xs text-green-600 ml-1 bg-green-100 px-2 py-0.5 rounded-full">Save $4</span></span>
+                        <span className="text-sm text-muted-foreground">$20/year</span>
+                      </div>
+                    </Label>
+                  </div>
+                </RadioGroup>
               </div>
             </CardHeader>
             <CardContent className="flex-grow">
@@ -148,7 +176,7 @@ const PricingPage: React.FC = () => {
                 onClick={handleSubscribe}
                 disabled={isLoading || !auth.isAuthenticated}
               >
-                {isLoading ? "Processing..." : "Subscribe Now"}
+                {isLoading ? "Processing..." : `Subscribe ${billingPeriod === 'monthly' ? 'Monthly' : 'Yearly'}`}
               </Button>
             </CardFooter>
           </Card>
