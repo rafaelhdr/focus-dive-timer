@@ -1,9 +1,10 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Users, Calendar, Siren } from 'lucide-react';
+import { Check, Users, Calendar, Siren, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { API_URL } from '@/config/env';
@@ -97,12 +98,21 @@ const PricingPage: React.FC = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       <div className="container max-w-5xl mx-auto pt-20 px-4 pb-16">
-        <div className="text-center mb-12">
+        <div className="text-center mb-6">
           <h1 className="text-3xl font-bold tracking-tight mb-4">Choose Your Plan</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Select the perfect plan for your needs. Boost your productivity with our premium features.
           </p>
         </div>
+
+        {!auth.isAuthenticated && (
+          <Alert variant="default" className="mb-8">
+            <Info className="h-4 w-4" />
+            <AlertDescription>
+              Please <Button variant="link" className="p-0 h-auto font-semibold" onClick={() => navigate('/login')}>login or register</Button> first to subscribe to a plan and try all the features.
+            </AlertDescription>
+          </Alert>
+        )}
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Premium Individual Plan */}
@@ -136,7 +146,7 @@ const PricingPage: React.FC = () => {
               <Button 
                 className="w-full" 
                 onClick={handleSubscribe}
-                disabled={isLoading}
+                disabled={isLoading || !auth.isAuthenticated}
               >
                 {isLoading ? "Processing..." : "Subscribe Now"}
               </Button>
@@ -178,7 +188,7 @@ const PricingPage: React.FC = () => {
                 className="w-full" 
                 variant="outline" 
                 onClick={handleTeamRequest}
-                disabled={isLoading}
+                disabled={isLoading || !auth.isAuthenticated}
               >
                 {isLoading ? "Processing..." : "Request Team Pricing"}
               </Button>
