@@ -56,16 +56,6 @@ const Navigation: React.FC = () => {
               <span className="hidden sm:inline">Integrations</span>
             </Button>
           </Link>
-          <Link to="/subscriptions">
-            <Button 
-              variant={location.pathname === '/subscriptions' ? 'default' : 'ghost'} 
-              size="sm"
-              className="gap-2"
-            >
-              <DollarSign className="h-4 w-4" />
-              <span className="hidden sm:inline">Pricing</span>
-            </Button>
-          </Link>
           <Link to="/settings">
             <Button 
               variant={location.pathname === '/settings' ? 'default' : 'ghost'} 
@@ -74,6 +64,16 @@ const Navigation: React.FC = () => {
             >
               <Settings className="h-4 w-4" />
               <span className="hidden sm:inline">Settings</span>
+            </Button>
+          </Link>
+          <Link to="/subscriptions">
+            <Button 
+              variant={location.pathname === '/subscriptions' ? 'default' : 'ghost'} 
+              size="sm"
+              className="gap-2"
+            >
+              <DollarSign className="h-4 w-4" />
+              <span className="hidden sm:inline">Subscription</span>
             </Button>
           </Link>
           
