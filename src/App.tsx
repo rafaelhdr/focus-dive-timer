@@ -11,7 +11,8 @@ import BlockDistractions from "./pages/BlockDistractions";
 import SlackConnect from "./pages/SlackConnect";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
-import Pricing from "./pages/Pricing";
+import Subscriptions from "./pages/Subscriptions";
+import StripeFallback from "./pages/StripeFallback";
 import { ThemeProvider } from "./contexts/ThemeProvider";
 
 const queryClient = new QueryClient();
@@ -30,7 +31,8 @@ const App = () => (
               <Route path="/settings" element={<Settings />} />
               <Route path="/block-distractions" element={<BlockDistractions />} />
               <Route path="/slack/connect" element={<SlackConnect />} />
-              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/subscriptions" element={<Subscriptions />} />
+              <Route path="/subscriptions/stripe-fallback" element={<StripeFallback />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

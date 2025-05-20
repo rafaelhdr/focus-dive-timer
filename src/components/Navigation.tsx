@@ -56,9 +56,9 @@ const Navigation: React.FC = () => {
               <span className="hidden sm:inline">Integrations</span>
             </Button>
           </Link>
-          <Link to="/pricing">
+          <Link to="/subscriptions">
             <Button 
-              variant={location.pathname === '/pricing' ? 'default' : 'ghost'} 
+              variant={location.pathname === '/subscriptions' ? 'default' : 'ghost'} 
               size="sm"
               className="gap-2"
             >

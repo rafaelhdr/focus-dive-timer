@@ -13,7 +13,7 @@ import { API_URL } from '@/config/env';
 import { getCommonHeaders } from '@/utils/apiUtils';
 import Navigation from '@/components/Navigation';
 
-const PricingPage: React.FC = () => {
+const SubscriptionsPage: React.FC = () => {
   const { auth } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -228,4 +228,4 @@ const PricingPage: React.FC = () => {
   );
 };
 
-export default PricingPage;
+export default SubscriptionsPage;
