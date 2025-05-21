@@ -42,11 +42,11 @@ const getDurationInSeconds = (
   
   if (mode === "focus") {
     // Use the default focus duration from settings
-    const duration = settings.defaultFocusDuration || settings.focusDuration;
+    const duration = settings.focusDuration;
     return duration * toMinutesMultiplier;
   } else {
     // Use the default break duration from settings
-    const duration = settings.defaultBreakDuration || settings.breakDuration;
+    const duration = settings.breakDuration;
     return duration * toMinutesMultiplier;
   }
 };
@@ -323,7 +323,8 @@ export const useTimerStore = create<TimerState>((set, get) => {
       socket.emit("reset_timer");
       
       // Also update with explicit null values to ensure reset
-      get().updateTimerOnServer(null, "focus", false);
+      const { mode, updateTimerOnServer } = get();
+      updateTimerOnServer(null, mode, false);
     },
     
     // Toggle timer (start/pause)

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { fetchPreferences, savePreferences } from "@/services/api";
+import { useTimerStore } from "./timerStore";
 import { toast } from "sonner";
 
 interface TimerSettings {
@@ -49,6 +50,10 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
         ...newSettings,
       }
     }));
+    if (newSettings.focusDuration || newSettings.breakDuration) {
+      const { isActive, resetTimer } = useTimerStore.getState();
+      if (!isActive) resetTimer()
+    }
   },
   
   // Load settings from API
@@ -72,7 +77,9 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
           autostartFocus: preferences.autostart_focus !== undefined 
             ? preferences.autostart_focus 
             : true,
+          focusDuration: preferences.default_focus_duration || state.settings.focusDuration,
           defaultFocusDuration: preferences.default_focus_duration || 25,
+          breakDuration: preferences.default_break_duration || state.settings.breakDuration,
           defaultBreakDuration: preferences.default_break_duration || 5,
         }
       }));
