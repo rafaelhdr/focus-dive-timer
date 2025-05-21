@@ -89,7 +89,6 @@ const Navigation: React.FC = () => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link to="/subscriptions" className="flex items-center cursor-pointer">
-                    <DollarSign className="mr-2 h-4 w-4" />
                     Subscription
                   </Link>
                 </DropdownMenuItem>
