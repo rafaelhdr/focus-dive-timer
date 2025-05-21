@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Users, Calendar, Siren, Info, ExternalLink } from 'lucide-react';
+import { Check, Users, Calendar, Siren, Info, ExternalLink, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -277,6 +277,10 @@ const SubscriptionsPage: React.FC = () => {
                 <li className="flex items-start gap-2">
                   <Calendar className="h-5 w-5 text-primary mr-2 shrink-0 mt-0.5" />
                   <span>Google Calendar integration</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Clock className="h-5 w-5 text-primary mr-2 shrink-0 mt-0.5" />
+                  <span>Synced timer between teammates</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Siren className="h-5 w-5 text-primary mr-2 shrink-0 mt-0.5" />
