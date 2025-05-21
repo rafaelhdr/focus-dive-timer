@@ -1,6 +1,6 @@
 
 import { useEffect, useRef } from "react";
-import { useTimerStoreRaw } from "@/store/timerStore";
+import { useTimerStore as useTimerStoreBase } from "@/store/timerStore";
 import { useSettingsStore } from "@/store/settingsStore";
 
 // Custom hook to initialize both timer stores and provide access to them
@@ -8,7 +8,7 @@ export function useTimerStore() {
   const isInitialized = useRef(false);
   
   // Select all the parts of the stores we need
-  const timerStore = useTimerStoreRaw(state => state);
+  const timerStore = useTimerStoreBase(state => state);
   const settingsStore = useSettingsStore(state => state);
   
   // Initialize the stores on first render
