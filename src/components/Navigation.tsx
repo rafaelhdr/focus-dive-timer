@@ -66,16 +66,6 @@ const Navigation: React.FC = () => {
               <span className="hidden sm:inline">Settings</span>
             </Button>
           </Link>
-          <Link to="/subscriptions">
-            <Button 
-              variant={location.pathname === '/subscriptions' ? 'default' : 'ghost'} 
-              size="sm"
-              className="gap-2"
-            >
-              <DollarSign className="h-4 w-4" />
-              <span className="hidden sm:inline">Subscription</span>
-            </Button>
-          </Link>
           
           {auth.isAuthenticated ? (
             <DropdownMenu>
@@ -97,6 +87,12 @@ const Navigation: React.FC = () => {
                   </span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/subscriptions" className="flex items-center cursor-pointer">
+                    <DollarSign className="mr-2 h-4 w-4" />
+                    Subscription
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={logout} className="text-red-500 cursor-pointer">
                   <LogOut className="mr-2 h-4 w-4" />
                   Log out
