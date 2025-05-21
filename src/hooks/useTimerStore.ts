@@ -1,6 +1,6 @@
 
 import { useEffect, useRef } from "react";
-import { useTimerStore as useTimerStoreRaw } from "@/store/timerStore";
+import { useTimerStoreRaw } from "@/store/timerStore";
 import { useSettingsStore } from "@/store/settingsStore";
 
 // Custom hook to initialize both timer stores and provide access to them
@@ -39,6 +39,5 @@ export function useTimerStore() {
     updateSettings: settingsStore.updateSettings,
     saveSoundSettings: settingsStore.saveSoundSettings,
     saveTimerSettings: settingsStore.saveTimerSettings,
-    saveDefaultDurations: settingsStore.saveDefaultDurations,
   };
 }

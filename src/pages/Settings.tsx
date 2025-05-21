@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Volume2, Volume, VolumeX, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -26,7 +25,7 @@ const ALARM_SOUNDS = [
 ];
 
 const Settings = () => {
-  const { settings, updateSettings, saveSoundSettings, saveTimerSettings, saveDefaultDurations, isLoading } = useTimer();
+  const { settings, updateSettings, saveSoundSettings, saveTimerSettings, isLoading } = useTimer();
   const { 
     enableSound, 
     volume = 1, 
@@ -91,11 +90,12 @@ const Settings = () => {
   };
 
   const handleSaveTimerSettings = async () => {
-    await saveTimerSettings(currentAutostartBreak, currentAutostartFocus);
-  };
-
-  const handleSaveDefaultDurations = async () => {
-    await saveDefaultDurations(currentDefaultFocusDuration, currentDefaultBreakDuration);
+    await saveTimerSettings(
+      currentAutostartBreak, 
+      currentAutostartFocus, 
+      currentDefaultFocusDuration, 
+      currentDefaultBreakDuration
+    );
   };
 
   const playTestSound = () => {
@@ -209,47 +209,6 @@ const Settings = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="autostart-break" 
-                  checked={currentAutostartBreak}
-                  onCheckedChange={(checked) => setCurrentAutostartBreak(checked === true)}
-                  disabled={isLoading}
-                />
-                <Label htmlFor="autostart-break" className="cursor-pointer">
-                  Autostart break when focus finishes
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="autostart-focus" 
-                  checked={currentAutostartFocus}
-                  onCheckedChange={(checked) => setCurrentAutostartFocus(checked === true)}
-                  disabled={isLoading}
-                />
-                <Label htmlFor="autostart-focus" className="cursor-pointer">
-                  Autostart focus when break finishes
-                </Label>
-              </div>
-              
-              <Button 
-                onClick={handleSaveTimerSettings} 
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? 'Saving...' : 'Save Timer Settings'}
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl flex items-center gap-2">
-                <Clock className="h-5 w-5" /> Default Timer Durations
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="default-focus-duration">Default Focus Duration</Label>
@@ -284,12 +243,36 @@ const Settings = () => {
                 />
               </div>
               
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="autostart-break" 
+                  checked={currentAutostartBreak}
+                  onCheckedChange={(checked) => setCurrentAutostartBreak(checked === true)}
+                  disabled={isLoading}
+                />
+                <Label htmlFor="autostart-break" className="cursor-pointer">
+                  Autostart break when focus finishes
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="autostart-focus" 
+                  checked={currentAutostartFocus}
+                  onCheckedChange={(checked) => setCurrentAutostartFocus(checked === true)}
+                  disabled={isLoading}
+                />
+                <Label htmlFor="autostart-focus" className="cursor-pointer">
+                  Autostart focus when break finishes
+                </Label>
+              </div>
+              
               <Button 
-                onClick={handleSaveDefaultDurations} 
+                onClick={handleSaveTimerSettings} 
                 className="w-full"
                 disabled={isLoading}
               >
-                {isLoading ? 'Saving...' : 'Save Default Durations'}
+                {isLoading ? 'Saving...' : 'Save Timer Settings'}
               </Button>
             </CardContent>
           </Card>

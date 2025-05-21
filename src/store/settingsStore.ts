@@ -1,4 +1,3 @@
-
 import { create } from "zustand";
 import { fetchPreferences, savePreferences } from "@/services/api";
 import { toast } from "sonner";
@@ -23,8 +22,7 @@ interface SettingsState {
   // Methods for settings
   updateSettings: (newSettings: Partial<TimerSettings>) => void;
   saveSoundSettings: (enableSound: boolean, volume: number, alarmSound: string) => Promise<void>;
-  saveTimerSettings: (autostartBreak: boolean, autostartFocus: boolean) => Promise<void>;
-  saveDefaultDurations: (defaultFocusDuration: number, defaultBreakDuration: number) => Promise<void>;
+  saveTimerSettings: (autostartBreak: boolean, autostartFocus: boolean, defaultFocusDuration: number, defaultBreakDuration: number) => Promise<void>;
   loadSettings: () => Promise<void>;
 }
 
@@ -127,22 +125,21 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
   },
   
   // Save timer settings to API
-  saveTimerSettings: async (autostartBreak, autostartFocus) => {
+  saveTimerSettings: async (autostartBreak, autostartFocus, defaultFocusDuration, defaultBreakDuration) => {
     set({ isLoading: true });
     
     try {
-      console.log("Saving timer settings:", { autostartBreak, autostartFocus });
+      console.log("Saving timer settings:", { autostartBreak, autostartFocus, defaultFocusDuration, defaultBreakDuration });
       const success = await savePreferences({
         // Include current sound settings to avoid overwriting them
         focus_beep_enabled: get().settings.enableSound,
         focus_beep_volume: Math.round(get().settings.volume * 100),
         alarm_sound: get().settings.alarmSound,
-        // Add the autostart settings
+        // Add the autostart settings and default durations
         autostart_break: autostartBreak,
         autostart_focus: autostartFocus,
-        // Include default durations to avoid overwriting them
-        default_focus_duration: get().settings.defaultFocusDuration,
-        default_break_duration: get().settings.defaultBreakDuration,
+        default_focus_duration: defaultFocusDuration,
+        default_break_duration: defaultBreakDuration,
       });
       
       if (success) {
@@ -154,6 +151,8 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
             ...state.settings,
             autostartBreak,
             autostartFocus,
+            defaultFocusDuration,
+            defaultBreakDuration,
           }
         }));
       } else {
@@ -166,45 +165,4 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
       set({ isLoading: false });
     }
   },
-  
-  // Save default durations to API
-  saveDefaultDurations: async (defaultFocusDuration, defaultBreakDuration) => {
-    set({ isLoading: true });
-    
-    try {
-      console.log("Saving default durations:", { defaultFocusDuration, defaultBreakDuration });
-      const success = await savePreferences({
-        // Include current sound settings to avoid overwriting them
-        focus_beep_enabled: get().settings.enableSound,
-        focus_beep_volume: Math.round(get().settings.volume * 100),
-        alarm_sound: get().settings.alarmSound,
-        // Include autostart settings to avoid overwriting them
-        autostart_break: get().settings.autostartBreak,
-        autostart_focus: get().settings.autostartFocus,
-        // Add default durations
-        default_focus_duration: defaultFocusDuration,
-        default_break_duration: defaultBreakDuration,
-      });
-      
-      if (success) {
-        toast.success("Default durations saved");
-        
-        // Update local settings to ensure consistency
-        set((state) => ({
-          settings: {
-            ...state.settings,
-            defaultFocusDuration,
-            defaultBreakDuration,
-          }
-        }));
-      } else {
-        toast.error("Failed to save settings");
-      }
-    } catch (error) {
-      toast.error("Error saving settings");
-      console.error("Error saving default durations:", error);
-    } finally {
-      set({ isLoading: false });
-    }
-  }
 }));
