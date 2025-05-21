@@ -15,8 +15,7 @@ export function useTimer() {
     toggleMode,
     updateSettings,
     saveSoundSettings,
-    saveTimerSettings,
-    saveDefaultDurations
+    saveTimerSettings
   } = useTimerStore();
 
   return {
@@ -32,6 +31,5 @@ export function useTimer() {
     updateSettings,
     saveSoundSettings,
     saveTimerSettings,
-    saveDefaultDurations,
   };
 }
