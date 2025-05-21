@@ -11,6 +11,8 @@ interface TimerSettings {
   alarmSound: string; // ID of the alarm sound
   autostartBreak: boolean; // Autostart break after focus
   autostartFocus: boolean; // Autostart focus after break
+  defaultFocusDuration: number; // Default focus duration
+  defaultBreakDuration: number; // Default break duration
 }
 
 interface SettingsState {
@@ -22,6 +24,7 @@ interface SettingsState {
   updateSettings: (newSettings: Partial<TimerSettings>) => void;
   saveSoundSettings: (enableSound: boolean, volume: number, alarmSound: string) => Promise<void>;
   saveTimerSettings: (autostartBreak: boolean, autostartFocus: boolean) => Promise<void>;
+  saveDefaultDurations: (defaultFocusDuration: number, defaultBreakDuration: number) => Promise<void>;
   loadSettings: () => Promise<void>;
 }
 
@@ -35,6 +38,8 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
     alarmSound: "minimalistic",
     autostartBreak: true,
     autostartFocus: true,
+    defaultFocusDuration: 25,
+    defaultBreakDuration: 5,
   },
   isLoading: false,
   
@@ -69,6 +74,8 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
           autostartFocus: preferences.autostart_focus !== undefined 
             ? preferences.autostart_focus 
             : true,
+          defaultFocusDuration: preferences.default_focus_duration || 25,
+          defaultBreakDuration: preferences.default_break_duration || 5,
         }
       }));
     } catch (error) {
@@ -91,7 +98,9 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
         alarm_sound: alarmSound,
         // Include autostart settings from current state to avoid overwriting them
         autostart_break: get().settings.autostartBreak,
-        autostart_focus: get().settings.autostartFocus
+        autostart_focus: get().settings.autostartFocus,
+        default_focus_duration: get().settings.defaultFocusDuration,
+        default_break_duration: get().settings.defaultBreakDuration,
       });
       
       if (success) {
@@ -131,6 +140,9 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
         // Add the autostart settings
         autostart_break: autostartBreak,
         autostart_focus: autostartFocus,
+        // Include default durations to avoid overwriting them
+        default_focus_duration: get().settings.defaultFocusDuration,
+        default_break_duration: get().settings.defaultBreakDuration,
       });
       
       if (success) {
@@ -150,6 +162,47 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
     } catch (error) {
       toast.error("Error saving settings");
       console.error("Error saving timer settings:", error);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+  
+  // Save default durations to API
+  saveDefaultDurations: async (defaultFocusDuration, defaultBreakDuration) => {
+    set({ isLoading: true });
+    
+    try {
+      console.log("Saving default durations:", { defaultFocusDuration, defaultBreakDuration });
+      const success = await savePreferences({
+        // Include current sound settings to avoid overwriting them
+        focus_beep_enabled: get().settings.enableSound,
+        focus_beep_volume: Math.round(get().settings.volume * 100),
+        alarm_sound: get().settings.alarmSound,
+        // Include autostart settings to avoid overwriting them
+        autostart_break: get().settings.autostartBreak,
+        autostart_focus: get().settings.autostartFocus,
+        // Add default durations
+        default_focus_duration: defaultFocusDuration,
+        default_break_duration: defaultBreakDuration,
+      });
+      
+      if (success) {
+        toast.success("Default durations saved");
+        
+        // Update local settings to ensure consistency
+        set((state) => ({
+          settings: {
+            ...state.settings,
+            defaultFocusDuration,
+            defaultBreakDuration,
+          }
+        }));
+      } else {
+        toast.error("Failed to save settings");
+      }
+    } catch (error) {
+      toast.error("Error saving settings");
+      console.error("Error saving default durations:", error);
     } finally {
       set({ isLoading: false });
     }

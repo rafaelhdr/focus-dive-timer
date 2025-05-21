@@ -1,3 +1,4 @@
+
 import { API_URL } from '@/config/env';
 import { getAccessToken } from './authApi';
 import { getCommonHeaders } from '@/utils/apiUtils';
@@ -8,6 +9,8 @@ export interface Preferences {
   alarm_sound: string;
   autostart_break?: boolean;
   autostart_focus?: boolean;
+  default_focus_duration?: number;
+  default_break_duration?: number;
 }
 
 export const fetchPreferences = async (): Promise<Preferences> => {
@@ -36,7 +39,9 @@ export const fetchPreferences = async (): Promise<Preferences> => {
       focus_beep_volume: 100,
       alarm_sound: 'minimalistic',
       autostart_break: true,
-      autostart_focus: true
+      autostart_focus: true,
+      default_focus_duration: 25,
+      default_break_duration: 5
     };
   }
 };

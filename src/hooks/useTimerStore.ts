@@ -39,5 +39,6 @@ export function useTimerStore() {
     updateSettings: settingsStore.updateSettings,
     saveSoundSettings: settingsStore.saveSoundSettings,
     saveTimerSettings: settingsStore.saveTimerSettings,
+    saveDefaultDurations: settingsStore.saveDefaultDurations,
   };
 }

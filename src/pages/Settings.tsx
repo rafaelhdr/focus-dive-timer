@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import ThemeToggle from '@/components/ThemeToggle';
 import Navigation from '@/components/Navigation';
@@ -26,19 +26,23 @@ const ALARM_SOUNDS = [
 ];
 
 const Settings = () => {
-  const { settings, updateSettings, saveSoundSettings, saveTimerSettings, isLoading } = useTimer();
+  const { settings, updateSettings, saveSoundSettings, saveTimerSettings, saveDefaultDurations, isLoading } = useTimer();
   const { 
     enableSound, 
     volume = 1, 
     alarmSound = 'minimalistic',
     autostartBreak = true,
-    autostartFocus = true 
+    autostartFocus = true,
+    defaultFocusDuration = 25,
+    defaultBreakDuration = 5
   } = settings;
   
   const [currentVolume, setCurrentVolume] = useState(volume);
   const [currentSound, setCurrentSound] = useState(alarmSound);
   const [currentAutostartBreak, setCurrentAutostartBreak] = useState(autostartBreak);
   const [currentAutostartFocus, setCurrentAutostartFocus] = useState(autostartFocus);
+  const [currentDefaultFocusDuration, setCurrentDefaultFocusDuration] = useState(defaultFocusDuration);
+  const [currentDefaultBreakDuration, setCurrentDefaultBreakDuration] = useState(defaultBreakDuration);
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
 
   // Initialize audio element
@@ -54,7 +58,9 @@ const Settings = () => {
     setCurrentSound(alarmSound);
     setCurrentAutostartBreak(autostartBreak);
     setCurrentAutostartFocus(autostartFocus);
-  }, [volume, alarmSound, autostartBreak, autostartFocus]);
+    setCurrentDefaultFocusDuration(defaultFocusDuration);
+    setCurrentDefaultBreakDuration(defaultBreakDuration);
+  }, [volume, alarmSound, autostartBreak, autostartFocus, defaultFocusDuration, defaultBreakDuration]);
 
   // Update audio volume when it changes
   React.useEffect(() => {
@@ -86,6 +92,10 @@ const Settings = () => {
 
   const handleSaveTimerSettings = async () => {
     await saveTimerSettings(currentAutostartBreak, currentAutostartFocus);
+  };
+
+  const handleSaveDefaultDurations = async () => {
+    await saveDefaultDurations(currentDefaultFocusDuration, currentDefaultBreakDuration);
   };
 
   const playTestSound = () => {
@@ -229,6 +239,57 @@ const Settings = () => {
                 disabled={isLoading}
               >
                 {isLoading ? 'Saving...' : 'Save Timer Settings'}
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl flex items-center gap-2">
+                <Clock className="h-5 w-5" /> Default Timer Durations
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="default-focus-duration">Default Focus Duration</Label>
+                  <span className="font-medium">{currentDefaultFocusDuration} minutes</span>
+                </div>
+                <Slider
+                  id="default-focus-duration"
+                  min={5}
+                  max={60}
+                  step={5}
+                  value={[currentDefaultFocusDuration]}
+                  onValueChange={(values) => setCurrentDefaultFocusDuration(values[0])}
+                  className="py-4"
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="default-break-duration">Default Break Duration</Label>
+                  <span className="font-medium">{currentDefaultBreakDuration} minutes</span>
+                </div>
+                <Slider
+                  id="default-break-duration"
+                  min={1}
+                  max={30}
+                  step={1}
+                  value={[currentDefaultBreakDuration]}
+                  onValueChange={(values) => setCurrentDefaultBreakDuration(values[0])}
+                  className="py-4"
+                  disabled={isLoading}
+                />
+              </div>
+              
+              <Button 
+                onClick={handleSaveDefaultDurations} 
+                className="w-full"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Saving...' : 'Save Default Durations'}
               </Button>
             </CardContent>
           </Card>

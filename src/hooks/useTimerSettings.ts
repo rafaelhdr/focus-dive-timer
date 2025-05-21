@@ -11,6 +11,8 @@ interface TimerSettings {
   alarmSound?: string; // ID of the alarm sound
   autostartBreak: boolean; // Autostart break after focus
   autostartFocus: boolean; // Autostart focus after break
+  defaultFocusDuration?: number; // Default focus duration
+  defaultBreakDuration?: number; // Default break duration
 }
 
 export function useTimerSettings() {
@@ -22,6 +24,8 @@ export function useTimerSettings() {
     alarmSound: 'minimalistic',
     autostartBreak: true,
     autostartFocus: true,
+    defaultFocusDuration: 25,
+    defaultBreakDuration: 5,
   });
   const [isLoading, setIsLoading] = useState(false);
   const preferencesLoadedRef = useRef(false);
@@ -45,6 +49,8 @@ export function useTimerSettings() {
             alarmSound: prev.alarmSound || 'minimalistic',
             autostartBreak: preferences.autostart_break !== undefined ? preferences.autostart_break : true,
             autostartFocus: preferences.autostart_focus !== undefined ? preferences.autostart_focus : true,
+            defaultFocusDuration: preferences.default_focus_duration || 25,
+            defaultBreakDuration: preferences.default_break_duration || 5,
           };
           
           console.log('Updated settings:', updatedSettings);
@@ -123,6 +129,35 @@ export function useTimerSettings() {
     }
   }, []);
   
+  // Save default duration settings
+  const saveDefaultDurations = useCallback(async (defaultFocusDuration: number, defaultBreakDuration: number) => {
+    setIsLoading(true);
+    try {
+      console.log('Saving default durations:', { defaultFocusDuration, defaultBreakDuration });
+      const success = await savePreferences({
+        default_focus_duration: defaultFocusDuration,
+        default_break_duration: defaultBreakDuration,
+      });
+      
+      if (success) {
+        toast.success('Default durations saved');
+        // Update local settings to ensure consistency
+        setSettings(prev => ({
+          ...prev,
+          defaultFocusDuration,
+          defaultBreakDuration,
+        }));
+      } else {
+        toast.error('Failed to save settings');
+      }
+    } catch (error) {
+      toast.error('Error saving settings');
+      console.error('Error saving default durations:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+  
   // Update timer settings
   const updateSettings = (newSettings: Partial<TimerSettings>) => {
     setSettings(prev => ({ ...prev, ...newSettings }));
@@ -134,5 +169,6 @@ export function useTimerSettings() {
     updateSettings,
     saveSoundSettings,
     saveTimerSettings,
+    saveDefaultDurations,
   };
 }

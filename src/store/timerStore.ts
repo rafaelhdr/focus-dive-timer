@@ -39,9 +39,16 @@ const getDurationInSeconds = (
 ): number => {
   const { settings } = useSettingsStore.getState();
   const toMinutesMultiplier = TEST_TIMER ? 1 : 60;
-  return mode === "focus"
-    ? settings.focusDuration * toMinutesMultiplier
-    : settings.breakDuration * toMinutesMultiplier;
+  
+  if (mode === "focus") {
+    // Use the default focus duration from settings
+    const duration = settings.defaultFocusDuration || settings.focusDuration;
+    return duration * toMinutesMultiplier;
+  } else {
+    // Use the default break duration from settings
+    const duration = settings.defaultBreakDuration || settings.breakDuration;
+    return duration * toMinutesMultiplier;
+  }
 };
 
 // Create the Zustand store
