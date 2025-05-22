@@ -4,7 +4,6 @@ import { io, Socket } from "socket.io-client";
 import { API_URL } from "@/config/env";
 import { TimerData } from "@/hooks/types";
 import { getAccessToken } from "@/services/authApi";
-import { triggerTimerEvent } from "@/services/api";
 import { toast } from "sonner";
 import { useSettingsStore } from "./settingsStore";
 
@@ -99,10 +98,6 @@ export const useTimerStore = create<TimerState>((set, get) => {
       
       // Update server
       get().updateTimerOnServer(newEndTime, nextMode, true);
-      
-      // Trigger API event
-      triggerTimerEvent("start", nextMode === "focus" ? "focus" : "relax")
-        .catch(err => console.error("Failed to trigger timer start:", err));
         
       // Start new interval
       startTimerInterval();
@@ -349,10 +344,6 @@ export const useTimerStore = create<TimerState>((set, get) => {
         // Update server
         get().updateTimerOnServer(newEndTime, state.mode, true);
         
-        // Trigger API event
-        triggerTimerEvent("start", state.mode === "focus" ? "focus" : "relax")
-          .catch(err => console.error("Failed to trigger timer start:", err));
-        
         // Start countdown interval
         startTimerInterval();
       } else {
@@ -363,10 +354,6 @@ export const useTimerStore = create<TimerState>((set, get) => {
           clearInterval(intervalRef);
           intervalRef = null;
         }
-        
-        // Trigger API event
-        triggerTimerEvent("stop", state.mode === "focus" ? "focus" : "relax")
-          .catch(err => console.error("Failed to trigger timer stop:", err));
         
         // Update state
         set({
@@ -385,12 +372,6 @@ export const useTimerStore = create<TimerState>((set, get) => {
     // Reset timer
     resetTimer: () => {
       const state = get();
-      
-      // If timer is active, trigger stop event
-      if (state.isActive) {
-        triggerTimerEvent("stop", state.mode === "focus" ? "focus" : "relax")
-          .catch(err => console.error("Failed to trigger timer stop:", err));
-      }
       
       // Clear any existing interval
       if (intervalRef !== null) {
@@ -419,11 +400,8 @@ export const useTimerStore = create<TimerState>((set, get) => {
     toggleMode: () => {
       const state = get();
       
-      // If timer is active, trigger stop event
+      // If timer is active, clear interval
       if (state.isActive) {
-        triggerTimerEvent("stop", state.mode === "focus" ? "focus" : "relax")
-          .catch(err => console.error("Failed to trigger timer stop:", err));
-          
         // Clear any existing interval
         if (intervalRef !== null) {
           clearInterval(intervalRef);
