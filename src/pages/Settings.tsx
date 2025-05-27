@@ -196,7 +196,7 @@ const Settings = () => {
                   className="flex-1"
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Saving...' : 'Save Settings'}
+                  {isLoading ? 'Saving...' : 'Save Sound Settings'}
                 </Button>
               </div>
             </CardContent>
