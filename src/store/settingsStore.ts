@@ -162,6 +162,12 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
             defaultBreakDuration,
           }
         }));
+
+        // Update current timer for consistency
+        setInterval(() => {
+          const { isActive, resetTimer } = useTimerStore.getState();
+          if (!isActive) resetTimer()
+        }, 100);
       } else {
         toast.error("Failed to save settings");
       }
