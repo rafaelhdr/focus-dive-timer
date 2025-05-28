@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -129,7 +128,7 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
               <RadioGroupItem value={emoji.value} id={emoji.value} disabled={isFormDisabled} />
               <Label
                 htmlFor={emoji.value}
-                className="flex items-center space-x-2 cursor-pointer"
+                className="flex items-center space-x-6 cursor-pointer"
               >
                 {emoji.icon ? (
                   emoji.icon
@@ -138,7 +137,7 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
                     {emoji.value.replace(/:/g, '')}
                   </div>
                 )}
-                <span>{emoji.label}</span>
+                <span className="pl-2">{emoji.label}</span>
               </Label>
             </div>
           ))}
