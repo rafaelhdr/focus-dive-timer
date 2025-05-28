@@ -26,11 +26,11 @@ const Navigation: React.FC = () => {
       <div className="container max-w-4xl mx-auto flex justify-between items-center py-2">
         <div className="flex items-center">
           {showTimer ? (
-            <div className="text-lg font-bold mr-4">
+            <Link to="/" className="text-lg font-bold mr-4 hover:opacity-80 transition-opacity">
               <span className={mode === 'focus' ? "text-primary" : "text-emerald-500"}>
                 {formattedTime} {mode === 'focus' ? 'Focus' : 'Break'}
               </span>
-            </div>
+            </Link>
           ) : (
             <Link to="/" className="text-lg font-bold mr-4">Focus Dive</Link>
           )}
