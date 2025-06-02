@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
 import SlackConfigForm from '@/components/SlackConfigForm';
+import SlackDisconnectDialog from '@/components/SlackDisconnectDialog';
 
 const BlockDistractions = () => {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
@@ -47,6 +48,14 @@ const BlockDistractions = () => {
 
   const handleSlackConnect = () => {
     window.location.href = SLACK_AUTH_URL;
+  };
+
+  const handleSlackDisconnected = () => {
+    setIsConnected(false);
+    toast({
+      title: 'Disconnected',
+      description: 'Your Slack account has been disconnected from Focus Dive.',
+    });
   };
 
   return (
@@ -97,13 +106,19 @@ const BlockDistractions = () => {
               </div>
             ) : isConnected ? (
               <div>
-                <Alert className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900 mb-6">
-                  <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-                  <AlertTitle>Connected to Slack</AlertTitle>
-                  <AlertDescription>
-                    Your Slack account is connected and ready to use with Focus Dive.
-                  </AlertDescription>
-                </Alert>
+                <div className="flex items-center justify-between mb-6">
+                  <Alert className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900 flex-1 mr-4">
+                    <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    <AlertTitle>Connected to Slack</AlertTitle>
+                    <AlertDescription>
+                      Your Slack account is connected and ready to use with Focus Dive.
+                    </AlertDescription>
+                  </Alert>
+                  
+                  {auth.isAuthenticated && (
+                    <SlackDisconnectDialog onDisconnected={handleSlackDisconnected} />
+                  )}
+                </div>
                 
                 <SlackConfigForm 
                   isConnected={!!isConnected} 
