@@ -15,6 +15,8 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Subscriptions from "./pages/Subscriptions";
 import StripeFallback from "./pages/StripeFallback";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Support from "./pages/Support";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +37,8 @@ const App = () => (
                 <Route path="/slack/connect" element={<SlackConnect />} />
                 <Route path="/subscriptions" element={<Subscriptions />} />
                 <Route path="/subscriptions/stripe-fallback" element={<StripeFallback />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/support" element={<Support />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
