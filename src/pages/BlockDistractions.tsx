@@ -9,6 +9,7 @@ import { CheckCircle, Slack, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Navigation from '@/components/Navigation';
 import ThemeToggle from '@/components/ThemeToggle';
+import Footer from '@/components/Footer';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
@@ -59,10 +60,10 @@ const BlockDistractions = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-background p-4 transition-colors duration-300">
+    <div className="min-h-screen flex flex-col bg-background transition-colors duration-300">
       <Navigation />
       
-      <div className="pt-16 container max-w-4xl">
+      <div className="pt-16 container max-w-4xl mx-auto p-4 flex-1">
         <header className="mb-8 text-center relative w-full">
           <div className="absolute right-0 top-0 flex items-center">
             <IntegrationsInfoDialog />
@@ -154,6 +155,8 @@ const BlockDistractions = () => {
           </CardContent>
         </Card>
       </div>
+      
+      <Footer />
     </div>
   );
 };

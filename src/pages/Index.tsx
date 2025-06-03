@@ -5,6 +5,7 @@ import TimerControls from '@/components/TimerControls';
 import SettingsPanel from '@/components/SettingsPanel';
 import ThemeToggle from '@/components/ThemeToggle';
 import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
 import { useTimer } from '@/hooks/useTimer';
 import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
 
@@ -21,10 +22,10 @@ const Index = () => {
   } = useTimer();
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-background p-4 transition-colors duration-300">
+    <div className="min-h-screen flex flex-col bg-background transition-colors duration-300">
       <Navigation />
       
-      <div className="pt-16 flex flex-col items-center justify-center flex-1 w-full max-w-md">
+      <div className="pt-16 flex flex-col items-center justify-center flex-1 w-full max-w-md mx-auto p-4">
         <header className="mb-8 text-center relative w-full">
           <div className="absolute right-0 top-0">
             <ThemeToggle />
@@ -61,6 +62,8 @@ const Index = () => {
           />
         </div>
       </div>
+      
+      <Footer />
     </div>
   );
 };
