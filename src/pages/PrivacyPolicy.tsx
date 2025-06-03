@@ -57,7 +57,7 @@ const PrivacyPolicy = () => {
             
             <div>
               <h2 className="text-xl font-semibold mb-3">Your Rights</h2>
-              <p>You can request deletion of your account and associated email by contacting us at [your support email].</p>
+              <p>You can request deletion of your account and associated email by contacting us at support@focusdive.app.</p>
             </div>
             
             <div>
