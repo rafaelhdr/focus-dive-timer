@@ -51,6 +51,28 @@ const PrivacyPolicy = () => {
                     See Stripe's Privacy Policy.
                   </a>
                 </li>
+                <li>
+                  <strong>AWS (SES):</strong> Used to send essential account-related emails (e.g., confirmations, alerts).{' '}
+                  <a 
+                    href="https://aws.amazon.com/privacy/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    See AWS Privacy Policy.
+                  </a>
+                </li>
+                <li>
+                  <strong>DigitalOcean:</strong> Used to host our application and database infrastructure.{' '}
+                  <a 
+                    href="https://www.digitalocean.com/legal/privacy-policy" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    See DigitalOcean's Privacy Policy.
+                  </a>
+                </li>
               </ul>
               <p className="mt-3">These services may collect data according to their own privacy terms. We don't control or store this data ourselves.</p>
             </div>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
@@ -56,7 +55,27 @@ const SubProcessors = () => {
             </div>
             
             <div>
-              <h2 className="text-xl font-semibold mb-3">3. DigitalOcean</h2>
+              <h2 className="text-xl font-semibold mb-3">3. AWS (SES)</h2>
+              <div className="space-y-2">
+                <p><strong>Purpose:</strong> Email delivery service</p>
+                <p><strong>Data Processed:</strong> Email addresses for sending essential account-related emails</p>
+                <p><strong>Location:</strong> United States</p>
+                <p>
+                  <strong>Privacy Policy:</strong>{' '}
+                  <a 
+                    href="https://aws.amazon.com/privacy/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    https://aws.amazon.com/privacy/
+                  </a>
+                </p>
+              </div>
+            </div>
+            
+            <div>
+              <h2 className="text-xl font-semibold mb-3">4. DigitalOcean</h2>
               <div className="space-y-2">
                 <p><strong>Purpose:</strong> Application and database hosting</p>
                 <p><strong>Data Processed:</strong> Email, Slack user ID, encrypted Slack token</p>

@@ -34,10 +34,12 @@ const TermsOfService = () => {
             
             <div>
               <h2 className="text-xl font-semibold mb-3">4. Third-Party Services</h2>
-              <p className="mb-3">We use Slack and Stripe as part of our service:</p>
+              <p className="mb-3">We use Slack, Stripe, AWS, and DigitalOcean as part of our service:</p>
               <ul className="list-disc list-inside space-y-2 ml-4">
                 <li><strong>Slack:</strong> for focus automation</li>
                 <li><strong>Stripe:</strong> for payment processing</li>
+                <li><strong>AWS:</strong> for sending essential account-related emails</li>
+                <li><strong>DigitalOcean:</strong> for hosting our application and database</li>
               </ul>
               <p className="mt-3">Your use of these services is also subject to their terms.</p>
             </div>
