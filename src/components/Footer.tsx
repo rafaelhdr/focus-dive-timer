@@ -19,6 +19,12 @@ const Footer: React.FC = () => {
           </Button>
         </Link>
 
+        <Link to="/sub-processors">
+          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+            Sub-processors
+          </Button>
+        </Link>
+
         <Link to="/support">
           <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
             Support
