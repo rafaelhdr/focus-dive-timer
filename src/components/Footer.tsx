@@ -13,6 +13,12 @@ const Footer: React.FC = () => {
           </Button>
         </Link>
 
+        <Link to="/terms-of-service">
+          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+            Terms of Service
+          </Button>
+        </Link>
+
         <Link to="/support">
           <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
             Support
