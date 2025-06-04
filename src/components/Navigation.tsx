@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Clock, Settings, Link2, UserRound, LogOut, DollarSign } from 'lucide-react';
+import { Clock, Settings, Link2, UserRound, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTimer } from '@/hooks/useTimer';
 import { useAuth } from '@/contexts/AuthContext';
@@ -68,8 +68,6 @@ const Navigation: React.FC = () => {
             </Button>
           </Link>
           
-          <ThemeToggle />
-          
           {auth.isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -113,6 +111,8 @@ const Navigation: React.FC = () => {
               </Button>
             </Link>
           )}
+          
+          <ThemeToggle />
         </div>
       </div>
     </div>
