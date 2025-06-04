@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { getIntegrationSettings, saveIntegrationSettings } from "@/services/integrationService";
 import { Card, CardContent } from "@/components/ui/card";
+import { API_URL } from "@/config/env";
+import { getCommonHeaders } from "@/utils/apiUtils";
 
 // Available emoji options
 const emojiOptions = [
@@ -25,6 +28,8 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
   const [selectedEmoji, setSelectedEmoji] = useState<string>(":person_in_lotus_position:");
   const [statusText, setStatusText] = useState<string>("Focus time");
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [isTestingStart, setIsTestingStart] = useState<boolean>(false);
+  const [isTestingStop, setIsTestingStop] = useState<boolean>(false);
   const { toast } = useToast();
 
   // Only load settings if user is both authenticated and connected to Slack
@@ -85,6 +90,84 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
       });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleTestStart = async () => {
+    if (!isConnected || !isAuthenticated) return;
+
+    setIsTestingStart(true);
+    try {
+      const response = await fetch(`${API_URL}/slack/test`, {
+        method: 'POST',
+        headers: getCommonHeaders(),
+        credentials: 'include',
+        body: JSON.stringify({
+          mode: 'start',
+          test_dnd_text: statusText,
+          test_dnd_emoji: selectedEmoji,
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Test Started",
+          description: "Slack status has been set with your test settings.",
+        });
+      } else {
+        toast({
+          title: "Test Failed",
+          description: "Failed to start Slack test.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error starting Slack test:", error);
+      toast({
+        title: "Error",
+        description: "An error occurred while starting the test.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsTestingStart(false);
+    }
+  };
+
+  const handleTestStop = async () => {
+    if (!isConnected || !isAuthenticated) return;
+
+    setIsTestingStop(true);
+    try {
+      const response = await fetch(`${API_URL}/slack/test`, {
+        method: 'POST',
+        headers: getCommonHeaders(),
+        credentials: 'include',
+        body: JSON.stringify({
+          mode: 'stop',
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Test Stopped",
+          description: "Slack status has been cleared.",
+        });
+      } else {
+        toast({
+          title: "Test Failed",
+          description: "Failed to stop Slack test.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error stopping Slack test:", error);
+      toast({
+        title: "Error",
+        description: "An error occurred while stopping the test.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsTestingStop(false);
     }
   };
 
@@ -152,11 +235,33 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
         </p>
         <Card className="max-w-md border-slate-200">
           <CardContent className="pt-4">
-            <div className="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800">
+            <div className="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800 mb-4">
               <div className="flex items-center justify-center w-8 h-8">
                 {getSelectedEmojiIcon()}
               </div>
               <span className="font-medium text-sm">{statusText || "Focus time"}</span>
+            </div>
+            
+            {/* Test buttons */}
+            <div className="flex gap-2">
+              <Button
+                onClick={handleTestStart}
+                disabled={isFormDisabled || isTestingStart || !isConnected}
+                size="sm"
+                variant="outline"
+                type="button"
+              >
+                {isTestingStart ? "Testing..." : "Test Start"}
+              </Button>
+              <Button
+                onClick={handleTestStop}
+                disabled={isFormDisabled || isTestingStop || !isConnected}
+                size="sm"
+                variant="outline"
+                type="button"
+              >
+                {isTestingStop ? "Stopping..." : "Test Stop"}
+              </Button>
             </div>
           </CardContent>
         </Card>
