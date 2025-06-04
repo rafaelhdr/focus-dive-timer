@@ -289,10 +289,6 @@ const SubscriptionsPage: React.FC = () => {
             <CardHeader>
               <CardTitle className="text-2xl">Teams</CardTitle>
               <CardDescription>For organizations and teams</CardDescription>
-              <div className="mt-4">
-                <span className="text-4xl font-bold">Custom</span>
-                <div className="text-sm text-muted-foreground mt-1">Contact us for pricing</div>
-              </div>
             </CardHeader>
             <CardContent className="flex-grow">
               <ul className="space-y-4">
@@ -325,7 +321,7 @@ const SubscriptionsPage: React.FC = () => {
                 onClick={handleTeamRequest}
                 disabled={isLoading || !auth.isAuthenticated}
               >
-                {isLoading ? "Processing..." : "Request Team Pricing"}
+                {isLoading ? "Processing..." : "Contact us for Pricing"}
               </Button>
             </CardFooter>
           </Card>
