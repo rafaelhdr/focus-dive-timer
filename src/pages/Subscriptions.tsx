@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Users, Calendar, Siren, Info, ExternalLink, Clock } from 'lucide-react';
+import { X, Check, Users, Calendar, Siren, Info, ExternalLink, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -199,33 +199,23 @@ const SubscriptionsPage: React.FC = () => {
             <CardHeader>
               <CardTitle className="text-2xl">Free</CardTitle>
               <CardDescription>For getting started with focus sessions</CardDescription>
-              
-              <div className="mt-4">
-                <span className="text-4xl font-bold">$0</span>
-                <div className="text-sm text-muted-foreground mt-1">Forever</div>
-              </div>
             </CardHeader>
             <CardContent className="flex-grow">
               <ul className="space-y-4">
+                <li className="flex items-start">
+                  <X className="h-5 w-5 text-red-500 mr-2 shrink-0 mt-0.5" />
+                  <span>Includes advertisements</span>
+                </li>
                 <li className="flex items-start">
                   <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
                   <span>Unlimited focus sessions</span>
                 </li>
                 <li className="flex items-start">
                   <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
-                  <span>Limited Slack integration</span>
-                </li>
-                <li className="flex items-start">
-                  <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
-                  <span>Includes advertisements</span>
+                  <span>Limited Slack integration & status sync</span>
                 </li>
               </ul>
             </CardContent>
-            <CardFooter>
-              <div className="w-full text-center text-sm text-muted-foreground">
-                Currently active
-              </div>
-            </CardFooter>
           </Card>
 
           {/* Premium Individual Plan */}
@@ -263,6 +253,10 @@ const SubscriptionsPage: React.FC = () => {
             </CardHeader>
             <CardContent className="flex-grow">
               <ul className="space-y-4">
+                <li className="flex items-start">
+                  <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
+                  <span>All Premium features</span>
+                </li>
                 <li className="flex items-start">
                   <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
                   <span>No advertisements</span>
