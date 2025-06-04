@@ -3,7 +3,6 @@ import React from 'react';
 import Timer from '@/components/Timer';
 import TimerControls from '@/components/TimerControls';
 import SettingsPanel from '@/components/SettingsPanel';
-import ThemeToggle from '@/components/ThemeToggle';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { useTimer } from '@/hooks/useTimer';
@@ -26,10 +25,7 @@ const Index = () => {
       <Navigation />
       
       <div className="pt-16 flex flex-col items-center justify-center flex-1 w-full max-w-md mx-auto p-4">
-        <header className="mb-8 text-center relative w-full">
-          <div className="absolute right-0 top-0">
-            <ThemeToggle />
-          </div>
+        <header className="mb-8 text-center w-full">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Focus Dive</h1>
           <div className="flex items-center justify-center gap-2">
             <p className="text-muted-foreground">

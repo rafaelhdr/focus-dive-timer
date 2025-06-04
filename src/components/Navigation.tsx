@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useTimer } from '@/hooks/useTimer';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import ThemeToggle from '@/components/ThemeToggle';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,6 +67,8 @@ const Navigation: React.FC = () => {
               <span className="hidden sm:inline">Settings</span>
             </Button>
           </Link>
+          
+          <ThemeToggle />
           
           {auth.isAuthenticated ? (
             <DropdownMenu>

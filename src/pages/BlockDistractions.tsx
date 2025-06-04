@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { SLACK_AUTH_URL } from '@/config/env';
 import { checkSlackConnection } from '@/services/slackService';
@@ -8,7 +7,6 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { CheckCircle, Slack, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Navigation from '@/components/Navigation';
-import ThemeToggle from '@/components/ThemeToggle';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link } from 'react-router-dom';
@@ -67,7 +65,6 @@ const BlockDistractions = () => {
         <header className="mb-8 text-center relative w-full">
           <div className="absolute right-0 top-0 flex items-center">
             <IntegrationsInfoDialog />
-            <ThemeToggle />
           </div>
           <h1 className="text-3xl font-bold mb-2">Block Distractions</h1>
           <p className="text-muted-foreground mb-4">

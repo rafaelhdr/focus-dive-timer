@@ -6,7 +6,6 @@ import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import ThemeToggle from '@/components/ThemeToggle';
 import Navigation from '@/components/Navigation';
 import { useTimer } from '@/hooks/useTimer';
 import { 
@@ -116,10 +115,7 @@ const Settings = () => {
       <Navigation />
       
       <div className="pt-16 flex flex-col items-center w-full max-w-md">
-        <header className="mb-8 text-center relative w-full">
-          <div className="absolute right-0 top-0">
-            <ThemeToggle />
-          </div>
+        <header className="mb-8 text-center w-full">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Settings</h1>
           <p className="text-muted-foreground">Customize your Focus Dive experience</p>
         </header>
