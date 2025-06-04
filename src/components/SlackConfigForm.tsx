@@ -103,7 +103,7 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
         headers: getCommonHeaders(),
         credentials: 'include',
         body: JSON.stringify({
-          mode: 'start',
+          action: 'start',
           test_dnd_text: statusText,
           test_dnd_emoji: selectedEmoji,
         }),
@@ -143,7 +143,7 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
         headers: getCommonHeaders(),
         credentials: 'include',
         body: JSON.stringify({
-          mode: 'stop',
+          action: 'stop',
         }),
       });
 
