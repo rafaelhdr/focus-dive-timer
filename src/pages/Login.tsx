@@ -128,19 +128,21 @@ const Login = () => {
                   control={verificationForm.control}
                   name="token"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Verification Code</FormLabel>
+                    <FormItem className="text-center">
+                      <FormLabel className="text-center block">Verification Code</FormLabel>
                       <FormControl>
-                        <InputOTP maxLength={6} {...field}>
-                          <InputOTPGroup>
-                            <InputOTPSlot index={0} />
-                            <InputOTPSlot index={1} />
-                            <InputOTPSlot index={2} />
-                            <InputOTPSlot index={3} />
-                            <InputOTPSlot index={4} />
-                            <InputOTPSlot index={5} />
-                          </InputOTPGroup>
-                        </InputOTP>
+                        <div className="flex justify-center">
+                          <InputOTP maxLength={6} {...field}>
+                            <InputOTPGroup>
+                              <InputOTPSlot index={0} />
+                              <InputOTPSlot index={1} />
+                              <InputOTPSlot index={2} />
+                              <InputOTPSlot index={3} />
+                              <InputOTPSlot index={4} />
+                              <InputOTPSlot index={5} />
+                            </InputOTPGroup>
+                          </InputOTP>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
