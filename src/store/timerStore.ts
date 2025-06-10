@@ -140,7 +140,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
       
       // Update document title
       const focusType = state.mode === "focus" ? "Focus" : "Break";
-      document.title = `${get().formatTime(secondsLeft)} ${focusType}`;
+      document.title = `${state.formatTime(secondsLeft)} ${focusType}`;
       
       // Handle timer completion
       if (secondsLeft === 0 && state.isActive) {
