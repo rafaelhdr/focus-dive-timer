@@ -1,11 +1,14 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Timer from '@/components/Timer';
 import TimerControls from '@/components/TimerControls';
 import SettingsPanel from '@/components/SettingsPanel';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import SubscriptionAlert from '@/components/SubscriptionAlert';
 import { useTimer } from '@/hooks/useTimer';
+import { useAuth } from '@/contexts/AuthContext';
+import { fetchUserSubscriptionData, UserSubscriptionData } from '@/services/userApi';
 import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
 
 const Index = () => {
@@ -19,6 +22,42 @@ const Index = () => {
     toggleMode, 
     updateSettings 
   } = useTimer();
+
+  const { auth } = useAuth();
+  const [userSubscriptionData, setUserSubscriptionData] = useState<UserSubscriptionData | null>(null);
+  const [showSubscriptionAlert, setShowSubscriptionAlert] = useState(false);
+
+  // Check if subscription alert should be shown
+  useEffect(() => {
+    const checkSubscriptionAlert = async () => {
+      if (!auth.isAuthenticated) {
+        setShowSubscriptionAlert(false);
+        return;
+      }
+
+      const dismissedAlert = localStorage.getItem('dismiss_subscription_alert') === 'true';
+      if (dismissedAlert) {
+        setShowSubscriptionAlert(false);
+        return;
+      }
+
+      const subscriptionData = await fetchUserSubscriptionData();
+      setUserSubscriptionData(subscriptionData);
+      
+      if (subscriptionData && !subscriptionData.has_subscription) {
+        setShowSubscriptionAlert(true);
+      } else {
+        setShowSubscriptionAlert(false);
+      }
+    };
+
+    checkSubscriptionAlert();
+  }, [auth.isAuthenticated]);
+
+  const handleDismissAlert = () => {
+    localStorage.setItem('dismiss_subscription_alert', 'true');
+    setShowSubscriptionAlert(false);
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background transition-colors duration-300">
@@ -36,6 +75,10 @@ const Index = () => {
         </header>
 
         <div className="w-full max-w-md">
+          {showSubscriptionAlert && (
+            <SubscriptionAlert onDismiss={handleDismissAlert} />
+          )}
+
           <Timer 
             time={formattedTime} 
             mode={mode} 
