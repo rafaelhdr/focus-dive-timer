@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => ({
   },
   server: {
     host: "::",
-    allowedHosts: ['focusdive.app', '867917a8-7dc5-4c33-8d1d-c97fe6b92624.lovableproject.com'],
+    allowedHosts: ['staging.focusdive.app', 'focusdive.app', '867917a8-7dc5-4c33-8d1d-c97fe6b92624.lovableproject.com'],
     port: 8080,
   },
   plugins: [
