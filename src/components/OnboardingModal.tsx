@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -8,7 +7,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Clock, Slack, MessageCircle, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Clock, Slack, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface OnboardingModalProps {
   isOpen: boolean;
@@ -100,17 +99,8 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}}>
-      <DialogContent className="sm:max-w-md" onPointerDownOutside={(e) => e.preventDefault()}>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute right-4 top-4"
-          onClick={handleClose}
-        >
-          <X className="h-4 w-4" />
-        </Button>
-        
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-md">        
         {renderStepContent()}
         
         <div className="flex items-center justify-between mt-6">
