@@ -82,7 +82,14 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
               <DialogDescription className="text-base">
                 Focus Dive is actively being developed with your productivity in mind. We're constantly working on new features and integrations.
                 <br /><br />
-                Have ideas on how we can make Focus Dive better for your workflow? We'd love to hear from you! Reach out through our Contact link to share your suggestions.
+                Have ideas on how we can make Focus Dive better for your workflow? We'd love to hear from you! Reach out to{' '}
+                <a 
+                  href="mailto:support@focusdive.app" 
+                  className="text-primary hover:underline"
+                >
+                  support@focusdive.app
+                </a>{' '}
+                to share your suggestions.
               </DialogDescription>
             </DialogHeader>
           </div>
