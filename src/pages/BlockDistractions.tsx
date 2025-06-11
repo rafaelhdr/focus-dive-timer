@@ -66,7 +66,7 @@ const BlockDistractions = () => {
           <div className="absolute right-0 top-0 flex items-center">
             <IntegrationsInfoDialog />
           </div>
-          <h1 className="text-3xl font-bold mb-2">Block Distractions</h1>
+          <h1 className="text-3xl font-bold mb-2">Integrations</h1>
           <p className="text-muted-foreground mb-4">
             Connect your Slack account to automatically update your status during focus sessions.
           </p>

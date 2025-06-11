@@ -60,9 +60,9 @@ const Navigation: React.FC = () => {
                 <span className="hidden sm:inline">Timer</span>
               </Button>
             </Link>
-            <Link to="/block-distractions">
+            <Link to="/integrations">
               <Button 
-                variant={location.pathname === '/block-distractions' ? 'default' : 'ghost'} 
+                variant={location.pathname === '/integrations' ? 'default' : 'ghost'} 
                 size="sm"
                 className="gap-2"
               >

@@ -35,7 +35,7 @@ const App = () => (
                 <Route path="/login" element={<Login />} />
                 <Route path="/" element={<Index />} />
                 <Route path="/settings" element={<Settings />} />
-                <Route path="/block-distractions" element={<BlockDistractions />} />
+                <Route path="/integrations" element={<BlockDistractions />} />
                 <Route path="/slack/connect" element={<SlackConnect />} />
                 <Route path="/subscriptions" element={<Subscriptions />} />
                 <Route path="/subscriptions/stripe-fallback" element={<StripeFallback />} />
