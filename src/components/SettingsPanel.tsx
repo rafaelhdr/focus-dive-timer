@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
+import { analytics } from '@/utils/analytics';
 
 interface SettingsPanelProps {
   focusDuration: number;
@@ -17,6 +18,18 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   onUpdateFocusDuration,
   onUpdateBreakDuration,
 }) => {
+  const handleFocusDurationChange = (values: number[]) => {
+    const newValue = values[0];
+    analytics.settingsChanged('focus_duration', newValue);
+    onUpdateFocusDuration(newValue);
+  };
+
+  const handleBreakDurationChange = (values: number[]) => {
+    const newValue = values[0];
+    analytics.settingsChanged('break_duration', newValue);
+    onUpdateBreakDuration(newValue);
+  };
+
   return (
     <Card className="mt-6">
       <CardHeader>
@@ -34,7 +47,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
             max={60}
             step={5}
             value={[focusDuration]}
-            onValueChange={(values) => onUpdateFocusDuration(values[0])}
+            onValueChange={handleFocusDurationChange}
             className="py-4"
           />
         </div>
@@ -50,7 +63,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
             max={30}
             step={1}
             value={[breakDuration]}
-            onValueChange={(values) => onUpdateBreakDuration(values[0])}
+            onValueChange={handleBreakDurationChange}
             className="py-4"
           />
         </div>

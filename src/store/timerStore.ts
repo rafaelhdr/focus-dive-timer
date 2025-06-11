@@ -6,6 +6,7 @@ import { TimerData } from "@/hooks/types";
 import { getAccessToken } from "@/services/authApi";
 import { toast } from "sonner";
 import { useSettingsStore } from "./settingsStore";
+import { analytics } from "@/utils/analytics";
 
 const TEST_TIMER = false; // Set to true for testing purposes
 
@@ -65,6 +66,9 @@ export const useTimerStore = create<TimerState>((set, get) => {
     
     const state = get();
     
+    // Track timer completion
+    analytics.timerCompleted(state.mode, getDurationInSeconds(state.mode));
+    
     // Get settings for sound and autostart
     const { settings } = useSettingsStore.getState();
     
@@ -87,6 +91,9 @@ export const useTimerStore = create<TimerState>((set, get) => {
       // Auto-start the next timer
       const newDuration = getDurationInSeconds(nextMode);
       const newEndTime = Date.now() + newDuration * 1000 + 1000; // Add 1s buffer
+      
+      // Track auto-start
+      analytics.timerStarted(nextMode, newDuration);
       
       // Update state
       set({ 
@@ -335,6 +342,9 @@ export const useTimerStore = create<TimerState>((set, get) => {
         // Starting the timer
         const newEndTime = Date.now() + (state.timeLeft * 1000) + 1000; // Add 1s buffer
         
+        // Track timer start
+        analytics.timerStarted(state.mode, state.timeLeft);
+        
         // Update state
         set({
           isActive: true,
@@ -348,6 +358,9 @@ export const useTimerStore = create<TimerState>((set, get) => {
         startTimerInterval();
       } else {
         // Pausing the timer
+        
+        // Track timer pause
+        analytics.timerPaused(state.mode, state.timeLeft);
         
         // Clear interval
         if (intervalRef !== null) {
@@ -372,6 +385,9 @@ export const useTimerStore = create<TimerState>((set, get) => {
     // Reset timer
     resetTimer: () => {
       const state = get();
+      
+      // Track timer reset
+      analytics.timerReset(state.mode);
       
       // Clear any existing interval
       if (intervalRef !== null) {
@@ -400,6 +416,10 @@ export const useTimerStore = create<TimerState>((set, get) => {
     toggleMode: () => {
       const state = get();
       
+      // Track mode toggle
+      const newMode = state.mode === "focus" ? "break" : "focus";
+      analytics.modeToggled(state.mode, newMode);
+      
       // If timer is active, clear interval
       if (state.isActive) {
         // Clear any existing interval
@@ -408,9 +428,6 @@ export const useTimerStore = create<TimerState>((set, get) => {
           intervalRef = null;
         }
       }
-      
-      // Switch mode
-      const newMode = state.mode === "focus" ? "break" : "focus";
       
       // Calculate new duration
       const newDuration = getDurationInSeconds(newMode);

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -8,6 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Clock, Slack, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { analytics } from '@/utils/analytics';
 
 interface OnboardingModalProps {
   isOpen: boolean;
@@ -32,6 +34,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
 
   const handleClose = () => {
     localStorage.setItem('focus_dive_onboarding_dismissed', 'true');
+    analytics.onboardingCompleted();
     setCurrentStep(1); // Reset for next time
     onClose();
   };
