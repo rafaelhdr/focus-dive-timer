@@ -38,7 +38,6 @@ const Timer: React.FC<TimerProps> = ({ time, mode, isActive, onAddFocusMinutes }
         variant="secondary"
         className="absolute bottom-4 right-4 bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"
       >
-        <Plus className="h-3 w-3 mr-1" />
         +5 Focus
       </Button>
     </div>
