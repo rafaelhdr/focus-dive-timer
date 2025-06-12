@@ -106,7 +106,7 @@ const BlockDistractions = () => {
               </div>
             ) : isConnected ? (
               <div>
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-left justify-between mb-6">
                   <Alert className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900 flex-1 mr-4">
                     <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
                     <AlertTitle>Connected to Slack</AlertTitle>
