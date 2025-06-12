@@ -61,8 +61,6 @@ const SlackPermissionsDialog = () => {
                   <p className="text-sm font-medium mb-1">If approval is required:</p>
                   <p className="text-sm text-muted-foreground">
                     Accept the installation request and contact your Slack administrators. 
-                    Let them know you'd like to use Focus Dive to automatically update your 
-                    status during focus sessions.
                   </p>
                 </div>
               </div>
