@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { SLACK_AUTH_URL } from '@/config/env';
 import { checkSlackConnection } from '@/services/slackService';
@@ -13,6 +14,7 @@ import { Link } from 'react-router-dom';
 import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
 import SlackConfigForm from '@/components/SlackConfigForm';
 import SlackDisconnectDialog from '@/components/SlackDisconnectDialog';
+import SlackPermissionsDialog from '@/components/SlackPermissionsDialog';
 
 const BlockDistractions = () => {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
@@ -127,14 +129,17 @@ const BlockDistractions = () => {
               <div>
                 <div className="text-left py-4 mb-8">
                   <p className="mb-4">Connect your Slack account to enable automatic status updates.</p>
-                  <Button 
-                    onClick={handleSlackConnect} 
-                    className="gap-2" 
-                    disabled={!auth.isAuthenticated}
-                  >
-                    <Slack className="h-4 w-4" />
-                    Connect to Slack
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={handleSlackConnect} 
+                      className="gap-2" 
+                      disabled={!auth.isAuthenticated}
+                    >
+                      <Slack className="h-4 w-4" />
+                      Connect to Slack
+                    </Button>
+                    <SlackPermissionsDialog />
+                  </div>
                   {!auth.isAuthenticated && (
                     <p className="text-sm text-muted-foreground mt-3">
                       Please login to enable this integration
