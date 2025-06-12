@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Clock, Settings, Link2, UserRound, LogOut, HelpCircle, Menu } from 'lucide-react';
@@ -21,7 +20,6 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
-  DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer';
@@ -82,7 +80,7 @@ const Navigation: React.FC = () => {
               </Link>
             ) : (
               <div className="flex items-center">
-                <Link to="/" className={`${isMobile ? 'text-base' : 'text-lg'} font-bold mr-2`}>Focus Dive</Link>
+                <Link to="/" className={`${isMobile ? 'text-sm' : 'text-lg'} font-bold mr-2`}>Focus Dive</Link>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -149,10 +147,8 @@ const Navigation: React.FC = () => {
                   </Button>
                 </DrawerTrigger>
                 <DrawerContent>
-                  <DrawerHeader>
-                    <DrawerTitle>Navigation</DrawerTitle>
-                  </DrawerHeader>
-                  <div className="px-4 pb-6 space-y-2">
+                  <div className="px-4 pt-4 pb-6 space-y-2">
+                    <DrawerTitle className="text-left mb-4">Navigation</DrawerTitle>
                     <DrawerClose asChild>
                       <div className="space-y-2">
                         <NavigationLinks onItemClick={() => {}} />
