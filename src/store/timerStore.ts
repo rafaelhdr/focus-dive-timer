@@ -456,8 +456,9 @@ export const useTimerStore = create<TimerState>((set, get) => {
       analytics.settingsChanged('add_focus_minutes', minutes);
       
       if (state.mode === "break") {
-        // Switch to focus mode with the added minutes
+        // Switch to focus mode with the added minutes and start the timer
         const newDuration = additionalSeconds;
+        const newEndTime = Date.now() + (newDuration * 1000) + 1000; // Add 1s buffer
         
         // Clear any existing interval if timer was running
         if (intervalRef !== null) {
@@ -465,20 +466,23 @@ export const useTimerStore = create<TimerState>((set, get) => {
           intervalRef = null;
         }
         
+        // Track timer start
+        analytics.timerStarted("focus", newDuration);
+        
         set({
           mode: "focus",
           timeLeft: newDuration,
-          isActive: false,
-          timerEndTime: null
+          isActive: true,
+          timerEndTime: newEndTime
         });
         
         // Update server
-        get().updateTimerOnServer(null, "focus", false);
+        get().updateTimerOnServer(newEndTime, "focus", true);
         
-        // Reset document title
-        document.title = "Focus Dive";
+        // Start countdown interval
+        startTimerInterval();
         
-        toast(`Switched to focus mode with ${minutes} minutes`);
+        toast(`Switched to focus mode with ${minutes} minutes and started timer`);
       } else {
         // Add minutes to current focus timer
         const newTimeLeft = state.timeLeft + additionalSeconds;
