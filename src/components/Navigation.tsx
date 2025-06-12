@@ -1,13 +1,14 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Clock, Settings, Link2, UserRound, LogOut, HelpCircle } from 'lucide-react';
+import { Clock, Settings, Link2, UserRound, LogOut, HelpCircle, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTimer } from '@/hooks/useTimer';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import ThemeToggle from '@/components/ThemeToggle';
 import OnboardingModal from '@/components/OnboardingModal';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +17,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer';
 
 const Navigation: React.FC = () => {
   const location = useLocation();
@@ -23,6 +32,42 @@ const Navigation: React.FC = () => {
   const { auth, logout } = useAuth();
   const showTimer = location.pathname !== '/' && isActive;
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const isMobile = useIsMobile();
+  
+  const NavigationLinks = ({ onItemClick }: { onItemClick?: () => void }) => (
+    <>
+      <Link to="/" onClick={onItemClick}>
+        <Button 
+          variant={location.pathname === '/' ? 'default' : 'ghost'} 
+          size="sm"
+          className="gap-2 w-full justify-start"
+        >
+          <Clock className="h-4 w-4" />
+          Timer
+        </Button>
+      </Link>
+      <Link to="/integrations" onClick={onItemClick}>
+        <Button 
+          variant={location.pathname === '/integrations' ? 'default' : 'ghost'} 
+          size="sm"
+          className="gap-2 w-full justify-start"
+        >
+          <Link2 className="h-4 w-4" />
+          Integrations
+        </Button>
+      </Link>
+      <Link to="/settings" onClick={onItemClick}>
+        <Button 
+          variant={location.pathname === '/settings' ? 'default' : 'ghost'} 
+          size="sm"
+          className="gap-2 w-full justify-start"
+        >
+          <Settings className="h-4 w-4" />
+          Settings
+        </Button>
+      </Link>
+    </>
+  );
   
   return (
     <>
@@ -30,14 +75,14 @@ const Navigation: React.FC = () => {
         <div className="container max-w-4xl mx-auto flex justify-between items-center py-2">
           <div className="flex items-center">
             {showTimer ? (
-              <Link to="/" className="text-lg font-bold mr-4 hover:opacity-80 transition-opacity">
+              <Link to="/" className={`${isMobile ? 'text-base' : 'text-lg'} font-bold mr-4 hover:opacity-80 transition-opacity`}>
                 <span className={mode === 'focus' ? "text-primary" : "text-emerald-500"}>
                   {formattedTime} {mode === 'focus' ? 'Focus' : 'Break'}
                 </span>
               </Link>
             ) : (
               <div className="flex items-center">
-                <Link to="/" className="text-lg font-bold mr-2">Focus Dive</Link>
+                <Link to="/" className={`${isMobile ? 'text-base' : 'text-lg'} font-bold mr-2`}>Focus Dive</Link>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -49,84 +94,125 @@ const Navigation: React.FC = () => {
               </div>
             )}
           </div>
-          <div className="flex items-center gap-2">
-            <Link to="/">
-              <Button 
-                variant={location.pathname === '/' ? 'default' : 'ghost'} 
-                size="sm"
-                className="gap-2"
-              >
-                <Clock className="h-4 w-4" />
-                <span className="hidden sm:inline">Timer</span>
-              </Button>
-            </Link>
-            <Link to="/integrations">
-              <Button 
-                variant={location.pathname === '/integrations' ? 'default' : 'ghost'} 
-                size="sm"
-                className="gap-2"
-              >
-                <Link2 className="h-4 w-4" />
-                <span className="hidden sm:inline">Integrations</span>
-              </Button>
-            </Link>
-            <Link to="/settings">
-              <Button 
-                variant={location.pathname === '/settings' ? 'default' : 'ghost'} 
-                size="sm"
-                className="gap-2"
-              >
-                <Settings className="h-4 w-4" />
-                <span className="hidden sm:inline">Settings</span>
-              </Button>
-            </Link>
-            
-            {auth.isAuthenticated ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-primary text-primary-foreground">
-                        <UserRound className="h-4 w-4" />
-                      </AvatarFallback>
-                    </Avatar>
+          
+          {isMobile ? (
+            <div className="flex items-center gap-2">
+              {auth.isAuthenticated ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="relative h-8 w-8 rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                          <UserRound className="h-4 w-4" />
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem disabled className="flex justify-between">
+                      <span className="text-muted-foreground text-xs">
+                        {localStorage.getItem('focus_dive_user_email') || 'User'}
+                      </span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/subscriptions" className="flex items-center cursor-pointer">
+                        Subscription
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={logout} className="text-red-500 cursor-pointer">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link to="/login">
+                  <Button 
+                    variant={location.pathname === '/login' ? 'default' : 'ghost'} 
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                  >
+                    <UserRound className="h-4 w-4" />
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem disabled className="flex justify-between">
-                    <span className="text-muted-foreground text-xs">
-                      {localStorage.getItem('focus_dive_user_email') || 'User'}
-                    </span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to="/subscriptions" className="flex items-center cursor-pointer">
-                      Subscription
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={logout} className="text-red-500 cursor-pointer">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Log out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Link to="/login">
-                <Button 
-                  variant={location.pathname === '/login' ? 'default' : 'ghost'} 
-                  size="sm"
-                  className="gap-2"
-                >
-                  <UserRound className="h-4 w-4" />
-                  <span className="hidden sm:inline">Login</span>
-                </Button>
-              </Link>
-            )}
-            
-            <ThemeToggle />
-          </div>
+                </Link>
+              )}
+              
+              <ThemeToggle />
+              
+              <Drawer>
+                <DrawerTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <Menu className="h-4 w-4" />
+                  </Button>
+                </DrawerTrigger>
+                <DrawerContent>
+                  <DrawerHeader>
+                    <DrawerTitle>Navigation</DrawerTitle>
+                  </DrawerHeader>
+                  <div className="px-4 pb-6 space-y-2">
+                    <DrawerClose asChild>
+                      <div className="space-y-2">
+                        <NavigationLinks onItemClick={() => {}} />
+                      </div>
+                    </DrawerClose>
+                  </div>
+                </DrawerContent>
+              </Drawer>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <NavigationLinks />
+              
+              {auth.isAuthenticated ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="relative h-8 w-8 rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                          <UserRound className="h-4 w-4" />
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem disabled className="flex justify-between">
+                      <span className="text-muted-foreground text-xs">
+                        {localStorage.getItem('focus_dive_user_email') || 'User'}
+                      </span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/subscriptions" className="flex items-center cursor-pointer">
+                        Subscription
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={logout} className="text-red-500 cursor-pointer">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link to="/login">
+                  <Button 
+                    variant={location.pathname === '/login' ? 'default' : 'ghost'} 
+                    size="sm"
+                    className="gap-2"
+                  >
+                    <UserRound className="h-4 w-4" />
+                    <span className="hidden sm:inline">Login</span>
+                  </Button>
+                </Link>
+              )}
+              
+              <ThemeToggle />
+            </div>
+          )}
         </div>
       </div>
       
