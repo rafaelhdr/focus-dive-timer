@@ -125,7 +125,7 @@ const BlockDistractions = () => {
               </div>
             ) : (
               <div>
-                <div className="text-center py-4 mb-8">
+                <div className="text-left py-4 mb-8">
                   <p className="mb-4">Connect your Slack account to enable automatic status updates.</p>
                   <Button 
                     onClick={handleSlackConnect} 
