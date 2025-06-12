@@ -13,6 +13,7 @@ export function useTimer() {
     toggleTimer,
     resetTimer,
     toggleMode,
+    addFocusMinutes,
     updateSettings,
     saveSoundSettings,
     saveTimerSettings
@@ -28,6 +29,7 @@ export function useTimer() {
     toggleTimer,
     resetTimer,
     toggleMode,
+    addFocusMinutes,
     updateSettings,
     saveSoundSettings,
     saveTimerSettings,

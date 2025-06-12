@@ -1,4 +1,3 @@
-
 import { create } from "zustand";
 import { io, Socket } from "socket.io-client";
 import { API_URL } from "@/config/env";
@@ -25,6 +24,7 @@ interface TimerState {
   toggleTimer: () => void;
   resetTimer: () => void;
   toggleMode: () => void;
+  addFocusMinutes: (minutes: number) => void;
   formatTime: (timeInSeconds: number) => string;
   
   // Socket methods
@@ -445,6 +445,69 @@ export const useTimerStore = create<TimerState>((set, get) => {
       
       // Update server
       get().updateTimerOnServer(null, newMode, false);
+    },
+    
+    // Add focus minutes function
+    addFocusMinutes: (minutes: number) => {
+      const state = get();
+      const additionalSeconds = minutes * (TEST_TIMER ? 1 : 60);
+      
+      // Track the action
+      analytics.settingsChanged('add_focus_minutes', minutes);
+      
+      if (state.mode === "break") {
+        // Switch to focus mode with the added minutes
+        const newDuration = additionalSeconds;
+        
+        // Clear any existing interval if timer was running
+        if (intervalRef !== null) {
+          clearInterval(intervalRef);
+          intervalRef = null;
+        }
+        
+        set({
+          mode: "focus",
+          timeLeft: newDuration,
+          isActive: false,
+          timerEndTime: null
+        });
+        
+        // Update server
+        get().updateTimerOnServer(null, "focus", false);
+        
+        // Reset document title
+        document.title = "Focus Dive";
+        
+        toast(`Switched to focus mode with ${minutes} minutes`);
+      } else {
+        // Add minutes to current focus timer
+        const newTimeLeft = state.timeLeft + additionalSeconds;
+        
+        if (state.isActive && state.timerEndTime) {
+          // If timer is running, extend the end time
+          const newEndTime = state.timerEndTime + (additionalSeconds * 1000);
+          
+          set({
+            timeLeft: newTimeLeft,
+            timerEndTime: newEndTime
+          });
+          
+          // Update server
+          get().updateTimerOnServer(newEndTime, "focus", true);
+        } else {
+          // If timer is paused, just add to the time left
+          set({
+            timeLeft: newTimeLeft
+          });
+          
+          // Update server if needed
+          if (state.socket) {
+            get().updateTimerOnServer(null, "focus", false);
+          }
+        }
+        
+        toast(`Added ${minutes} minutes to focus timer`);
+      }
     },
   };
 });

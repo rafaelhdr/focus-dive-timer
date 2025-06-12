@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import Timer from '@/components/Timer';
 import TimerControls from '@/components/TimerControls';
@@ -20,7 +19,8 @@ const Index = () => {
     settings,
     toggleTimer, 
     resetTimer, 
-    toggleMode, 
+    toggleMode,
+    addFocusMinutes,
     updateSettings 
   } = useTimer();
 
@@ -71,6 +71,10 @@ const Index = () => {
     setShowSubscriptionAlert(false);
   };
 
+  const handleAddFocusMinutes = () => {
+    addFocusMinutes(5);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background transition-colors duration-300">
       <Navigation />
@@ -94,7 +98,8 @@ const Index = () => {
           <Timer 
             time={formattedTime} 
             mode={mode} 
-            isActive={isActive} 
+            isActive={isActive}
+            onAddFocusMinutes={handleAddFocusMinutes}
           />
 
           <TimerControls 
