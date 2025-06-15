@@ -1,4 +1,3 @@
-
 import { create } from "zustand";
 import { io, Socket } from "socket.io-client";
 import { API_URL } from "@/config/env";
@@ -57,74 +56,15 @@ export const useTimerStore = create<TimerState>((set, get) => {
   // Interval reference for timer countdown
   let intervalRef: number | null = null;
   
-  // Wake lock functionality
-  let wakeLockSentinel: WakeLockSentinel | null = null;
-  const isWakeLockSupported = 'wakeLock' in navigator;
-  let visibilityListenerAdded = false;
-
-  const requestWakeLock = async (): Promise<void> => {
-    if (!isWakeLockSupported) {
-      console.warn('Wake Lock API is not supported in this browser');
-      return;
+  // Wake lock functionality - we'll import this dynamically to avoid SSR issues
+  let wakeLockHook: ReturnType<typeof import("@/hooks/useWakeLock").useWakeLock> | null = null;
+  
+  const getWakeLock = async () => {
+    if (!wakeLockHook) {
+      const { useWakeLock } = await import("@/hooks/useWakeLock");
+      wakeLockHook = useWakeLock();
     }
-
-    try {
-      if (wakeLockSentinel && !wakeLockSentinel.released) {
-        // Already have an active wake lock
-        return;
-      }
-
-      wakeLockSentinel = await navigator.wakeLock.request('screen');
-      console.log('Wake lock activated - screen will stay on during timer');
-      
-      // Listen for wake lock release
-      wakeLockSentinel.addEventListener('release', () => {
-        console.log('Wake lock was released');
-        wakeLockSentinel = null;
-      });
-    } catch (error) {
-      console.error('Failed to request wake lock:', error);
-    }
-  };
-
-  const releaseWakeLock = async (): Promise<void> => {
-    if (wakeLockSentinel && !wakeLockSentinel.released) {
-      try {
-        await wakeLockSentinel.release();
-        wakeLockSentinel = null;
-        console.log('Wake lock released - screen can now turn off');
-      } catch (error) {
-        console.error('Failed to release wake lock:', error);
-      }
-    }
-  };
-
-  // Handle page visibility changes
-  const handleVisibilityChange = async () => {
-    if (document.visibilityState === 'visible' && wakeLockSentinel?.released) {
-      const state = get();
-      // Reacquire wake lock if timer is still active
-      if (state.isActive) {
-        await requestWakeLock();
-      }
-    }
-  };
-
-  // Add event listener for visibility changes only once
-  const addVisibilityListener = () => {
-    if (!visibilityListenerAdded) {
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-      visibilityListenerAdded = true;
-      console.log('Visibility change listener added');
-    }
-  };
-
-  const removeVisibilityListener = () => {
-    if (visibilityListenerAdded) {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      visibilityListenerAdded = false;
-      console.log('Visibility change listener removed');
-    }
+    return wakeLockHook;
   };
 
   // Helper function to handle timer completion
@@ -197,7 +137,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
       document.title = "Focus Dive";
       
       // Release wake lock when timer stops
-      releaseWakeLock();
+      getWakeLock().then(wakeLock => wakeLock.deactivateWakeLock());
     }
   };
   
@@ -419,9 +359,8 @@ export const useTimerStore = create<TimerState>((set, get) => {
         // Track timer start
         analytics.timerStarted(state.mode, state.timeLeft);
         
-        // Add visibility listener and request wake lock when starting timer
-        addVisibilityListener();
-        requestWakeLock();
+        // Activate wake lock when starting timer
+        getWakeLock().then(wakeLock => wakeLock.activateWakeLock());
         
         // Update state
         set({
@@ -440,8 +379,8 @@ export const useTimerStore = create<TimerState>((set, get) => {
         // Track timer pause
         analytics.timerPaused(state.mode, state.timeLeft);
         
-        // Release wake lock when pausing timer
-        releaseWakeLock();
+        // Deactivate wake lock when pausing timer
+        getWakeLock().then(wakeLock => wakeLock.deactivateWakeLock());
         
         // Clear interval
         if (intervalRef !== null) {
@@ -470,9 +409,8 @@ export const useTimerStore = create<TimerState>((set, get) => {
       // Track timer reset
       analytics.timerReset(state.mode);
       
-      // Release wake lock and remove listener when resetting timer
-      releaseWakeLock();
-      removeVisibilityListener();
+      // Deactivate wake lock when resetting timer
+      getWakeLock().then(wakeLock => wakeLock.deactivateWakeLock());
       
       // Clear any existing interval
       if (intervalRef !== null) {
@@ -505,7 +443,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
       const newMode = state.mode === "focus" ? "break" : "focus";
       analytics.modeToggled(state.mode, newMode);
       
-      // If timer is active, clear interval, release wake lock and remove listener
+      // If timer is active, clear interval and deactivate wake lock
       if (state.isActive) {
         // Clear any existing interval
         if (intervalRef !== null) {
@@ -513,9 +451,8 @@ export const useTimerStore = create<TimerState>((set, get) => {
           intervalRef = null;
         }
         
-        // Release wake lock and remove listener when stopping timer
-        releaseWakeLock();
-        removeVisibilityListener();
+        // Deactivate wake lock when stopping timer
+        getWakeLock().then(wakeLock => wakeLock.deactivateWakeLock());
       }
       
       // Calculate new duration
@@ -559,7 +496,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
         analytics.timerStarted("focus", newDuration);
         
         // Request wake lock when starting timer
-        requestWakeLock();
+        getWakeLock().then(wakeLock => wakeLock.activateWakeLock());
         
         set({
           mode: "focus",
