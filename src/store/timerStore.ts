@@ -6,6 +6,7 @@ import { getAccessToken } from "@/services/authApi";
 import { toast } from "sonner";
 import { useSettingsStore } from "./settingsStore";
 import { analytics } from "@/utils/analytics";
+import { useWakeLock } from "@/hooks/useWakeLock";
 
 const TEST_TIMER = false; // Set to true for testing purposes
 
@@ -56,16 +57,8 @@ export const useTimerStore = create<TimerState>((set, get) => {
   // Interval reference for timer countdown
   let intervalRef: number | null = null;
   
-  // Wake lock functionality - we'll import this dynamically to avoid SSR issues
-  let wakeLockHook: ReturnType<typeof import("@/hooks/useWakeLock").useWakeLock> | null = null;
-  
-  const getWakeLock = async () => {
-    if (!wakeLockHook) {
-      const { useWakeLock } = await import("@/hooks/useWakeLock");
-      wakeLockHook = useWakeLock();
-    }
-    return wakeLockHook;
-  };
+  // Wake lock instance
+  const wakeLock = useWakeLock();
 
   // Helper function to handle timer completion
   const handleTimerCompletion = () => {
@@ -137,7 +130,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
       document.title = "Focus Dive";
       
       // Release wake lock when timer stops
-      getWakeLock().then(wakeLock => wakeLock.deactivateWakeLock());
+      wakeLock.deactivateWakeLock();
     }
   };
   
@@ -360,7 +353,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
         analytics.timerStarted(state.mode, state.timeLeft);
         
         // Activate wake lock when starting timer
-        getWakeLock().then(wakeLock => wakeLock.activateWakeLock());
+        wakeLock.activateWakeLock();
         
         // Update state
         set({
@@ -380,7 +373,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
         analytics.timerPaused(state.mode, state.timeLeft);
         
         // Deactivate wake lock when pausing timer
-        getWakeLock().then(wakeLock => wakeLock.deactivateWakeLock());
+        wakeLock.deactivateWakeLock();
         
         // Clear interval
         if (intervalRef !== null) {
@@ -410,7 +403,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
       analytics.timerReset(state.mode);
       
       // Deactivate wake lock when resetting timer
-      getWakeLock().then(wakeLock => wakeLock.deactivateWakeLock());
+      wakeLock.deactivateWakeLock();
       
       // Clear any existing interval
       if (intervalRef !== null) {
@@ -452,7 +445,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
         }
         
         // Deactivate wake lock when stopping timer
-        getWakeLock().then(wakeLock => wakeLock.deactivateWakeLock());
+        wakeLock.deactivateWakeLock();
       }
       
       // Calculate new duration
@@ -496,7 +489,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
         analytics.timerStarted("focus", newDuration);
         
         // Request wake lock when starting timer
-        getWakeLock().then(wakeLock => wakeLock.activateWakeLock());
+        wakeLock.activateWakeLock();
         
         set({
           mode: "focus",
