@@ -1,3 +1,4 @@
+
 import { create } from "zustand";
 import { io, Socket } from "socket.io-client";
 import { API_URL } from "@/config/env";
@@ -59,6 +60,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
   // Wake lock functionality
   let wakeLockSentinel: WakeLockSentinel | null = null;
   const isWakeLockSupported = 'wakeLock' in navigator;
+  let visibilityListenerAdded = false;
 
   const requestWakeLock = async (): Promise<void> => {
     if (!isWakeLockSupported) {
@@ -108,8 +110,22 @@ export const useTimerStore = create<TimerState>((set, get) => {
     }
   };
 
-  // Add event listener for visibility changes
-  document.addEventListener('visibilitychange', handleVisibilityChange);
+  // Add event listener for visibility changes only once
+  const addVisibilityListener = () => {
+    if (!visibilityListenerAdded) {
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      visibilityListenerAdded = true;
+      console.log('Visibility change listener added');
+    }
+  };
+
+  const removeVisibilityListener = () => {
+    if (visibilityListenerAdded) {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      visibilityListenerAdded = false;
+      console.log('Visibility change listener removed');
+    }
+  };
 
   // Helper function to handle timer completion
   const handleTimerCompletion = () => {
@@ -403,7 +419,8 @@ export const useTimerStore = create<TimerState>((set, get) => {
         // Track timer start
         analytics.timerStarted(state.mode, state.timeLeft);
         
-        // Request wake lock when starting timer
+        // Add visibility listener and request wake lock when starting timer
+        addVisibilityListener();
         requestWakeLock();
         
         // Update state
@@ -453,8 +470,9 @@ export const useTimerStore = create<TimerState>((set, get) => {
       // Track timer reset
       analytics.timerReset(state.mode);
       
-      // Release wake lock when resetting timer
+      // Release wake lock and remove listener when resetting timer
       releaseWakeLock();
+      removeVisibilityListener();
       
       // Clear any existing interval
       if (intervalRef !== null) {
@@ -487,7 +505,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
       const newMode = state.mode === "focus" ? "break" : "focus";
       analytics.modeToggled(state.mode, newMode);
       
-      // If timer is active, clear interval and release wake lock
+      // If timer is active, clear interval, release wake lock and remove listener
       if (state.isActive) {
         // Clear any existing interval
         if (intervalRef !== null) {
@@ -495,8 +513,9 @@ export const useTimerStore = create<TimerState>((set, get) => {
           intervalRef = null;
         }
         
-        // Release wake lock when stopping timer
+        // Release wake lock and remove listener when stopping timer
         releaseWakeLock();
+        removeVisibilityListener();
       }
       
       // Calculate new duration
