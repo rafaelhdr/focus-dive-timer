@@ -1,4 +1,3 @@
-
 import { create } from "zustand";
 import { io, Socket } from "socket.io-client";
 import { API_URL } from "@/config/env";
@@ -111,16 +110,6 @@ export const useTimerStore = create<TimerState>((set, get) => {
 
   // Add event listener for visibility changes
   document.addEventListener('visibilitychange', handleVisibilityChange);
-
-  // Cleanup function to remove event listeners and release wake lock
-  const cleanup = () => {
-    document.removeEventListener('visibilitychange', handleVisibilityChange);
-    releaseWakeLock();
-    if (intervalRef !== null) {
-      clearInterval(intervalRef);
-      intervalRef = null;
-    }
-  };
 
   // Helper function to handle timer completion
   const handleTimerCompletion = () => {
@@ -498,13 +487,16 @@ export const useTimerStore = create<TimerState>((set, get) => {
       const newMode = state.mode === "focus" ? "break" : "focus";
       analytics.modeToggled(state.mode, newMode);
       
-      // If timer is active, clear interval
+      // If timer is active, clear interval and release wake lock
       if (state.isActive) {
         // Clear any existing interval
         if (intervalRef !== null) {
           clearInterval(intervalRef);
           intervalRef = null;
         }
+        
+        // Release wake lock when stopping timer
+        releaseWakeLock();
       }
       
       // Calculate new duration
