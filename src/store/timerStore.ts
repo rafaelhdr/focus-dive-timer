@@ -6,6 +6,7 @@ import { getAccessToken } from "@/services/authApi";
 import { toast } from "sonner";
 import { useSettingsStore } from "./settingsStore";
 import { analytics } from "@/utils/analytics";
+import { useWakeLock } from "@/hooks/useWakeLock";
 
 const TEST_TIMER = false; // Set to true for testing purposes
 
@@ -56,6 +57,61 @@ export const useTimerStore = create<TimerState>((set, get) => {
   // Interval reference for timer countdown
   let intervalRef: number | null = null;
   
+  // Wake lock functionality
+  let wakeLockSentinel: WakeLockSentinel | null = null;
+  const isWakeLockSupported = 'wakeLock' in navigator;
+
+  const requestWakeLock = async (): Promise<void> => {
+    if (!isWakeLockSupported) {
+      console.warn('Wake Lock API is not supported in this browser');
+      return;
+    }
+
+    try {
+      if (wakeLockSentinel && !wakeLockSentinel.released) {
+        // Already have an active wake lock
+        return;
+      }
+
+      wakeLockSentinel = await navigator.wakeLock.request('screen');
+      console.log('Wake lock activated - screen will stay on during timer');
+      
+      // Listen for wake lock release
+      wakeLockSentinel.addEventListener('release', () => {
+        console.log('Wake lock was released');
+        wakeLockSentinel = null;
+      });
+    } catch (error) {
+      console.error('Failed to request wake lock:', error);
+    }
+  };
+
+  const releaseWakeLock = async (): Promise<void> => {
+    if (wakeLockSentinel && !wakeLockSentinel.released) {
+      try {
+        await wakeLockSentinel.release();
+        wakeLockSentinel = null;
+        console.log('Wake lock released - screen can now turn off');
+      } catch (error) {
+        console.error('Failed to release wake lock:', error);
+      }
+    }
+  };
+
+  // Handle page visibility changes
+  const handleVisibilityChange = async () => {
+    if (document.visibilityState === 'visible' && wakeLockSentinel?.released) {
+      const state = get();
+      // Reacquire wake lock if timer is still active
+      if (state.isActive) {
+        await requestWakeLock();
+      }
+    }
+  };
+
+  // Add event listener for visibility changes
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+
   // Helper function to handle timer completion
   const handleTimerCompletion = () => {
     // Clear the interval
@@ -345,6 +401,9 @@ export const useTimerStore = create<TimerState>((set, get) => {
         // Track timer start
         analytics.timerStarted(state.mode, state.timeLeft);
         
+        // Request wake lock when starting timer
+        requestWakeLock();
+        
         // Update state
         set({
           isActive: true,
@@ -361,6 +420,9 @@ export const useTimerStore = create<TimerState>((set, get) => {
         
         // Track timer pause
         analytics.timerPaused(state.mode, state.timeLeft);
+        
+        // Release wake lock when pausing timer
+        releaseWakeLock();
         
         // Clear interval
         if (intervalRef !== null) {
@@ -388,6 +450,9 @@ export const useTimerStore = create<TimerState>((set, get) => {
       
       // Track timer reset
       analytics.timerReset(state.mode);
+      
+      // Release wake lock when resetting timer
+      releaseWakeLock();
       
       // Clear any existing interval
       if (intervalRef !== null) {
@@ -468,6 +533,9 @@ export const useTimerStore = create<TimerState>((set, get) => {
         
         // Track timer start
         analytics.timerStarted("focus", newDuration);
+        
+        // Request wake lock when starting timer
+        requestWakeLock();
         
         set({
           mode: "focus",
