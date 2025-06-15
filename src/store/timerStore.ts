@@ -1,3 +1,4 @@
+
 import { create } from "zustand";
 import { io, Socket } from "socket.io-client";
 import { API_URL } from "@/config/env";
@@ -6,7 +7,6 @@ import { getAccessToken } from "@/services/authApi";
 import { toast } from "sonner";
 import { useSettingsStore } from "./settingsStore";
 import { analytics } from "@/utils/analytics";
-import { useWakeLock } from "@/hooks/useWakeLock";
 
 const TEST_TIMER = false; // Set to true for testing purposes
 
@@ -112,6 +112,16 @@ export const useTimerStore = create<TimerState>((set, get) => {
   // Add event listener for visibility changes
   document.addEventListener('visibilitychange', handleVisibilityChange);
 
+  // Cleanup function to remove event listeners and release wake lock
+  const cleanup = () => {
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+    releaseWakeLock();
+    if (intervalRef !== null) {
+      clearInterval(intervalRef);
+      intervalRef = null;
+    }
+  };
+
   // Helper function to handle timer completion
   const handleTimerCompletion = () => {
     // Clear the interval
@@ -180,6 +190,9 @@ export const useTimerStore = create<TimerState>((set, get) => {
       
       // Reset document title
       document.title = "Focus Dive";
+      
+      // Release wake lock when timer stops
+      releaseWakeLock();
     }
   };
   
