@@ -334,36 +334,38 @@ export const useTimerStore = create<TimerState>((set, get) => {
       }
     },
     
-    // Reset timer
+    // Reset timer - Fixed to avoid infinite loop
     resetTimer: () => {
-      const state = get();
-      
-      // Track timer reset
-      analytics.timerReset(state.mode);
-      
-      // Deactivate wake lock when resetting timer
-      wakeLockService.deactivateWakeLock();
-      
-      // Clear any existing interval
-      if (intervalRef !== null) {
-        clearInterval(intervalRef);
-        intervalRef = null;
-      }
-      
-      // Calculate new duration based on current mode
-      const newDuration = getDurationInSeconds(state.mode);
-      
-      // Update state
-      set({
-        isActive: false,
-        timeLeft: newDuration,
-        timerEndTime: null,
+      // Track timer reset and handle wake lock deactivation
+      set((state) => {
+        // Track timer reset
+        analytics.timerReset(state.mode);
+        
+        // Deactivate wake lock when resetting timer
+        wakeLockService.deactivateWakeLock();
+        
+        // Clear any existing interval
+        if (intervalRef !== null) {
+          clearInterval(intervalRef);
+          intervalRef = null;
+        }
+        
+        // Calculate new duration based on current mode
+        const newDuration = getDurationInSeconds(state.mode);
+        
+        // Reset document title
+        document.title = "Focus Dive";
+        
+        // Return new state
+        return {
+          ...state,
+          isActive: false,
+          timeLeft: newDuration,
+          timerEndTime: null,
+        };
       });
       
-      // Reset document title
-      document.title = "Focus Dive";
-      
-      // Reset timer on server
+      // Reset timer on server (called outside of set to avoid reactivity issues)
       get().resetTimerOnServer();
     },
     
