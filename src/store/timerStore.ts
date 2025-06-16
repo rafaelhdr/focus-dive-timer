@@ -1,12 +1,11 @@
+
 import { create } from "zustand";
-import { io, Socket } from "socket.io-client";
-import { API_URL } from "@/config/env";
 import { TimerData } from "@/hooks/types";
-import { getAccessToken } from "@/services/authApi";
 import { toast } from "sonner";
 import { useSettingsStore } from "./settingsStore";
 import { analytics } from "@/utils/analytics";
 import { useWakeLock } from "@/hooks/useWakeLock";
+import { timerSocketService } from "@/services/timerSocketService";
 
 const TEST_TIMER = false; // Set to true for testing purposes
 
@@ -18,7 +17,6 @@ interface TimerState {
   timerEndTime: number | null;
 
   // Socket state
-  socket: Socket | null;
   isSocketConnected: boolean;
 
   // Methods for timer control
@@ -164,6 +162,72 @@ export const useTimerStore = create<TimerState>((set, get) => {
     
     return intervalRef;
   };
+
+  // Socket event handlers
+  const handleTimerState = (data: TimerData) => {
+    // Update local state based on server state
+    if (data.mode) {
+      set({ mode: data.mode });
+    }
+    
+    set({ isActive: data.isRunning });
+    
+    if (data.timerEndsAt) {
+      const currentTime = Date.now();
+      const endTime = data.timerEndsAt;
+      const secondsLeft = Math.max(0, Math.floor((endTime - currentTime) / 1000));
+      
+      set({ 
+        timeLeft: secondsLeft,
+        timerEndTime: data.timerEndsAt
+      });
+      
+      // Start the countdown if timer is active
+      if (data.isRunning) {
+        startTimerInterval();
+      }
+    } else {
+      // If no end time is provided, just set the default duration
+      const duration = getDurationInSeconds(data.mode || "focus");
+      set({ timeLeft: duration });
+    }
+  };
+
+  const handleTimerUpdated = (data: TimerData) => {
+    // Similar logic as timer_state handler
+    if (data.mode) {
+      set({ mode: data.mode });
+    }
+    
+    set({ isActive: data.isRunning });
+    
+    if (data.timerEndsAt) {
+      const currentTime = Date.now();
+      const endTime = data.timerEndsAt;
+      const secondsLeft = Math.max(0, Math.floor((endTime - currentTime) / 1000));
+      
+      set({ 
+        timeLeft: secondsLeft,
+        timerEndTime: data.timerEndsAt
+      });
+      
+      // Start interval if timer is active
+      if (data.isRunning) {
+        startTimerInterval();
+      }
+    } else {
+      // If timer is stopped, clear interval
+      if (intervalRef !== null) {
+        clearInterval(intervalRef);
+        intervalRef = null;
+      }
+      
+      set({ timerEndTime: null });
+      
+      // Reset document title
+      document.title = "Focus Dive";
+    }
+  };
   
   return {
     // Initial state
@@ -173,7 +237,6 @@ export const useTimerStore = create<TimerState>((set, get) => {
     timerEndTime: null,
     
     // Socket state
-    socket: null,
     isSocketConnected: false,
     
     // Format time for display (mm:ss)
@@ -187,149 +250,29 @@ export const useTimerStore = create<TimerState>((set, get) => {
     
     // Initialize WebSocket connection
     initSocket: () => {
-      const currentState = get();
-      
-      // Skip if socket already exists
-      if (currentState.socket) return;
-      
-      console.log("Initializing WebSocket connection to:", `${API_URL}/timer`);
-      
-      try {
-        // Get authentication token
-        const accessToken = getAccessToken();
-        
-        // Create socket connection with token as query parameter
-        const socket = io(`${API_URL}/timer`, {
-          withCredentials: true,
-          query: {
-            token: accessToken
-          }
-        });
-        
-        socket.on("connect", () => {
-          console.log("WebSocket connected successfully");
+      const socket = timerSocketService.initialize({
+        onConnected: () => {
           set({ isSocketConnected: true });
-          
-          // Request current timer state from server
-          socket.emit("get_timer");
-        });
-        
-        socket.on("connect_error", (error) => {
-          console.error("WebSocket connection error:", error);
+        },
+        onDisconnected: () => {
           set({ isSocketConnected: false });
-        });
-        
-        socket.on("disconnect", (reason) => {
-          console.log("WebSocket disconnected:", reason);
+        },
+        onConnectionError: () => {
           set({ isSocketConnected: false });
-        });
-        
-        // Handle timer state from server
-        socket.on("timer_state", (data: TimerData) => {
-          console.log("Received timer state:", data);
-          
-          // Update local state based on server state
-          if (data.mode) {
-            set({ mode: data.mode });
-          }
-          
-          set({ isActive: data.isRunning });
-          
-          if (data.timerEndsAt) {
-            const currentTime = Date.now();
-            const endTime = data.timerEndsAt;
-            const secondsLeft = Math.max(0, Math.floor((endTime - currentTime) / 1000));
-            
-            set({ 
-              timeLeft: secondsLeft,
-              timerEndTime: data.timerEndsAt
-            });
-            
-            // Start the countdown if timer is active
-            if (data.isRunning) {
-              startTimerInterval();
-            }
-          } else {
-            // If no end time is provided, just set the default duration
-            const duration = getDurationInSeconds(data.mode || "focus");
-            set({ timeLeft: duration });
-          }
-        });
-        
-        // Listen for timer updates from server
-        socket.on("timer_updated", (data: TimerData) => {
-          console.log("Received timer update:", data);
-          
-          // Similar logic as timer_state handler
-          if (data.mode) {
-            set({ mode: data.mode });
-          }
-          
-          set({ isActive: data.isRunning });
-          
-          if (data.timerEndsAt) {
-            const currentTime = Date.now();
-            const endTime = data.timerEndsAt;
-            const secondsLeft = Math.max(0, Math.floor((endTime - currentTime) / 1000));
-            
-            set({ 
-              timeLeft: secondsLeft,
-              timerEndTime: data.timerEndsAt
-            });
-            
-            // Start interval if timer is active
-            if (data.isRunning) {
-              startTimerInterval();
-            }
-          } else {
-            // If timer is stopped, clear interval
-            if (intervalRef !== null) {
-              clearInterval(intervalRef);
-              intervalRef = null;
-            }
-            
-            set({ timerEndTime: null });
-            
-            // Reset document title
-            document.title = "Focus Dive";
-          }
-        });
-        
-        // Save socket to state
-        set({ socket });
-      } catch (error) {
-        console.error("Error initializing socket:", error);
-      }
+        },
+        onTimerState: handleTimerState,
+        onTimerUpdated: handleTimerUpdated,
+      });
     },
     
     // Update timer on the server
     updateTimerOnServer: (timerEndsAt, mode, isRunning) => {
-      const { socket } = get();
-      
-      if (!socket) {
-        console.warn("Cannot update timer: WebSocket not connected");
-        return;
-      }
-      
-      console.log("Updating timer on server:", { timerEndsAt, mode, isRunning });
-      socket.emit("timer_data", {
-        timerEndsAt,
-        mode,
-        isRunning,
-      });
+      timerSocketService.updateTimer(timerEndsAt, mode, isRunning);
     },
     
     // Reset timer on the server
     resetTimerOnServer: () => {
-      const { socket } = get();
-      
-      if (!socket) {
-        console.warn("Cannot reset timer: WebSocket not connected");
-        return;
-      }
-      
-      console.log("Resetting timer on server");
-      socket.emit("reset_timer");
+      timerSocketService.resetTimer();
       
       // Also update with explicit null values to ensure reset
       const { mode, updateTimerOnServer } = get();
@@ -341,7 +284,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
       const state = get();
       
       // If socket not connected, try to connect
-      if (!state.socket) {
+      if (!timerSocketService.isConnected()) {
         get().initSocket();
       }
       
@@ -527,7 +470,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
           });
           
           // Update server if needed
-          if (state.socket) {
+          if (timerSocketService.isConnected()) {
             get().updateTimerOnServer(null, "focus", false);
           }
         }
