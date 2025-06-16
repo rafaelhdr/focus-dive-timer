@@ -164,7 +164,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
         }));
 
         // Update current timer for consistency
-        setInterval(() => {
+        setTimeout(() => {
           const { isActive, resetTimer } = useTimerStore.getState();
           if (!isActive) resetTimer()
         }, 100);
