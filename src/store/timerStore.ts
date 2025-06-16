@@ -1,3 +1,4 @@
+
 import { create } from "zustand";
 import { TimerData } from "@/hooks/types";
 import { toast } from "sonner";
@@ -225,6 +226,12 @@ export const useTimerStore = create<TimerState>((set, get) => {
     }
   };
   
+  // Store reference to resetTimerOnServer to avoid get() calls
+  const resetTimerOnServerRef = () => {
+    timerSocketService.resetTimer();
+    timerSocketService.updateTimer(null, "focus", false);
+  };
+  
   return {
     // Initial state
     isActive: false,
@@ -267,13 +274,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
     },
     
     // Reset timer on the server
-    resetTimerOnServer: () => {
-      timerSocketService.resetTimer();
-      
-      // Also update with explicit null values to ensure reset
-      const { mode, updateTimerOnServer } = get();
-      updateTimerOnServer(null, mode, false);
-    },
+    resetTimerOnServer: resetTimerOnServerRef,
     
     // Toggle timer (start/pause)
     toggleTimer: () => {
@@ -334,7 +335,7 @@ export const useTimerStore = create<TimerState>((set, get) => {
       }
     },
     
-    // Reset timer - Fixed to avoid infinite loop
+    // Reset timer - Fixed to avoid infinite loop by not using get()
     resetTimer: () => {
       // Track timer reset and handle wake lock deactivation
       set((state) => {
@@ -365,8 +366,8 @@ export const useTimerStore = create<TimerState>((set, get) => {
         };
       });
       
-      // Reset timer on server (called outside of set to avoid reactivity issues)
-      get().resetTimerOnServer();
+      // Reset timer on server using direct reference (no get() call)
+      resetTimerOnServerRef();
     },
     
     // Toggle between focus and break modes
