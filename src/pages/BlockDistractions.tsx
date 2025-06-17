@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { SLACK_AUTH_URL } from '@/config/env';
+import { SLACK_AUTH_URL, generateSpotifyAuthUrl } from '@/config/env';
 import { checkSlackConnection } from '@/services/slackService';
+import { checkSpotifyConnection, disconnectSpotify } from '@/services/spotifyService';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle, Slack, Info } from 'lucide-react';
+import { CheckCircle, Slack, Info, Music } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
@@ -17,26 +18,32 @@ import SlackDisconnectDialog from '@/components/SlackDisconnectDialog';
 import SlackPermissionsDialog from '@/components/SlackPermissionsDialog';
 
 const BlockDistractions = () => {
-  const [isConnected, setIsConnected] = useState<boolean | null>(null);
+  const [isSlackConnected, setIsSlackConnected] = useState<boolean | null>(null);
+  const [isSpotifyConnected, setIsSpotifyConnected] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const { auth } = useAuth();
 
   useEffect(() => {
-    const checkConnection = async () => {
+    const checkConnections = async () => {
       try {
         setIsLoading(true);
         if (auth.isAuthenticated) {
-          const connected = await checkSlackConnection();
-          setIsConnected(connected);
+          const [slackConnected, spotifyConnected] = await Promise.all([
+            checkSlackConnection(),
+            checkSpotifyConnection()
+          ]);
+          setIsSlackConnected(slackConnected);
+          setIsSpotifyConnected(spotifyConnected);
         } else {
-          setIsConnected(false);
+          setIsSlackConnected(false);
+          setIsSpotifyConnected(false);
         }
       } catch (error) {
-        console.error('Error checking Slack connection:', error);
+        console.error('Error checking connections:', error);
         toast({
           title: 'Connection Error',
-          description: 'Failed to check Slack connection status.',
+          description: 'Failed to check integration status.',
           variant: 'destructive',
         });
       } finally {
@@ -44,7 +51,7 @@ const BlockDistractions = () => {
       }
     };
 
-    checkConnection();
+    checkConnections();
   }, [toast, auth.isAuthenticated]);
 
   const handleSlackConnect = () => {
@@ -52,11 +59,52 @@ const BlockDistractions = () => {
   };
 
   const handleSlackDisconnected = () => {
-    setIsConnected(false);
+    setIsSlackConnected(false);
     toast({
       title: 'Disconnected',
       description: 'Your Slack account has been disconnected from Focus Dive.',
     });
+  };
+
+  const handleSpotifyConnect = () => {
+    // Generate code verifier for PKCE
+    const codeVerifier = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32))))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+    
+    // Store code verifier in localStorage
+    localStorage.setItem('spotify_code_verifier', codeVerifier);
+    
+    // Redirect to Spotify authorization
+    const authUrl = generateSpotifyAuthUrl(codeVerifier);
+    window.location.href = authUrl;
+  };
+
+  const handleSpotifyDisconnect = async () => {
+    try {
+      const success = await disconnectSpotify();
+      if (success) {
+        setIsSpotifyConnected(false);
+        toast({
+          title: 'Disconnected',
+          description: 'Your Spotify account has been disconnected from Focus Dive.',
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: 'Failed to disconnect your Spotify account.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Error disconnecting Spotify:', error);
+      toast({
+        title: 'Error',
+        description: 'An error occurred while disconnecting your Spotify account.',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
@@ -70,7 +118,7 @@ const BlockDistractions = () => {
           </div>
           <h1 className="text-3xl font-bold mb-2">Integrations</h1>
           <p className="text-muted-foreground mb-4">
-            Connect your Slack account to automatically update your status during focus sessions.
+            Connect your accounts to enhance your focus sessions.
           </p>
         </header>
 
@@ -89,6 +137,7 @@ const BlockDistractions = () => {
           </Alert>
         )}
 
+        {/* Slack Integration */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -104,7 +153,7 @@ const BlockDistractions = () => {
               <div className="flex justify-center py-4">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </div>
-            ) : isConnected ? (
+            ) : isSlackConnected ? (
               <div>
                 <div className="flex items-left justify-between mb-6">
                   <Alert className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900 flex-1 mr-4">
@@ -121,7 +170,7 @@ const BlockDistractions = () => {
                 </div>
                 
                 <SlackConfigForm 
-                  isConnected={!!isConnected} 
+                  isConnected={!!isSlackConnected} 
                   isAuthenticated={auth.isAuthenticated}
                 />
               </div>
@@ -152,6 +201,63 @@ const BlockDistractions = () => {
                   isConnected={false} 
                   isAuthenticated={auth.isAuthenticated}
                 />
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Spotify Integration */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Music className="h-5 w-5" />
+              Spotify Integration
+            </CardTitle>
+            <CardDescription>
+              Control your music playback during focus sessions. Pause music during breaks and resume during focus time.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="flex justify-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : isSpotifyConnected ? (
+              <div className="flex items-center justify-between">
+                <Alert className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900 flex-1 mr-4">
+                  <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  <AlertTitle>Connected to Spotify</AlertTitle>
+                  <AlertDescription>
+                    Your Spotify account is connected and ready to use with Focus Dive.
+                  </AlertDescription>
+                </Alert>
+                
+                {auth.isAuthenticated && (
+                  <Button 
+                    variant="outline" 
+                    onClick={handleSpotifyDisconnect}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    Disconnect
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <div className="text-left py-4">
+                <p className="mb-4">Connect your Spotify account to control music during focus sessions.</p>
+                <Button 
+                  onClick={handleSpotifyConnect} 
+                  className="gap-2" 
+                  disabled={!auth.isAuthenticated}
+                >
+                  <Music className="h-4 w-4" />
+                  Connect to Spotify
+                </Button>
+                {!auth.isAuthenticated && (
+                  <p className="text-sm text-muted-foreground mt-3">
+                    Please login to enable this integration
+                  </p>
+                )}
               </div>
             )}
           </CardContent>

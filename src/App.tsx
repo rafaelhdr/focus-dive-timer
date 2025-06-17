@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import Settings from "./pages/Settings";
 import BlockDistractions from "./pages/BlockDistractions";
 import SlackConnect from "./pages/SlackConnect";
+import SpotifyConnect from "./pages/SpotifyConnect";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Subscriptions from "./pages/Subscriptions";
@@ -37,6 +38,7 @@ const App = () => (
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/integrations" element={<BlockDistractions />} />
                 <Route path="/slack/connect" element={<SlackConnect />} />
+                <Route path="/spotify/connect" element={<SpotifyConnect />} />
                 <Route path="/subscriptions" element={<Subscriptions />} />
                 <Route path="/subscriptions/stripe-fallback" element={<StripeFallback />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
