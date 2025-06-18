@@ -212,8 +212,8 @@ export const getSpotifyAccessToken = async (): Promise<{ success: boolean; token
   try {
     console.log('Getting Spotify access token...');
     
-    const response = await fetch(`${API_URL}/spotify/token`, {
-      method: 'GET',
+    const response = await fetch(`${API_URL}/spotify/refresh-token`, {
+      method: 'POST',
       headers: getCommonHeaders(),
       credentials: 'include',
     });
@@ -228,8 +228,8 @@ export const getSpotifyAccessToken = async (): Promise<{ success: boolean; token
         
         if (refreshResult.success) {
           // Retry the original request after successful refresh
-          const retryResponse = await fetch(`${API_URL}/spotify/token`, {
-            method: 'GET',
+          const retryResponse = await fetch(`${API_URL}/spotify/refresh-token`, {
+            method: 'POST',
             headers: getCommonHeaders(),
             credentials: 'include',
           });
