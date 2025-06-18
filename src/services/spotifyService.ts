@@ -204,3 +204,60 @@ export const disconnectSpotify = async (): Promise<boolean> => {
     return false;
   }
 };
+
+/**
+ * Get current access token for Web Playback SDK
+ */
+export const getSpotifyAccessToken = async (): Promise<{ success: boolean; token?: string; error?: string }> => {
+  try {
+    console.log('Getting Spotify access token...');
+    
+    const response = await fetch(`${API_URL}/spotify/token`, {
+      method: 'GET',
+      headers: getCommonHeaders(),
+      credentials: 'include',
+    });
+
+    console.log('Spotify token response:', response.status, response.statusText);
+
+    if (!response.ok) {
+      // If we get a 401, try to refresh the token
+      if (response.status === 401) {
+        console.log('Spotify token might be expired, attempting refresh...');
+        const refreshResult = await refreshSpotifyToken();
+        
+        if (refreshResult.success) {
+          // Retry the original request after successful refresh
+          const retryResponse = await fetch(`${API_URL}/spotify/token`, {
+            method: 'GET',
+            headers: getCommonHeaders(),
+            credentials: 'include',
+          });
+          
+          if (retryResponse.ok) {
+            const retryData = await retryResponse.json();
+            return { success: true, token: retryData.access_token };
+          }
+        }
+      }
+      
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Failed to get Spotify token:', errorData);
+      return { 
+        success: false, 
+        error: errorData.error || 'Failed to get Spotify access token' 
+      };
+    }
+
+    const data = await response.json();
+    console.log('Spotify token received successfully');
+    
+    return { success: true, token: data.access_token };
+  } catch (error) {
+    console.error('Error getting Spotify token:', error);
+    return { 
+      success: false, 
+      error: 'Network error occurred while getting Spotify access token' 
+    };
+  }
+};

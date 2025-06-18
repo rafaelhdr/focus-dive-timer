@@ -15,6 +15,7 @@ import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
 import SlackConfigForm from '@/components/SlackConfigForm';
 import SlackDisconnectDialog from '@/components/SlackDisconnectDialog';
 import SlackPermissionsDialog from '@/components/SlackPermissionsDialog';
+import SpotifyPlayer from '@/components/SpotifyPlayer';
 
 const BlockDistractions = () => {
   const [isSlackConnected, setIsSlackConnected] = useState<boolean | null>(null);
@@ -231,24 +232,29 @@ const BlockDistractions = () => {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </div>
             ) : isSpotifyConnected ? (
-              <div className="flex items-center justify-between">
-                <Alert className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900 flex-1 mr-4">
-                  <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-                  <AlertTitle>Connected to Spotify</AlertTitle>
-                  <AlertDescription>
-                    Your Spotify account is connected and ready to use with Focus Dive.
-                  </AlertDescription>
-                </Alert>
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <Alert className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900 flex-1 mr-4">
+                    <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    <AlertTitle>Connected to Spotify</AlertTitle>
+                    <AlertDescription>
+                      Your Spotify account is connected and ready to use with Focus Dive.
+                    </AlertDescription>
+                  </Alert>
+                  
+                  {auth.isAuthenticated && (
+                    <Button 
+                      variant="outline" 
+                      onClick={handleSpotifyDisconnect}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      Disconnect
+                    </Button>
+                  )}
+                </div>
                 
-                {auth.isAuthenticated && (
-                  <Button 
-                    variant="outline" 
-                    onClick={handleSpotifyDisconnect}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    Disconnect
-                  </Button>
-                )}
+                {/* Spotify Player Component */}
+                {auth.isAuthenticated && <SpotifyPlayer />}
               </div>
             ) : (
               <div className="text-left py-4">
