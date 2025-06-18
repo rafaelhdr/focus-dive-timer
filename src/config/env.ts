@@ -1,7 +1,6 @@
-
 // Environment variables with default fallbacks
 export const API_DOMAIN = import.meta.env.VITE_API_DOMAIN || 'api.focusdive.app';
-export const API_URL = import.meta.env.VITE_API_URL || `https://${API_URL}`;
+export const API_URL = import.meta.env.VITE_API_URL || `https://${API_DOMAIN}`;
 
 // Slack
 export const APP_URL = import.meta.env.VITE_APP_URL || window.location.origin;

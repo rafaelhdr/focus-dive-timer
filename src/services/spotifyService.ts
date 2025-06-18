@@ -19,7 +19,7 @@ export const checkSpotifyConnection = async (): Promise<boolean> => {
     }
 
     const data = await response.json();
-    return data.connected || false;
+    return data.is_connected || false;
   } catch (error) {
     console.error('Error checking Spotify connection:', error);
     return false;
