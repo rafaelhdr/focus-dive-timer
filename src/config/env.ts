@@ -10,7 +10,7 @@ export const CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || '';
 export const SLACK_AUTH_URL = `https://slack.com/oauth/v2/authorize?user_scope=dnd:write,users.profile:write,users:write&client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
 
 // Spotify
-export const SPOTIFY_REDIRECT_URI = `${APP_URL}/spotify/callback`;
+export const SPOTIFY_REDIRECT_URI = `${APP_URL}/spotify/connect`;
 
 // Sentry
 export const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN || '';

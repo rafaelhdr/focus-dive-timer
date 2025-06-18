@@ -70,7 +70,7 @@ export const exchangeSpotifyCode = async (code: string): Promise<{ success: bool
   try {
     console.log('Exchanging Spotify code for token...');
     
-    const response = await fetch(`${API_URL}/spotify/callback`, {
+    const response = await fetch(`${API_URL}/spotify/connect`, {
       method: 'POST',
       headers: getCommonHeaders(),
       body: JSON.stringify({
