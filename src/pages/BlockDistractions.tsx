@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
-import { SLACK_AUTH_URL, generateSpotifyAuthUrl } from '@/config/env';
+import { SLACK_AUTH_URL } from '@/config/env';
 import { checkSlackConnection } from '@/services/slackService';
-import { checkSpotifyConnection, disconnectSpotify } from '@/services/spotifyService';
+import { checkSpotifyConnection, disconnectSpotify, getSpotifyAuthUrl } from '@/services/spotifyService';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -66,19 +65,28 @@ const BlockDistractions = () => {
     });
   };
 
-  const handleSpotifyConnect = () => {
-    // Generate code verifier for PKCE
-    const codeVerifier = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32))))
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=/g, '');
-    
-    // Store code verifier in localStorage
-    localStorage.setItem('spotify_code_verifier', codeVerifier);
-    
-    // Redirect to Spotify authorization
-    const authUrl = generateSpotifyAuthUrl(codeVerifier);
-    window.location.href = authUrl;
+  const handleSpotifyConnect = async () => {
+    try {
+      const result = await getSpotifyAuthUrl();
+      
+      if (result.success && result.url) {
+        // Redirect to Spotify authorization
+        window.location.href = result.url;
+      } else {
+        toast({
+          title: 'Error',
+          description: result.error || 'Failed to get Spotify authorization URL.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Error getting Spotify auth URL:', error);
+      toast({
+        title: 'Error',
+        description: 'An error occurred while connecting to Spotify.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleSpotifyDisconnect = async () => {

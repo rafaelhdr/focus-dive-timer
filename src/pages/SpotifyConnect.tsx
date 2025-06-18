@@ -17,7 +17,6 @@ const SpotifyConnect = () => {
     const handleSpotifyCallback = async () => {
       const code = searchParams.get('code');
       const error = searchParams.get('error');
-      const codeVerifier = localStorage.getItem('spotify_code_verifier');
 
       // Handle authorization errors
       if (error) {
@@ -35,21 +34,12 @@ const SpotifyConnect = () => {
         return;
       }
 
-      if (!codeVerifier) {
-        console.error('No code verifier found in localStorage');
-        setStatus('error');
-        setError('Missing verification code. Please try connecting again.');
-        return;
-      }
-
       try {
         // Exchange code for access token
-        const result = await exchangeSpotifyCode(code, codeVerifier);
+        const result = await exchangeSpotifyCode(code);
 
         if (result.success) {
           setStatus('success');
-          // Clean up the code verifier
-          localStorage.removeItem('spotify_code_verifier');
           
           // Redirect to integrations page after a short delay
           setTimeout(() => {
@@ -58,14 +48,11 @@ const SpotifyConnect = () => {
         } else {
           setStatus('error');
           setError(result.error || 'Failed to connect to Spotify');
-          // Clean up the code verifier even on error
-          localStorage.removeItem('spotify_code_verifier');
         }
       } catch (error) {
         console.error('Error during Spotify connection:', error);
         setStatus('error');
         setError('An unexpected error occurred');
-        localStorage.removeItem('spotify_code_verifier');
       }
     };
 

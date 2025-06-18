@@ -38,7 +38,7 @@ const App = () => (
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/integrations" element={<BlockDistractions />} />
                 <Route path="/slack/connect" element={<SlackConnect />} />
-                <Route path="/spotify/connect" element={<SpotifyConnect />} />
+                <Route path="/spotify/callback" element={<SpotifyConnect />} />
                 <Route path="/subscriptions" element={<Subscriptions />} />
                 <Route path="/subscriptions/stripe-fallback" element={<StripeFallback />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />

@@ -27,18 +27,54 @@ export const checkSpotifyConnection = async (): Promise<boolean> => {
 };
 
 /**
+ * Get Spotify authorization URL from backend
+ */
+export const getSpotifyAuthUrl = async (): Promise<{ success: boolean; url?: string; error?: string }> => {
+  try {
+    console.log('Getting Spotify auth URL...');
+    
+    const response = await fetch(`${API_URL}/spotify/connect`, {
+      method: 'GET',
+      headers: getCommonHeaders(),
+      credentials: 'include',
+    });
+
+    console.log('Spotify auth URL response:', response.status, response.statusText);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Failed to get Spotify auth URL:', errorData);
+      return { 
+        success: false, 
+        error: errorData.error || 'Failed to get Spotify authorization URL' 
+      };
+    }
+
+    const data = await response.json();
+    console.log('Spotify auth URL received:', data);
+    
+    return { success: true, url: data.url };
+  } catch (error) {
+    console.error('Error getting Spotify auth URL:', error);
+    return { 
+      success: false, 
+      error: 'Network error occurred while getting Spotify authorization URL' 
+    };
+  }
+};
+
+/**
  * Exchange authorization code for access token
  */
-export const exchangeSpotifyCode = async (code: string, codeVerifier: string): Promise<{ success: boolean; error?: string }> => {
+export const exchangeSpotifyCode = async (code: string): Promise<{ success: boolean; error?: string }> => {
   try {
     console.log('Exchanging Spotify code for token...');
     
-    const response = await fetch(`${API_URL}/spotify/connect`, {
+    const response = await fetch(`${API_URL}/spotify/callback`, {
       method: 'POST',
       headers: getCommonHeaders(),
       body: JSON.stringify({
         code,
-        code_verifier: codeVerifier,
       }),
       credentials: 'include',
     });
