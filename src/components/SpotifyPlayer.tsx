@@ -1,104 +1,46 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Play, Pause, Loader2, AlertCircle, Music, ListMusic } from 'lucide-react';
-import { spotifyPlayerService } from '@/services/spotifyPlayerService';
-import { getSpotifyAccessToken } from '@/services/spotifyService';
-
-interface SpotifyPlayerState {
-  isPlaying: boolean;
-  track?: {
-    name: string;
-    artists: { name: string }[];
-    album: { images: { url: string }[] };
-  };
-}
+import { useSpotifyStore } from '@/store/spotifyStore';
 
 const SpotifyPlayer = () => {
-  const [isInitializing, setIsInitializing] = useState(false);
-  const [isReady, setIsReady] = useState(false);
-  const [playerState, setPlayerState] = useState<SpotifyPlayerState | null>(null);
-  const [error, setError] = useState<string>('');
-  const [isLoadingPlaylist, setIsLoadingPlaylist] = useState(false);
-  const [selectedPlaylist, setSelectedPlaylist] = useState<string>('focus-flow');
+  const {
+    isInitializing,
+    isReady,
+    playerState,
+    error,
+    isLoadingPlaylist,
+    selectedPlaylist,
+    initialize,
+    loadPlaylist,
+    togglePlayback,
+    updatePlayerState,
+    setSelectedPlaylist,
+    clearError,
+    getAvailablePlaylists,
+  } = useSpotifyStore();
 
   useEffect(() => {
-    initializePlayer();
-    
-    return () => {
-      spotifyPlayerService.disconnect();
-    };
-  }, []);
-
-  const initializePlayer = async () => {
-    try {
-      setIsInitializing(true);
-      setError('');
-
-      // Get access token
-      const tokenResult = await getSpotifyAccessToken();
-      if (!tokenResult.success || !tokenResult.token) {
-        setError(tokenResult.error || 'Failed to get access token');
-        return;
-      }
-
-      // Initialize player
-      const success = await spotifyPlayerService.initialize(tokenResult.token);
-      if (success) {
-        setIsReady(true);
-        updatePlayerState();
-      } else {
-        setError('Failed to initialize Spotify player');
-      }
-    } catch (error) {
-      console.error('Error initializing Spotify player:', error);
-      setError('An error occurred while initializing the player');
-    } finally {
-      setIsInitializing(false);
+    // Initialize player if not already done
+    if (!isReady && !isInitializing && !error) {
+      initialize();
     }
-  };
-
-  const updatePlayerState = async () => {
-    const state = await spotifyPlayerService.getCurrentState();
-    setPlayerState(state);
-  };
+  }, [isReady, isInitializing, error, initialize]);
 
   const handleLoadPlaylist = async () => {
-    try {
-      setIsLoadingPlaylist(true);
-      setError('');
-      
-      const result = await spotifyPlayerService.loadPlaylist(selectedPlaylist as any);
-      
-      if (result.success) {
-        // Update state after a short delay to allow for playlist loading
-        setTimeout(updatePlayerState, 1000);
-      } else {
-        setError(result.error || 'Failed to load playlist');
-      }
-    } catch (error) {
-      console.error('Error loading playlist:', error);
-      setError('Failed to load playlist');
-    } finally {
-      setIsLoadingPlaylist(false);
-    }
+    await loadPlaylist(selectedPlaylist as any);
   };
 
-  const handleTogglePlayback = async () => {
-    try {
-      await spotifyPlayerService.togglePlayback();
-      // Update state after a short delay to allow for state change
-      setTimeout(updatePlayerState, 500);
-    } catch (error) {
-      console.error('Error toggling playback:', error);
-      setError('Failed to control playback');
-    }
+  const handleRetry = () => {
+    clearError();
+    initialize();
   };
 
-  const availablePlaylists = spotifyPlayerService.getAvailablePlaylists();
+  const availablePlaylists = getAvailablePlaylists();
 
   if (error) {
     return (
@@ -115,7 +57,7 @@ const SpotifyPlayer = () => {
             <AlertDescription>{error}</AlertDescription>
           </Alert>
           <Button 
-            onClick={initializePlayer} 
+            onClick={handleRetry} 
             variant="outline" 
             className="mt-3"
             disabled={isInitializing}
@@ -170,7 +112,7 @@ const SpotifyPlayer = () => {
             </AlertDescription>
           </Alert>
           <Button 
-            onClick={initializePlayer} 
+            onClick={handleRetry} 
             variant="outline" 
             className="mt-3"
           >
@@ -238,7 +180,7 @@ const SpotifyPlayer = () => {
         {/* Playback Controls */}
         <div className="flex items-center gap-4">
           <Button
-            onClick={handleTogglePlayback}
+            onClick={togglePlayback}
             size="lg"
             className="flex items-center gap-2"
           >
