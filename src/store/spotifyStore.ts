@@ -226,16 +226,26 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
       // Wait a moment for the device transfer to take effect
       await new Promise(resolve => setTimeout(resolve, 500));
       
+      // Prepare the request body - add random offset if shuffle is enabled
+      const requestBody: any = {
+        context_uri: `spotify:playlist:${playlist.id}`,
+        device_id: deviceId,
+      };
+
+      // If shuffle is enabled, start from a random position (0-49 tracks into the playlist)
+      if (isShuffleEnabled) {
+        const randomOffset = Math.floor(Math.random() * 50);
+        requestBody.offset = { position: randomOffset };
+        console.log(`Starting playlist from random position: ${randomOffset}`);
+      }
+      
       const response = await fetch(`https://api.spotify.com/v1/me/player/play`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          context_uri: `spotify:playlist:${playlist.id}`,
-          device_id: deviceId,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -257,18 +267,11 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
                 'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({
-                context_uri: `spotify:playlist:${playlist.id}`,
-                device_id: deviceId,
-              }),
+              body: JSON.stringify(requestBody),
             });
 
             if (retryResponse.ok) {
               console.log('Playlist loaded successfully after device activation');
-              // Apply shuffle if enabled
-              if (isShuffleEnabled) {
-                await get().toggleShuffle();
-              }
               set({ isLoadingPlaylist: false });
               setTimeout(() => get().updatePlayerState(), 1000);
               return;
@@ -284,12 +287,6 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
       }
 
       console.log('Playlist loaded successfully');
-      
-      // Apply shuffle if enabled
-      if (isShuffleEnabled) {
-        await get().toggleShuffle();
-      }
-      
       set({ isLoadingPlaylist: false });
       setTimeout(() => get().updatePlayerState(), 1000);
     } catch (error) {
