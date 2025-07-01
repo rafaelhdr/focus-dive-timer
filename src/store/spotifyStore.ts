@@ -226,18 +226,31 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
       // Wait a moment for the device transfer to take effect
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Prepare the request body - add random offset if shuffle is enabled
-      const requestBody: any = {
+      // If shuffle is enabled, enable it via Spotify API first
+      if (isShuffleEnabled) {
+        console.log('Enabling shuffle mode via Spotify API...');
+        const shuffleResponse = await fetch(`https://api.spotify.com/v1/me/player/shuffle?state=true`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+
+        if (!shuffleResponse.ok) {
+          console.warn('Failed to enable shuffle mode, but continuing with playlist load');
+        } else {
+          console.log('Shuffle mode enabled successfully');
+        }
+        
+        // Wait a moment for shuffle to take effect
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+      
+      // Load the playlist from the beginning (no offset)
+      const requestBody = {
         context_uri: `spotify:playlist:${playlist.id}`,
         device_id: deviceId,
       };
-
-      // If shuffle is enabled, start from a random position (0-49 tracks into the playlist)
-      if (isShuffleEnabled) {
-        const randomOffset = Math.floor(Math.random() * 50);
-        requestBody.offset = { position: randomOffset };
-        console.log(`Starting playlist from random position: ${randomOffset}`);
-      }
       
       const response = await fetch(`https://api.spotify.com/v1/me/player/play`, {
         method: 'PUT',
@@ -364,7 +377,7 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
     }
 
     try {
-      const response = await fetch(`https://api.spotify.com/v1/me/player/shuffle?state=${isShuffleEnabled}`, {
+      const response = await fetch(`https://api.spotify.com/v1/me/player/shuffle?state=${!isShuffleEnabled}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -372,7 +385,8 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
       });
 
       if (response.ok) {
-        console.log(`Shuffle ${isShuffleEnabled ? 'enabled' : 'disabled'}`);
+        console.log(`Shuffle ${!isShuffleEnabled ? 'enabled' : 'disabled'}`);
+        set({ isShuffleEnabled: !isShuffleEnabled });
       } else {
         console.error('Failed to toggle shuffle:', await response.text());
       }
