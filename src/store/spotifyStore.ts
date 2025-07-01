@@ -19,11 +19,6 @@ interface SpotifyPlayerState {
 
 // Hardcoded public playlists for focus/work music
 const PUBLIC_PLAYLISTS = {
-  'focus-flow': {
-    id: '37i9dQZF1DX0XUsuxWHRQd',
-    name: 'Focus Flow',
-    description: 'Instrumental beats to keep you in the zone'
-  },
   'lofi-beats': {
     id: '37i9dQZF1DWWQRwui0ExPn', 
     name: 'Lo-Fi Beats',
@@ -33,7 +28,12 @@ const PUBLIC_PLAYLISTS = {
     id: '37i9dQZF1DX4sWSpwq3LiO',
     name: 'Peaceful Piano',
     description: 'Relaxing piano music for concentration'
-  }
+  },
+  'focus-flow': {
+    id: '37i9dQZF1DX0XUsuxWHRQd',
+    name: 'Focus Flow',
+    description: 'Instrumental beats to keep you in the zone'
+  },
 };
 
 interface SpotifyStore {
