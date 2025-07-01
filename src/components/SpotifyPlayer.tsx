@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Play, Pause, Loader2, AlertCircle, Music } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Play, Pause, Loader2, AlertCircle, Music, ListMusic } from 'lucide-react';
 import { spotifyPlayerService } from '@/services/spotifyPlayerService';
 import { getSpotifyAccessToken } from '@/services/spotifyService';
 
@@ -21,6 +22,8 @@ const SpotifyPlayer = () => {
   const [isReady, setIsReady] = useState(false);
   const [playerState, setPlayerState] = useState<SpotifyPlayerState | null>(null);
   const [error, setError] = useState<string>('');
+  const [isLoadingPlaylist, setIsLoadingPlaylist] = useState(false);
+  const [selectedPlaylist, setSelectedPlaylist] = useState<string>('focus-flow');
 
   useEffect(() => {
     initializePlayer();
@@ -63,6 +66,27 @@ const SpotifyPlayer = () => {
     setPlayerState(state);
   };
 
+  const handleLoadPlaylist = async () => {
+    try {
+      setIsLoadingPlaylist(true);
+      setError('');
+      
+      const result = await spotifyPlayerService.loadPlaylist(selectedPlaylist as any);
+      
+      if (result.success) {
+        // Update state after a short delay to allow for playlist loading
+        setTimeout(updatePlayerState, 1000);
+      } else {
+        setError(result.error || 'Failed to load playlist');
+      }
+    } catch (error) {
+      console.error('Error loading playlist:', error);
+      setError('Failed to load playlist');
+    } finally {
+      setIsLoadingPlaylist(false);
+    }
+  };
+
   const handleTogglePlayback = async () => {
     try {
       await spotifyPlayerService.togglePlayback();
@@ -73,6 +97,8 @@ const SpotifyPlayer = () => {
       setError('Failed to control playback');
     }
   };
+
+  const availablePlaylists = spotifyPlayerService.getAvailablePlaylists();
 
   if (error) {
     return (
@@ -164,7 +190,52 @@ const SpotifyPlayer = () => {
         </CardTitle>
         <CardDescription>Control your music during focus sessions</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        {/* Playlist Selection */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <ListMusic className="h-4 w-4" />
+            <span className="text-sm font-medium">Choose Focus Music</span>
+          </div>
+          
+          <div className="flex gap-2">
+            <Select value={selectedPlaylist} onValueChange={setSelectedPlaylist}>
+              <SelectTrigger className="flex-1">
+                <SelectValue placeholder="Select a playlist" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(availablePlaylists).map(([key, playlist]) => (
+                  <SelectItem key={key} value={key}>
+                    <div>
+                      <div className="font-medium">{playlist.name}</div>
+                      <div className="text-xs text-muted-foreground">{playlist.description}</div>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Button 
+              onClick={handleLoadPlaylist}
+              disabled={isLoadingPlaylist}
+              variant="outline"
+            >
+              {isLoadingPlaylist ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                <>
+                  <ListMusic className="h-4 w-4" />
+                  Load
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+
+        {/* Playback Controls */}
         <div className="flex items-center gap-4">
           <Button
             onClick={handleTogglePlayback}
@@ -194,7 +265,7 @@ const SpotifyPlayer = () => {
               </div>
             ) : (
               <p className="text-muted-foreground">
-                {playerState?.isPlaying ? 'Playing...' : 'No track selected'}
+                {playerState?.isPlaying ? 'Playing...' : 'No track selected - Load a playlist first'}
               </p>
             )}
           </div>
@@ -212,7 +283,7 @@ const SpotifyPlayer = () => {
           onClick={updatePlayerState} 
           variant="ghost" 
           size="sm" 
-          className="mt-3"
+          className="w-full"
         >
           Refresh State
         </Button>

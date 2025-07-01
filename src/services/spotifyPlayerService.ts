@@ -15,6 +15,25 @@ interface SpotifyPlayerState {
   };
 }
 
+// Hardcoded public playlists for focus/work music
+const PUBLIC_PLAYLISTS = {
+  'focus-flow': {
+    id: '37i9dQZF1DX0XUsuxWHRQd',
+    name: 'Focus Flow',
+    description: 'Instrumental beats to keep you in the zone'
+  },
+  'lofi-beats': {
+    id: '37i9dQZF1DWWQRwui0ExPn', 
+    name: 'Lo-Fi Beats',
+    description: 'Chill beats to help you focus'
+  },
+  'peaceful-piano': {
+    id: '37i9dQZF1DX4sWSpwq3LiO',
+    name: 'Peaceful Piano',
+    description: 'Relaxing piano music for concentration'
+  }
+};
+
 class SpotifyPlayerService {
   private player: any = null;
   private deviceId: string = '';
@@ -78,6 +97,51 @@ class SpotifyPlayerService {
     });
   }
 
+  async loadPlaylist(playlistKey: keyof typeof PUBLIC_PLAYLISTS = 'focus-flow'): Promise<{ success: boolean; error?: string }> {
+    if (!this.isReady || !this.deviceId) {
+      return { success: false, error: 'Player not ready' };
+    }
+
+    const playlist = PUBLIC_PLAYLISTS[playlistKey];
+    if (!playlist) {
+      return { success: false, error: 'Playlist not found' };
+    }
+
+    try {
+      console.log(`Loading playlist: ${playlist.name}`);
+      
+      const response = await fetch(`https://api.spotify.com/v1/me/player/play`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          context_uri: `spotify:playlist:${playlist.id}`,
+          device_id: this.deviceId,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Failed to load playlist:', errorData);
+        return { 
+          success: false, 
+          error: errorData.error?.message || 'Failed to load playlist' 
+        };
+      }
+
+      console.log('Playlist loaded successfully');
+      return { success: true };
+    } catch (error) {
+      console.error('Error loading playlist:', error);
+      return { 
+        success: false, 
+        error: 'Network error while loading playlist' 
+      };
+    }
+  }
+
   async togglePlayback(): Promise<void> {
     if (!this.player || !this.isReady) {
       console.error('Spotify player not ready');
@@ -115,6 +179,10 @@ class SpotifyPlayerService {
       console.error('Error getting player state:', error);
       return null;
     }
+  }
+
+  getAvailablePlaylists() {
+    return PUBLIC_PLAYLISTS;
   }
 
   disconnect(): void {
