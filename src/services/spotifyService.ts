@@ -314,7 +314,7 @@ export const searchUserPlaylists = async (query: string): Promise<{ success: boo
   }
 
   try {
-    console.log('Searching user playlists via Spotify API for:', query);
+    console.log('Searching playlists via Spotify API for:', query);
     
     // First get a fresh access token
     const tokenResult = await getSpotifyAccessToken();
@@ -323,7 +323,6 @@ export const searchUserPlaylists = async (query: string): Promise<{ success: boo
     }
 
     // Search for playlists using Spotify's search API
-    // This will search across all the user's playlists, not just the first 50
     const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=playlist&limit=50&market=from_token`, {
       method: 'GET',
       headers: {
@@ -342,34 +341,12 @@ export const searchUserPlaylists = async (query: string): Promise<{ success: boo
     }
 
     const data = await response.json();
+    console.log(`Found ${data.playlists?.items?.length || 0} playlists matching "${query}"`);
     
-    // Get current user's ID to filter only their playlists
-    const userResponse = await fetch('https://api.spotify.com/v1/me', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${tokenResult.token}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!userResponse.ok) {
-      console.warn('Failed to get user info, returning all search results');
-      return { success: true, playlists: data.playlists?.items || [] };
-    }
-
-    const userData = await userResponse.json();
-    const userId = userData.id;
-
-    // Filter to only include playlists owned by the current user
-    const userPlaylists = (data.playlists?.items || []).filter((playlist: any) => 
-      playlist.owner?.id === userId
-    );
-
-    console.log(`Found ${userPlaylists.length} user playlists matching "${query}"`);
-    
-    return { success: true, playlists: userPlaylists };
+    // Return all search results without filtering by owner
+    return { success: true, playlists: data.playlists?.items || [] };
   } catch (error) {
-    console.error('Error searching user playlists:', error);
+    console.error('Error searching playlists:', error);
     return { 
       success: false, 
       error: 'Network error occurred while searching playlists' 
