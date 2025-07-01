@@ -261,3 +261,79 @@ export const getSpotifyAccessToken = async (): Promise<{ success: boolean; token
     };
   }
 };
+
+/**
+ * Get user's playlists from Spotify
+ */
+export const getUserPlaylists = async (limit: number = 50, offset: number = 0): Promise<{ success: boolean; playlists?: any[]; error?: string }> => {
+  try {
+    console.log('Fetching user playlists...');
+    
+    // First get a fresh access token
+    const tokenResult = await getSpotifyAccessToken();
+    if (!tokenResult.success || !tokenResult.token) {
+      return { success: false, error: tokenResult.error || 'Failed to get access token' };
+    }
+
+    const response = await fetch(`https://api.spotify.com/v1/me/playlists?limit=${limit}&offset=${offset}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${tokenResult.token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Failed to fetch user playlists:', errorData);
+      return { 
+        success: false, 
+        error: errorData.error?.message || 'Failed to fetch playlists' 
+      };
+    }
+
+    const data = await response.json();
+    console.log('User playlists fetched successfully');
+    
+    return { success: true, playlists: data.items || [] };
+  } catch (error) {
+    console.error('Error fetching user playlists:', error);
+    return { 
+      success: false, 
+      error: 'Network error occurred while fetching playlists' 
+    };
+  }
+};
+
+/**
+ * Search user's playlists by name
+ */
+export const searchUserPlaylists = async (query: string): Promise<{ success: boolean; playlists?: any[]; error?: string }> => {
+  if (!query.trim()) {
+    return { success: true, playlists: [] };
+  }
+
+  try {
+    console.log('Searching user playlists for:', query);
+    
+    // Get all user playlists (we'll filter client-side for better UX)
+    const result = await getUserPlaylists(50, 0);
+    
+    if (!result.success) {
+      return result;
+    }
+
+    // Filter playlists by name (case-insensitive)
+    const filteredPlaylists = (result.playlists || []).filter((playlist: any) =>
+      playlist.name.toLowerCase().includes(query.toLowerCase())
+    );
+
+    return { success: true, playlists: filteredPlaylists };
+  } catch (error) {
+    console.error('Error searching user playlists:', error);
+    return { 
+      success: false, 
+      error: 'Network error occurred while searching playlists' 
+    };
+  }
+};

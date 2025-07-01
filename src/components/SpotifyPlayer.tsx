@@ -1,12 +1,11 @@
-
 import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Play, Pause, Loader2, AlertCircle, Music, ListMusic, Shuffle } from 'lucide-react';
 import { useSpotifyStore } from '@/store/spotifyStore';
+import PlaylistSearch from './PlaylistSearch';
 
 const SpotifyPlayer = () => {
   const {
@@ -24,7 +23,6 @@ const SpotifyPlayer = () => {
     setSelectedPlaylist,
     setShuffleEnabled,
     clearError,
-    getAvailablePlaylists,
   } = useSpotifyStore();
 
   useEffect(() => {
@@ -35,15 +33,13 @@ const SpotifyPlayer = () => {
   }, [isReady, isInitializing, error, initialize]);
 
   const handleLoadPlaylist = async () => {
-    await loadPlaylist(selectedPlaylist as any);
+    await loadPlaylist(selectedPlaylist);
   };
 
   const handleRetry = () => {
     clearError();
     initialize();
   };
-
-  const availablePlaylists = getAvailablePlaylists();
 
   if (error) {
     return (
@@ -144,21 +140,12 @@ const SpotifyPlayer = () => {
           </div>
           
           <div className="flex gap-2">
-            <Select value={selectedPlaylist} onValueChange={setSelectedPlaylist}>
-              <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Select a playlist" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(availablePlaylists).map(([key, playlist]) => (
-                  <SelectItem key={key} value={key}>
-                    <div>
-                      <div className="font-medium">{playlist.name}</div>
-                      <div className="text-xs text-muted-foreground">{playlist.description}</div>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex-1">
+              <PlaylistSearch 
+                onSelect={setSelectedPlaylist}
+                selectedPlaylist={selectedPlaylist}
+              />
+            </div>
             
             <Button 
               onClick={handleLoadPlaylist}

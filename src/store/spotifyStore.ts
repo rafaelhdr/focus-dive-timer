@@ -46,6 +46,12 @@ interface SpotifyStore {
   selectedPlaylist: string;
   isShuffleEnabled: boolean;
   
+  // New playlist search state
+  userPlaylists: any[];
+  isLoadingPlaylists: boolean;
+  playlistSearchQuery: string;
+  searchResults: any[];
+  
   // Internal player references
   player: any;
   deviceId: string;
@@ -53,7 +59,7 @@ interface SpotifyStore {
   
   // Actions
   initialize: () => Promise<void>;
-  loadPlaylist: (playlistKey?: keyof typeof PUBLIC_PLAYLISTS) => Promise<void>;
+  loadPlaylist: (playlistKey?: keyof typeof PUBLIC_PLAYLISTS | string) => Promise<void>;
   togglePlayback: () => Promise<void>;
   updatePlayerState: () => Promise<void>;
   transferPlaybackToDevice: () => Promise<{ success: boolean; error?: string }>;
@@ -63,6 +69,12 @@ interface SpotifyStore {
   disconnect: () => void;
   clearError: () => void;
   getAvailablePlaylists: () => typeof PUBLIC_PLAYLISTS;
+  
+  // New actions
+  fetchUserPlaylists: () => Promise<void>;
+  searchPlaylists: (query: string) => Promise<void>;
+  setPlaylistSearchQuery: (query: string) => void;
+  getAllPlaylists: () => any[];
 }
 
 export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
@@ -74,6 +86,10 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
   isLoadingPlaylist: false,
   selectedPlaylist: 'focus-flow',
   isShuffleEnabled: false,
+  userPlaylists: [],
+  isLoadingPlaylists: false,
+  playlistSearchQuery: '',
+  searchResults: [],
   player: null,
   deviceId: '',
   accessToken: '',
@@ -199,17 +215,30 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
   },
 
   loadPlaylist: async (playlistKey = 'focus-flow') => {
-    const { isReady, deviceId, accessToken, transferPlaybackToDevice, isShuffleEnabled } = get();
+    const { isReady, deviceId, accessToken, transferPlaybackToDevice, isShuffleEnabled, userPlaylists } = get();
     
     if (!isReady || !deviceId) {
       set({ error: 'Player not ready' });
       return;
     }
 
-    const playlist = PUBLIC_PLAYLISTS[playlistKey as keyof typeof PUBLIC_PLAYLISTS];
-    if (!playlist) {
-      set({ error: 'Playlist not found' });
-      return;
+    // Check if it's a public playlist or user playlist
+    let playlist;
+    let playlistId;
+    
+    if (PUBLIC_PLAYLISTS[playlistKey as keyof typeof PUBLIC_PLAYLISTS]) {
+      playlist = PUBLIC_PLAYLISTS[playlistKey as keyof typeof PUBLIC_PLAYLISTS];
+      playlistId = playlist.id;
+    } else {
+      // It's a user playlist ID
+      const userPlaylist = userPlaylists.find(p => p.id === playlistKey);
+      if (userPlaylist) {
+        playlist = { name: userPlaylist.name, id: userPlaylist.id };
+        playlistId = userPlaylist.id;
+      } else {
+        set({ error: 'Playlist not found' });
+        return;
+      }
     }
 
     set({ isLoadingPlaylist: true, error: '' });
@@ -248,7 +277,7 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
       
       // Load the playlist from the beginning (no offset)
       const requestBody = {
-        context_uri: `spotify:playlist:${playlist.id}`,
+        context_uri: `spotify:playlist:${playlistId}`,
         device_id: deviceId,
       };
       
@@ -416,4 +445,81 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
   },
 
   getAvailablePlaylists: () => PUBLIC_PLAYLISTS,
+
+  fetchUserPlaylists: async () => {
+    const { isReady } = get();
+    
+    if (!isReady) {
+      console.log('Player not ready, skipping playlist fetch');
+      return;
+    }
+
+    set({ isLoadingPlaylists: true, error: '' });
+
+    try {
+      const { getUserPlaylists } = await import('@/services/spotifyService');
+      const result = await getUserPlaylists();
+
+      if (result.success) {
+        set({ 
+          userPlaylists: result.playlists || [],
+          isLoadingPlaylists: false 
+        });
+      } else {
+        console.error('Failed to fetch user playlists:', result.error);
+        set({ 
+          error: result.error || 'Failed to fetch playlists',
+          isLoadingPlaylists: false 
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching user playlists:', error);
+      set({ 
+        error: 'Failed to fetch playlists',
+        isLoadingPlaylists: false 
+      });
+    }
+  },
+
+  searchPlaylists: async (query: string) => {
+    const { userPlaylists } = get();
+    
+    if (!query.trim()) {
+      set({ searchResults: [], playlistSearchQuery: query });
+      return;
+    }
+
+    set({ playlistSearchQuery: query });
+
+    // Filter user playlists locally for better UX
+    const filteredPlaylists = userPlaylists.filter((playlist: any) =>
+      playlist.name.toLowerCase().includes(query.toLowerCase())
+    );
+
+    set({ searchResults: filteredPlaylists });
+  },
+
+  setPlaylistSearchQuery: (query: string) => {
+    set({ playlistSearchQuery: query });
+  },
+
+  getAllPlaylists: () => {
+    const { userPlaylists } = get();
+    
+    // Convert public playlists to same format as user playlists
+    const publicPlaylistsArray = Object.entries(PUBLIC_PLAYLISTS).map(([key, playlist]) => ({
+      id: key,
+      name: playlist.name,
+      description: playlist.description,
+      isPublic: true
+    }));
+
+    // Combine public and user playlists
+    const userPlaylistsFormatted = userPlaylists.map(playlist => ({
+      ...playlist,
+      isPublic: false
+    }));
+
+    return [...publicPlaylistsArray, ...userPlaylistsFormatted];
+  },
 }));
