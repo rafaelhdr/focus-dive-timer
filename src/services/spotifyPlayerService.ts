@@ -97,6 +97,46 @@ class SpotifyPlayerService {
     });
   }
 
+  async transferPlaybackToDevice(): Promise<{ success: boolean; error?: string }> {
+    if (!this.deviceId || !this.accessToken) {
+      return { success: false, error: 'Device not ready or no access token' };
+    }
+
+    try {
+      console.log('Transferring playback to Focus Dive device:', this.deviceId);
+      
+      const response = await fetch(`https://api.spotify.com/v1/me/player`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          device_ids: [this.deviceId],
+          play: false, // Don't start playing immediately
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Failed to transfer playback:', errorData);
+        return { 
+          success: false, 
+          error: errorData.error?.message || 'Failed to transfer playback to device' 
+        };
+      }
+
+      console.log('Playback transferred successfully to Focus Dive device');
+      return { success: true };
+    } catch (error) {
+      console.error('Error transferring playback:', error);
+      return { 
+        success: false, 
+        error: 'Network error while transferring playback' 
+      };
+    }
+  }
+
   async loadPlaylist(playlistKey: keyof typeof PUBLIC_PLAYLISTS = 'focus-flow'): Promise<{ success: boolean; error?: string }> {
     if (!this.isReady || !this.deviceId) {
       return { success: false, error: 'Player not ready' };
@@ -109,6 +149,15 @@ class SpotifyPlayerService {
 
     try {
       console.log(`Loading playlist: ${playlist.name}`);
+      
+      // First, try to transfer playback to this device
+      const transferResult = await this.transferPlaybackToDevice();
+      if (!transferResult.success) {
+        console.warn('Failed to transfer playback, but continuing with playlist load:', transferResult.error);
+      }
+
+      // Wait a moment for the device transfer to take effect
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       const response = await fetch(`https://api.spotify.com/v1/me/player/play`, {
         method: 'PUT',
@@ -125,6 +174,35 @@ class SpotifyPlayerService {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         console.error('Failed to load playlist:', errorData);
+        
+        // If we get "No active device found", try to transfer playback again
+        if (errorData.error?.reason === 'NO_ACTIVE_DEVICE') {
+          console.log('No active device found, attempting to activate Focus Dive device...');
+          const retryTransfer = await this.transferPlaybackToDevice();
+          
+          if (retryTransfer.success) {
+            // Wait a bit more and retry the playlist load
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            const retryResponse = await fetch(`https://api.spotify.com/v1/me/player/play`, {
+              method: 'PUT',
+              headers: {
+                'Authorization': `Bearer ${this.accessToken}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                context_uri: `spotify:playlist:${playlist.id}`,
+                device_id: this.deviceId,
+              }),
+            });
+
+            if (retryResponse.ok) {
+              console.log('Playlist loaded successfully after device activation');
+              return { success: true };
+            }
+          }
+        }
+        
         return { 
           success: false, 
           error: errorData.error?.message || 'Failed to load playlist' 
