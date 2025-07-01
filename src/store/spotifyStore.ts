@@ -51,6 +51,7 @@ interface SpotifyStore {
   isLoadingPlaylists: boolean;
   playlistSearchQuery: string;
   searchResults: any[];
+  isSearching: boolean;
   
   // Internal player references
   player: any;
@@ -90,6 +91,7 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
   isLoadingPlaylists: false,
   playlistSearchQuery: '',
   searchResults: [],
+  isSearching: false,
   player: null,
   deviceId: '',
   accessToken: '',
@@ -482,21 +484,36 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
   },
 
   searchPlaylists: async (query: string) => {
-    const { userPlaylists } = get();
-    
+    set({ playlistSearchQuery: query, isSearching: true });
+
     if (!query.trim()) {
-      set({ searchResults: [], playlistSearchQuery: query });
+      set({ searchResults: [], isSearching: false });
       return;
     }
 
-    set({ playlistSearchQuery: query });
+    try {
+      const { searchUserPlaylists } = await import('@/services/spotifyService');
+      const result = await searchUserPlaylists(query);
 
-    // Filter user playlists locally for better UX
-    const filteredPlaylists = userPlaylists.filter((playlist: any) =>
-      playlist.name.toLowerCase().includes(query.toLowerCase())
-    );
-
-    set({ searchResults: filteredPlaylists });
+      if (result.success) {
+        set({ 
+          searchResults: result.playlists || [],
+          isSearching: false 
+        });
+      } else {
+        console.error('Failed to search playlists:', result.error);
+        set({ 
+          searchResults: [],
+          isSearching: false 
+        });
+      }
+    } catch (error) {
+      console.error('Error searching playlists:', error);
+      set({ 
+        searchResults: [],
+        isSearching: false 
+      });
+    }
   },
 
   setPlaylistSearchQuery: (query: string) => {

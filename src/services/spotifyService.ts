@@ -306,7 +306,7 @@ export const getUserPlaylists = async (limit: number = 50, offset: number = 0): 
 };
 
 /**
- * Search user's playlists by name
+ * Search user's playlists by name using Spotify API
  */
 export const searchUserPlaylists = async (query: string): Promise<{ success: boolean; playlists?: any[]; error?: string }> => {
   if (!query.trim()) {
@@ -314,21 +314,60 @@ export const searchUserPlaylists = async (query: string): Promise<{ success: boo
   }
 
   try {
-    console.log('Searching user playlists for:', query);
+    console.log('Searching user playlists via Spotify API for:', query);
     
-    // Get all user playlists (we'll filter client-side for better UX)
-    const result = await getUserPlaylists(50, 0);
-    
-    if (!result.success) {
-      return result;
+    // First get a fresh access token
+    const tokenResult = await getSpotifyAccessToken();
+    if (!tokenResult.success || !tokenResult.token) {
+      return { success: false, error: tokenResult.error || 'Failed to get access token' };
     }
 
-    // Filter playlists by name (case-insensitive)
-    const filteredPlaylists = (result.playlists || []).filter((playlist: any) =>
-      playlist.name.toLowerCase().includes(query.toLowerCase())
+    // Search for playlists using Spotify's search API
+    // This will search across all the user's playlists, not just the first 50
+    const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=playlist&limit=50&market=from_token`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${tokenResult.token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Failed to search playlists:', errorData);
+      return { 
+        success: false, 
+        error: errorData.error?.message || 'Failed to search playlists' 
+      };
+    }
+
+    const data = await response.json();
+    
+    // Get current user's ID to filter only their playlists
+    const userResponse = await fetch('https://api.spotify.com/v1/me', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${tokenResult.token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!userResponse.ok) {
+      console.warn('Failed to get user info, returning all search results');
+      return { success: true, playlists: data.playlists?.items || [] };
+    }
+
+    const userData = await userResponse.json();
+    const userId = userData.id;
+
+    // Filter to only include playlists owned by the current user
+    const userPlaylists = (data.playlists?.items || []).filter((playlist: any) => 
+      playlist.owner?.id === userId
     );
 
-    return { success: true, playlists: filteredPlaylists };
+    console.log(`Found ${userPlaylists.length} user playlists matching "${query}"`);
+    
+    return { success: true, playlists: userPlaylists };
   } catch (error) {
     console.error('Error searching user playlists:', error);
     return { 
