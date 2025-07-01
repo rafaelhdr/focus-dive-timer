@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { getSpotifyAccessToken } from '@/services/spotifyService';
 
@@ -45,6 +44,7 @@ interface SpotifyStore {
   error: string;
   isLoadingPlaylist: boolean;
   selectedPlaylist: string;
+  isShuffleEnabled: boolean;
   
   // Internal player references
   player: any;
@@ -58,6 +58,8 @@ interface SpotifyStore {
   updatePlayerState: () => Promise<void>;
   transferPlaybackToDevice: () => Promise<{ success: boolean; error?: string }>;
   setSelectedPlaylist: (playlist: string) => void;
+  setShuffleEnabled: (enabled: boolean) => void;
+  toggleShuffle: () => Promise<void>;
   disconnect: () => void;
   clearError: () => void;
   getAvailablePlaylists: () => typeof PUBLIC_PLAYLISTS;
@@ -71,6 +73,7 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
   error: '',
   isLoadingPlaylist: false,
   selectedPlaylist: 'focus-flow',
+  isShuffleEnabled: false,
   player: null,
   deviceId: '',
   accessToken: '',
@@ -196,7 +199,7 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
   },
 
   loadPlaylist: async (playlistKey = 'focus-flow') => {
-    const { isReady, deviceId, accessToken, transferPlaybackToDevice } = get();
+    const { isReady, deviceId, accessToken, transferPlaybackToDevice, isShuffleEnabled } = get();
     
     if (!isReady || !deviceId) {
       set({ error: 'Player not ready' });
@@ -262,6 +265,10 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
 
             if (retryResponse.ok) {
               console.log('Playlist loaded successfully after device activation');
+              // Apply shuffle if enabled
+              if (isShuffleEnabled) {
+                await get().toggleShuffle();
+              }
               set({ isLoadingPlaylist: false });
               setTimeout(() => get().updatePlayerState(), 1000);
               return;
@@ -277,6 +284,12 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
       }
 
       console.log('Playlist loaded successfully');
+      
+      // Apply shuffle if enabled
+      if (isShuffleEnabled) {
+        await get().toggleShuffle();
+      }
+      
       set({ isLoadingPlaylist: false });
       setTimeout(() => get().updatePlayerState(), 1000);
     } catch (error) {
@@ -341,6 +354,36 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
     set({ selectedPlaylist: playlist });
   },
 
+  setShuffleEnabled: (enabled: boolean) => {
+    set({ isShuffleEnabled: enabled });
+  },
+
+  toggleShuffle: async () => {
+    const { accessToken, isShuffleEnabled } = get();
+    
+    if (!accessToken) {
+      console.error('No access token available for shuffle');
+      return;
+    }
+
+    try {
+      const response = await fetch(`https://api.spotify.com/v1/me/player/shuffle?state=${isShuffleEnabled}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.ok) {
+        console.log(`Shuffle ${isShuffleEnabled ? 'enabled' : 'disabled'}`);
+      } else {
+        console.error('Failed to toggle shuffle:', await response.text());
+      }
+    } catch (error) {
+      console.error('Error toggling shuffle:', error);
+    }
+  },
+
   disconnect: () => {
     const { player } = get();
     if (player) {
@@ -353,6 +396,7 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
       accessToken: '',
       playerState: null,
       error: '',
+      isShuffleEnabled: false,
     });
   },
 

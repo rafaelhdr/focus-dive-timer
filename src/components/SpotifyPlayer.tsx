@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Play, Pause, Loader2, AlertCircle, Music, ListMusic } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Play, Pause, Loader2, AlertCircle, Music, ListMusic, Shuffle } from 'lucide-react';
 import { useSpotifyStore } from '@/store/spotifyStore';
 
 const SpotifyPlayer = () => {
@@ -15,11 +16,13 @@ const SpotifyPlayer = () => {
     error,
     isLoadingPlaylist,
     selectedPlaylist,
+    isShuffleEnabled,
     initialize,
     loadPlaylist,
     togglePlayback,
     updatePlayerState,
     setSelectedPlaylist,
+    setShuffleEnabled,
     clearError,
     getAvailablePlaylists,
   } = useSpotifyStore();
@@ -174,6 +177,22 @@ const SpotifyPlayer = () => {
                 </>
               )}
             </Button>
+          </div>
+
+          {/* Shuffle Option */}
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="shuffle" 
+              checked={isShuffleEnabled}
+              onCheckedChange={(checked) => setShuffleEnabled(!!checked)}
+            />
+            <label 
+              htmlFor="shuffle" 
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2"
+            >
+              <Shuffle className="h-4 w-4" />
+              Shuffle songs
+            </label>
           </div>
         </div>
 
