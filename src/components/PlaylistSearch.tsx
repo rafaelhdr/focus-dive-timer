@@ -63,10 +63,13 @@ const PlaylistSearch = ({ onSelect, selectedPlaylist }: PlaylistSearchProps) => 
   // Get playlists to display based on search
   const playlistsToShow = () => {
     if (playlistSearchQuery.trim()) {
-      console.log('Showing search results:', searchResults.length);
+      console.log('🔍 Search query:', playlistSearchQuery);
+      console.log('🔍 Search results:', searchResults);
+      console.log('🔍 Search results length:', searchResults.length);
+      console.log('🔍 User playlists length:', userPlaylists.length);
       return searchResults;
     }
-    console.log('Showing all user playlists:', userPlaylists.length);
+    console.log('📝 Showing all user playlists:', userPlaylists.length);
     return userPlaylists;
   };
 
@@ -79,6 +82,19 @@ const PlaylistSearch = ({ onSelect, selectedPlaylist }: PlaylistSearchProps) => 
       clearError();
     }
   };
+
+  const currentPlaylists = playlistsToShow();
+  const hasSearchQuery = playlistSearchQuery.trim().length > 0;
+  const isEmptyState = !isLoadingPlaylists && !isSearching && currentPlaylists.length === 0;
+
+  console.log('🎵 Render state:', {
+    hasSearchQuery,
+    isEmptyState,
+    currentPlaylistsLength: currentPlaylists.length,
+    isLoadingPlaylists,
+    isSearching,
+    error
+  });
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -104,31 +120,33 @@ const PlaylistSearch = ({ onSelect, selectedPlaylist }: PlaylistSearchProps) => 
             onValueChange={setPlaylistSearchQuery}
           />
           <CommandList className="max-h-[200px]">
-            <CommandEmpty>
-              {isLoadingPlaylists ? (
-                <div className="flex items-center gap-2 justify-center py-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Loading playlists...
-                </div>
-              ) : isSearching ? (
-                <div className="flex items-center gap-2 justify-center py-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Searching...
-                </div>
-              ) : error ? (
-                <div className="flex items-center gap-2 justify-center py-2 text-red-500">
-                  <AlertCircle className="h-4 w-4" />
-                  Search failed
-                </div>
-              ) : (
-                'No playlists found.'
-              )}
-            </CommandEmpty>
+            {/* Show loading states */}
+            {(isLoadingPlaylists || isSearching) && (
+              <div className="flex items-center gap-2 justify-center py-4">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                {isLoadingPlaylists ? 'Loading playlists...' : 'Searching...'}
+              </div>
+            )}
 
-            {/* User Playlists */}
-            {playlistsToShow().length > 0 && (
-              <CommandGroup heading={playlistSearchQuery.trim() ? "Search Results" : "Your Playlists"}>
-                {playlistsToShow().map((playlist) => (
+            {/* Show error state */}
+            {error && !isLoadingPlaylists && !isSearching && (
+              <div className="flex items-center gap-2 justify-center py-4 text-red-500">
+                <AlertCircle className="h-4 w-4" />
+                {error}
+              </div>
+            )}
+
+            {/* Show empty state only when not loading and no results */}
+            {isEmptyState && !error && (
+              <CommandEmpty>
+                {hasSearchQuery ? 'No playlists found matching your search.' : 'No playlists found.'}
+              </CommandEmpty>
+            )}
+
+            {/* Show playlists when we have results and not loading */}
+            {currentPlaylists.length > 0 && !isLoadingPlaylists && !isSearching && (
+              <CommandGroup heading={hasSearchQuery ? "Search Results" : "Your Playlists"}>
+                {currentPlaylists.map((playlist) => (
                   <CommandItem
                     key={playlist.id}
                     value={playlist.id}
