@@ -1,5 +1,3 @@
-
-
 import { create } from "zustand";
 import { TimerData } from "@/hooks/types";
 import { toast } from "sonner";
@@ -115,19 +113,8 @@ const handleSpotifyPlayback = async (mode: "focus" | "break") => {
   if (playlistToLoad && playlistToLoad.id) {
     try {
       console.log(`Loading ${mode} playlist:`, playlistToLoad.name);
+      // The loadPlaylist function should handle starting playback automatically
       await spotifyStore.loadPlaylist(playlistToLoad.id);
-      
-      // Wait a moment for the playlist to load
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Ensure playback starts
-      const currentState = await spotifyStore.updatePlayerState();
-      spotifyStore = useSpotifyStore.getState();
-      
-      if (spotifyStore.playerState && !spotifyStore.playerState.isPlaying) {
-        console.log('Starting playback...');
-        await spotifyStore.togglePlayback();
-      }
     } catch (error) {
       console.error(`Error loading ${mode} playlist:`, error);
       toast.error(`Failed to load ${mode} playlist`);
