@@ -1,4 +1,5 @@
 
+
 import { create } from "zustand";
 import { TimerData } from "@/hooks/types";
 import { toast } from "sonner";
@@ -53,12 +54,14 @@ const getDurationInSeconds = (
 
 // Helper function to handle Spotify playback based on timer mode
 const handleSpotifyPlayback = async (mode: "focus" | "break") => {
-  const spotifyStore = useSpotifyStore.getState();
+  let spotifyStore = useSpotifyStore.getState();
   
   // Load Spotify settings if not already loaded
   if (!spotifyStore.spotifyEnabled && !spotifyStore.focusPlaylist && !spotifyStore.breakPlaylist) {
     console.log('Loading Spotify settings...');
     await spotifyStore.loadSpotifySettings();
+    // Get fresh state after loading settings
+    spotifyStore = useSpotifyStore.getState();
   }
   
   // Check if Spotify integration is enabled
