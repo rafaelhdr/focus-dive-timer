@@ -96,6 +96,15 @@ const handleSpotifyPlayback = async (mode: "focus" | "break") => {
     if (spotifyStore.breakKeepFocusSound) {
       // Keep focus music during breaks - don't change playlist
       console.log('Keeping focus music during break');
+      try {
+        // Just resume playback if paused
+        const currentState = spotifyStore.playerState;
+        if (currentState && !currentState.isPlaying) {
+          await spotifyStore.togglePlayback();
+        }
+      } catch (error) {
+        console.error('Error resuming playback during break:', error);
+      }
       return;
     } else {
       // Use break playlist if configured
@@ -107,6 +116,18 @@ const handleSpotifyPlayback = async (mode: "focus" | "break") => {
     try {
       console.log(`Loading ${mode} playlist:`, playlistToLoad.name);
       await spotifyStore.loadPlaylist(playlistToLoad.id);
+      
+      // Wait a moment for the playlist to load
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Ensure playback starts
+      const currentState = await spotifyStore.updatePlayerState();
+      spotifyStore = useSpotifyStore.getState();
+      
+      if (spotifyStore.playerState && !spotifyStore.playerState.isPlaying) {
+        console.log('Starting playback...');
+        await spotifyStore.togglePlayback();
+      }
     } catch (error) {
       console.error(`Error loading ${mode} playlist:`, error);
       toast.error(`Failed to load ${mode} playlist`);
