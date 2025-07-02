@@ -524,8 +524,20 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
   },
 
   getAllPlaylists: () => {
-    const { userPlaylists } = get();
-    return userPlaylists.map(playlist => ({
+    const { userPlaylists, searchResults } = get();
+    
+    // Combine user playlists and search results, removing duplicates
+    const allPlaylists = [...userPlaylists];
+    
+    // Add search results that aren't already in user playlists
+    searchResults.forEach(searchPlaylist => {
+      const existsInUserPlaylists = userPlaylists.some(userPlaylist => userPlaylist.id === searchPlaylist.id);
+      if (!existsInUserPlaylists) {
+        allPlaylists.push(searchPlaylist);
+      }
+    });
+    
+    return allPlaylists.map(playlist => ({
       ...playlist,
       isPublic: false
     }));

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -9,9 +10,10 @@ import { useSpotifyStore } from '@/store/spotifyStore';
 interface PlaylistSearchProps {
   onSelect: (playlistId: string) => void;
   selectedPlaylist: string;
+  disabled?: boolean;
 }
 
-const PlaylistSearch = ({ onSelect, selectedPlaylist }: PlaylistSearchProps) => {
+const PlaylistSearch = ({ onSelect, selectedPlaylist, disabled = false }: PlaylistSearchProps) => {
   const [open, setOpen] = useState(false);
   const {
     userPlaylists,
@@ -110,6 +112,7 @@ const PlaylistSearch = ({ onSelect, selectedPlaylist }: PlaylistSearchProps) => 
           role="combobox"
           aria-expanded={open}
           className="w-full justify-between"
+          disabled={disabled}
         >
           <div className="flex items-center gap-2">
             <Music className="h-4 w-4 shrink-0" />
