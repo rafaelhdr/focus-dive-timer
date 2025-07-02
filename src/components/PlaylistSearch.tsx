@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
-import { Check, ChevronsUpDown, Music, User, Globe, Loader2 } from 'lucide-react';
+import { Check, ChevronsUpDown, Music, User, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSpotifyStore } from '@/store/spotifyStore';
 
@@ -23,8 +23,6 @@ const PlaylistSearch = ({ onSelect, selectedPlaylist }: PlaylistSearchProps) => 
     fetchUserPlaylists,
     searchPlaylists,
     setPlaylistSearchQuery,
-    getAllPlaylists,
-    getAvailablePlaylists,
     isReady
   } = useSpotifyStore();
 
@@ -46,14 +44,8 @@ const PlaylistSearch = ({ onSelect, selectedPlaylist }: PlaylistSearchProps) => 
     return () => clearTimeout(timer);
   }, [playlistSearchQuery, searchPlaylists]);
 
-  const publicPlaylists = getAvailablePlaylists();
-
   // Get display name for selected playlist
   const getSelectedPlaylistName = () => {
-    if (publicPlaylists[selectedPlaylist as keyof typeof publicPlaylists]) {
-      return publicPlaylists[selectedPlaylist as keyof typeof publicPlaylists].name;
-    }
-    
     const userPlaylist = userPlaylists.find(p => p.id === selectedPlaylist);
     if (userPlaylist) {
       return userPlaylist.name;
@@ -109,39 +101,6 @@ const PlaylistSearch = ({ onSelect, selectedPlaylist }: PlaylistSearchProps) => 
                 'No playlists found.'
               )}
             </CommandEmpty>
-            
-            {/* Public Playlists - Always show unless searching */}
-            {!playlistSearchQuery.trim() && (
-              <CommandGroup heading="Focus Playlists">
-                {Object.entries(publicPlaylists).map(([key, playlist]) => (
-                  <CommandItem
-                    key={key}
-                    value={key}
-                    onSelect={() => {
-                      onSelect(key);
-                      setOpen(false);
-                      setPlaylistSearchQuery('');
-                    }}
-                  >
-                    <div className="flex items-center gap-2 flex-1">
-                      <Globe className="h-4 w-4 text-muted-foreground" />
-                      <div className="flex-1">
-                        <div className="font-medium">{playlist.name}</div>
-                        <div className="text-xs text-muted-foreground truncate">
-                          {playlist.description}
-                        </div>
-                      </div>
-                    </div>
-                    <Check
-                      className={cn(
-                        "ml-2 h-4 w-4",
-                        selectedPlaylist === key ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            )}
 
             {/* User Playlists */}
             {playlistsToShow().length > 0 && (

@@ -60,7 +60,7 @@ interface SpotifyStore {
   
   // Actions
   initialize: () => Promise<void>;
-  loadPlaylist: (playlistKey?: keyof typeof PUBLIC_PLAYLISTS | string) => Promise<void>;
+  loadPlaylist: (playlistId?: string) => Promise<void>;
   togglePlayback: () => Promise<void>;
   updatePlayerState: () => Promise<void>;
   transferPlaybackToDevice: () => Promise<{ success: boolean; error?: string }>;
@@ -69,7 +69,6 @@ interface SpotifyStore {
   toggleShuffle: () => Promise<void>;
   disconnect: () => void;
   clearError: () => void;
-  getAvailablePlaylists: () => typeof PUBLIC_PLAYLISTS;
   
   // New actions
   fetchUserPlaylists: () => Promise<void>;
@@ -85,7 +84,7 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
   playerState: null,
   error: '',
   isLoadingPlaylist: false,
-  selectedPlaylist: 'focus-flow',
+  selectedPlaylist: '',
   isShuffleEnabled: false,
   userPlaylists: [],
   isLoadingPlaylists: false,
@@ -216,7 +215,7 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
     }
   },
 
-  loadPlaylist: async (playlistKey = 'focus-flow') => {
+  loadPlaylist: async (playlistId) => {
     const { isReady, deviceId, accessToken, transferPlaybackToDevice, isShuffleEnabled, userPlaylists } = get();
     
     if (!isReady || !deviceId) {
@@ -224,29 +223,22 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
       return;
     }
 
-    // Check if it's a public playlist or user playlist
-    let playlist;
-    let playlistId;
-    
-    if (PUBLIC_PLAYLISTS[playlistKey as keyof typeof PUBLIC_PLAYLISTS]) {
-      playlist = PUBLIC_PLAYLISTS[playlistKey as keyof typeof PUBLIC_PLAYLISTS];
-      playlistId = playlist.id;
-    } else {
-      // It's a user playlist ID
-      const userPlaylist = userPlaylists.find(p => p.id === playlistKey);
-      if (userPlaylist) {
-        playlist = { name: userPlaylist.name, id: userPlaylist.id };
-        playlistId = userPlaylist.id;
-      } else {
-        set({ error: 'Playlist not found' });
-        return;
-      }
+    if (!playlistId) {
+      set({ error: 'No playlist selected' });
+      return;
+    }
+
+    // Find the playlist in user playlists
+    const userPlaylist = userPlaylists.find(p => p.id === playlistId);
+    if (!userPlaylist) {
+      set({ error: 'Playlist not found' });
+      return;
     }
 
     set({ isLoadingPlaylist: true, error: '' });
 
     try {
-      console.log(`Loading playlist: ${playlist.name}`);
+      console.log(`Loading playlist: ${userPlaylist.name}`);
       
       // First, try to transfer playback to this device
       const transferResult = await transferPlaybackToDevice();
@@ -446,8 +438,6 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
     set({ error: '' });
   },
 
-  getAvailablePlaylists: () => PUBLIC_PLAYLISTS,
-
   fetchUserPlaylists: async () => {
     const { isReady } = get();
     
@@ -522,21 +512,9 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
 
   getAllPlaylists: () => {
     const { userPlaylists } = get();
-    
-    // Convert public playlists to same format as user playlists
-    const publicPlaylistsArray = Object.entries(PUBLIC_PLAYLISTS).map(([key, playlist]) => ({
-      id: key,
-      name: playlist.name,
-      description: playlist.description,
-      isPublic: true
-    }));
-
-    // Combine public and user playlists
-    const userPlaylistsFormatted = userPlaylists.map(playlist => ({
+    return userPlaylists.map(playlist => ({
       ...playlist,
       isPublic: false
     }));
-
-    return [...publicPlaylistsArray, ...userPlaylistsFormatted];
   },
 }));
