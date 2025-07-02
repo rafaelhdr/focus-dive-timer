@@ -68,6 +68,28 @@ const SpotifyConfigForm = ({ isConnected, isAuthenticated }: SpotifyConfigFormPr
     }
   }, [isAuthenticated, isConnected, spotifyEnabled, setSpotifyEnabled]);
 
+  const handleSpotifyEnabledChange = async (enabled: boolean) => {
+    setSpotifyEnabled(enabled);
+    
+    // Auto-save when toggling Spotify integration
+    const success = await saveSpotifySettingsToBackend();
+    
+    if (success) {
+      toast({
+        title: enabled ? 'Spotify Enabled' : 'Spotify Disabled',
+        description: `Spotify integration has been ${enabled ? 'enabled' : 'disabled'}.`,
+      });
+    } else {
+      // Revert the change if save failed
+      setSpotifyEnabled(!enabled);
+      toast({ 
+        title: 'Error',
+        description: 'Failed to save Spotify settings. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const handleFocusPlaylistSelect = (playlistId: string) => {
     setLocalFocusPlaylist(playlistId);
     const allPlaylists = getAllPlaylists();
@@ -142,8 +164,8 @@ const SpotifyConfigForm = ({ isConnected, isAuthenticated }: SpotifyConfigFormPr
           <Switch
             id="spotify-enable"
             checked={spotifyEnabled}
-            onCheckedChange={setSpotifyEnabled}
-            disabled={isDisabled}
+            onCheckedChange={handleSpotifyEnabledChange}
+            disabled={isDisabled || isSavingSettings}
           />
         </div>
 
@@ -160,6 +182,7 @@ const SpotifyConfigForm = ({ isConnected, isAuthenticated }: SpotifyConfigFormPr
           <PlaylistSearch
             onSelect={handleFocusPlaylistSelect}
             selectedPlaylist={localFocusPlaylist}
+            disabled={!spotifyEnabled || isDisabled}
           />
         </div>
 
@@ -180,7 +203,7 @@ const SpotifyConfigForm = ({ isConnected, isAuthenticated }: SpotifyConfigFormPr
               id="break-keep-sound"
               checked={breakKeepFocusSound}
               onCheckedChange={setBreakKeepFocusSound}
-              disabled={isDisabled}
+              disabled={!spotifyEnabled || isDisabled}
             />
             <Label htmlFor="break-keep-sound" className="text-sm font-normal">
               Keep Focus Music During Breaks
@@ -190,7 +213,7 @@ const SpotifyConfigForm = ({ isConnected, isAuthenticated }: SpotifyConfigFormPr
           <PlaylistSearch
             onSelect={handleBreakPlaylistSelect}
             selectedPlaylist={localBreakPlaylist}
-            disabled={breakKeepFocusSound}
+            disabled={!spotifyEnabled || breakKeepFocusSound || isDisabled}
           />
           
           {breakKeepFocusSound && (
