@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { getSpotifyAccessToken } from '@/services/spotifyService';
 
@@ -197,7 +198,7 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
   },
 
   loadPlaylist: async (playlistId) => {
-    const { isReady, deviceId, accessToken, transferPlaybackToDevice, isShuffleEnabled, userPlaylists } = get();
+    const { isReady, deviceId, accessToken, transferPlaybackToDevice, isShuffleEnabled, userPlaylists, searchResults } = get();
     
     if (!isReady || !deviceId) {
       set({ error: 'Player not ready' });
@@ -209,9 +210,13 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
       return;
     }
 
-    // Find the playlist in user playlists
-    const userPlaylist = userPlaylists.find(p => p.id === playlistId);
-    if (!userPlaylist) {
+    // Find the playlist in user playlists first, then in search results
+    let playlist = userPlaylists.find(p => p.id === playlistId);
+    if (!playlist) {
+      playlist = searchResults.find(p => p.id === playlistId);
+    }
+    
+    if (!playlist) {
       set({ error: 'Playlist not found' });
       return;
     }
@@ -219,7 +224,7 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
     set({ isLoadingPlaylist: true, error: '' });
 
     try {
-      console.log(`Loading playlist: ${userPlaylist.name}`);
+      console.log(`Loading playlist: ${playlist.name}`);
       
       // First, try to transfer playback to this device
       const transferResult = await transferPlaybackToDevice();
