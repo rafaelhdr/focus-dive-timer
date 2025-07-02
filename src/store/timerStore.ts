@@ -1,8 +1,8 @@
-
 import { create } from "zustand";
 import { TimerData } from "@/hooks/types";
 import { toast } from "sonner";
 import { useSettingsStore } from "./settingsStore";
+import { useSpotifyStore } from "./spotifyStore";
 import { analytics } from "@/utils/analytics";
 import { timerSocketService } from "@/services/timerSocketService";
 import { wakeLockService } from "@/services/wakeLockService";
@@ -47,6 +47,52 @@ const getDurationInSeconds = (
     // Use the default break duration from settings
     const duration = settings.breakDuration;
     return duration * toMinutesMultiplier;
+  }
+};
+
+// Helper function to handle Spotify playback based on timer mode
+const handleSpotifyPlayback = async (mode: "focus" | "break") => {
+  const spotifyStore = useSpotifyStore.getState();
+  
+  // Check if Spotify integration is enabled
+  if (!spotifyStore.spotifyEnabled) {
+    console.log('Spotify integration is disabled');
+    return;
+  }
+
+  // Check if Spotify player is ready
+  if (!spotifyStore.isReady) {
+    console.log('Spotify player is not ready');
+    return;
+  }
+
+  let playlistToLoad = null;
+
+  if (mode === "focus") {
+    // For focus mode, use focus playlist
+    playlistToLoad = spotifyStore.focusPlaylist;
+  } else {
+    // For break mode, check if we should keep focus sound or use break playlist
+    if (spotifyStore.breakKeepFocusSound) {
+      // Keep focus music during breaks - don't change playlist
+      console.log('Keeping focus music during break');
+      return;
+    } else {
+      // Use break playlist if configured
+      playlistToLoad = spotifyStore.breakPlaylist;
+    }
+  }
+
+  if (playlistToLoad && playlistToLoad.id) {
+    try {
+      console.log(`Loading ${mode} playlist:`, playlistToLoad.name);
+      await spotifyStore.loadPlaylist(playlistToLoad.id);
+    } catch (error) {
+      console.error(`Error loading ${mode} playlist:`, error);
+      toast.error(`Failed to load ${mode} playlist`);
+    }
+  } else {
+    console.log(`No ${mode} playlist configured`);
   }
 };
 
@@ -107,6 +153,9 @@ export const useTimerStore = create<TimerState>((set, get) => {
         
       // Start new interval
       startTimerInterval();
+
+      // Handle Spotify playback for auto-started timer
+      handleSpotifyPlayback(nextMode);
     } else {
       // Just switch mode without starting timer
       const newDuration = getDurationInSeconds(nextMode);
@@ -306,6 +355,9 @@ export const useTimerStore = create<TimerState>((set, get) => {
         
         // Start countdown interval
         startTimerInterval();
+
+        // Handle Spotify playback when timer starts
+        handleSpotifyPlayback(state.mode);
       } else {
         // Pausing the timer
         
