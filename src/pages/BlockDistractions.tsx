@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { SLACK_AUTH_URL } from '@/config/env';
 import { checkSlackConnection } from '@/services/slackService';
@@ -17,6 +18,7 @@ import SlackDisconnectDialog from '@/components/SlackDisconnectDialog';
 import SlackPermissionsDialog from '@/components/SlackPermissionsDialog';
 import SpotifyPlayer from '@/components/SpotifyPlayer';
 import SpotifyConfigForm from '@/components/SpotifyConfigForm';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const BlockDistractions = () => {
   const [isSlackConnected, setIsSlackConnected] = useState<boolean | null>(null);
@@ -147,144 +149,159 @@ const BlockDistractions = () => {
           </Alert>
         )}
 
-        {/* Slack Integration */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Slack className="h-5 w-5" />
-              Slack Integration
-            </CardTitle>
-            <CardDescription>
-              When you start a focus session, we'll update your Slack status to let your team know you're focusing.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="flex justify-center py-4">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              </div>
-            ) : isSlackConnected ? (
-              <div>
-                <div className="flex items-left justify-between mb-6">
-                  <Alert className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900 flex-1 mr-4">
-                    <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-                    <AlertTitle>Connected to Slack</AlertTitle>
-                    <AlertDescription>
-                      Your Slack account is connected and ready to use with Focus Dive.
-                    </AlertDescription>
-                  </Alert>
-                  
-                  {auth.isAuthenticated && (
-                    <SlackDisconnectDialog onDisconnected={handleSlackDisconnected} />
-                  )}
-                </div>
-                
-                <SlackConfigForm 
-                  isConnected={!!isSlackConnected} 
-                  isAuthenticated={auth.isAuthenticated}
-                />
-              </div>
-            ) : (
-              <div>
-                <div className="text-left py-4 mb-8">
-                  <p className="mb-4">Connect your Slack account to enable automatic status updates.</p>
-                  <div className="flex gap-2">
+        <Tabs defaultValue="slack" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="slack" className="flex items-center gap-2">
+              <Slack className="h-4 w-4" />
+              Slack
+            </TabsTrigger>
+            <TabsTrigger value="spotify" className="flex items-center gap-2">
+              <Music className="h-4 w-4" />
+              Spotify
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="slack" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Slack className="h-5 w-5" />
+                  Slack Integration
+                </CardTitle>
+                <CardDescription>
+                  When you start a focus session, we'll update your Slack status to let your team know you're focusing.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <div className="flex justify-center py-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  </div>
+                ) : isSlackConnected ? (
+                  <div>
+                    <div className="flex items-left justify-between mb-6">
+                      <Alert className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900 flex-1 mr-4">
+                        <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                        <AlertTitle>Connected to Slack</AlertTitle>
+                        <AlertDescription>
+                          Your Slack account is connected and ready to use with Focus Dive.
+                        </AlertDescription>
+                      </Alert>
+                      
+                      {auth.isAuthenticated && (
+                        <SlackDisconnectDialog onDisconnected={handleSlackDisconnected} />
+                      )}
+                    </div>
+                    
+                    <SlackConfigForm 
+                      isConnected={!!isSlackConnected} 
+                      isAuthenticated={auth.isAuthenticated}
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <div className="text-left py-4 mb-8">
+                      <p className="mb-4">Connect your Slack account to enable automatic status updates.</p>
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={handleSlackConnect} 
+                          className="gap-2" 
+                          disabled={!auth.isAuthenticated}
+                        >
+                          <Slack className="h-4 w-4" />
+                          Connect to Slack
+                        </Button>
+                        <SlackPermissionsDialog />
+                      </div>
+                      {!auth.isAuthenticated && (
+                        <p className="text-sm text-muted-foreground mt-3">
+                          Please login to enable this integration
+                        </p>
+                      )}
+                    </div>
+                    
+                    {/* Always show the SlackConfigForm, but it will be disabled if not authenticated */}
+                    <SlackConfigForm 
+                      isConnected={false} 
+                      isAuthenticated={auth.isAuthenticated}
+                    />
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="spotify" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Music className="h-5 w-5" />
+                  Spotify Integration
+                </CardTitle>
+                <CardDescription>
+                  Control your music playback during focus sessions. Pause music during breaks and resume during focus time.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <div className="flex justify-center py-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  </div>
+                ) : isSpotifyConnected ? (
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <Alert className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900 flex-1 mr-4">
+                        <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                        <AlertTitle>Connected to Spotify</AlertTitle>
+                        <AlertDescription>
+                          Your Spotify account is connected and ready to use with Focus Dive.
+                        </AlertDescription>
+                      </Alert>
+                      
+                      {auth.isAuthenticated && (
+                        <Button 
+                          variant="outline" 
+                          onClick={handleSpotifyDisconnect}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          Disconnect
+                        </Button>
+                      )}
+                    </div>
+                    
+                    {/* Spotify Player Component */}
+                    {auth.isAuthenticated && <SpotifyPlayer />}
+                    
+                    {/* Spotify Configuration Form */}
+                    {auth.isAuthenticated && (
+                      <SpotifyConfigForm 
+                        isConnected={!!isSpotifyConnected} 
+                        isAuthenticated={auth.isAuthenticated}
+                      />
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-left py-4">
+                    <p className="mb-4">Connect your Spotify account to control music during focus sessions.</p>
                     <Button 
-                      onClick={handleSlackConnect} 
+                      onClick={handleSpotifyConnect} 
                       className="gap-2" 
                       disabled={!auth.isAuthenticated}
                     >
-                      <Slack className="h-4 w-4" />
-                      Connect to Slack
+                      <Music className="h-4 w-4" />
+                      Connect to Spotify
                     </Button>
-                    <SlackPermissionsDialog />
+                    {!auth.isAuthenticated && (
+                      <p className="text-sm text-muted-foreground mt-3">
+                        Please login to enable this integration
+                      </p>
+                    )}
                   </div>
-                  {!auth.isAuthenticated && (
-                    <p className="text-sm text-muted-foreground mt-3">
-                      Please login to enable this integration
-                    </p>
-                  )}
-                </div>
-                
-                {/* Always show the SlackConfigForm, but it will be disabled if not authenticated */}
-                <SlackConfigForm 
-                  isConnected={false} 
-                  isAuthenticated={auth.isAuthenticated}
-                />
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Spotify Integration */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Music className="h-5 w-5" />
-              Spotify Integration
-            </CardTitle>
-            <CardDescription>
-              Control your music playback during focus sessions. Pause music during breaks and resume during focus time.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="flex justify-center py-4">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              </div>
-            ) : isSpotifyConnected ? (
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <Alert className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900 flex-1 mr-4">
-                    <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-                    <AlertTitle>Connected to Spotify</AlertTitle>
-                    <AlertDescription>
-                      Your Spotify account is connected and ready to use with Focus Dive.
-                    </AlertDescription>
-                  </Alert>
-                  
-                  {auth.isAuthenticated && (
-                    <Button 
-                      variant="outline" 
-                      onClick={handleSpotifyDisconnect}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      Disconnect
-                    </Button>
-                  )}
-                </div>
-                
-                {/* Spotify Player Component */}
-                {auth.isAuthenticated && <SpotifyPlayer />}
-                
-                {/* Spotify Configuration Form */}
-                {auth.isAuthenticated && (
-                  <SpotifyConfigForm 
-                    isConnected={!!isSpotifyConnected} 
-                    isAuthenticated={auth.isAuthenticated}
-                  />
                 )}
-              </div>
-            ) : (
-              <div className="text-left py-4">
-                <p className="mb-4">Connect your Spotify account to control music during focus sessions.</p>
-                <Button 
-                  onClick={handleSpotifyConnect} 
-                  className="gap-2" 
-                  disabled={!auth.isAuthenticated}
-                >
-                  <Music className="h-4 w-4" />
-                  Connect to Spotify
-                </Button>
-                {!auth.isAuthenticated && (
-                  <p className="text-sm text-muted-foreground mt-3">
-                    Please login to enable this integration
-                  </p>
-                )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
       
       <Footer />
