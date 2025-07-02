@@ -16,6 +16,7 @@ import SlackConfigForm from '@/components/SlackConfigForm';
 import SlackDisconnectDialog from '@/components/SlackDisconnectDialog';
 import SlackPermissionsDialog from '@/components/SlackPermissionsDialog';
 import SpotifyPlayer from '@/components/SpotifyPlayer';
+import SpotifyConfigForm from '@/components/SpotifyConfigForm';
 
 const BlockDistractions = () => {
   const [isSlackConnected, setIsSlackConnected] = useState<boolean | null>(null);
@@ -255,6 +256,14 @@ const BlockDistractions = () => {
                 
                 {/* Spotify Player Component */}
                 {auth.isAuthenticated && <SpotifyPlayer />}
+                
+                {/* Spotify Configuration Form */}
+                {auth.isAuthenticated && (
+                  <SpotifyConfigForm 
+                    isConnected={!!isSpotifyConnected} 
+                    isAuthenticated={auth.isAuthenticated}
+                  />
+                )}
               </div>
             ) : (
               <div className="text-left py-4">
