@@ -1,12 +1,12 @@
-
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Save, Music, Volume2, VolumeX } from 'lucide-react';
+import { Loader2, Save, Music } from 'lucide-react';
 import { useSpotifyStore } from '@/store/spotifyStore';
 import PlaylistSearch from './PlaylistSearch';
 import { useToast } from '@/hooks/use-toast';
@@ -60,6 +60,13 @@ const SpotifyConfigForm = ({ isConnected, isAuthenticated }: SpotifyConfigFormPr
   useEffect(() => {
     setLocalBreakPlaylist(breakPlaylist?.id || '');
   }, [breakPlaylist]);
+
+  // Set default value for spotify enabled when component loads
+  useEffect(() => {
+    if (isAuthenticated && isConnected && !spotifyEnabled) {
+      setSpotifyEnabled(true);
+    }
+  }, [isAuthenticated, isConnected, spotifyEnabled, setSpotifyEnabled]);
 
   const handleFocusPlaylistSelect = (playlistId: string) => {
     setLocalFocusPlaylist(playlistId);
@@ -166,31 +173,31 @@ const SpotifyConfigForm = ({ isConnected, isAuthenticated }: SpotifyConfigFormPr
               Music to play during break sessions (optional)
             </div>
           </div>
+          
+          {/* Keep Focus Music During Breaks Checkbox */}
+          <div className="flex items-center space-x-2 mb-3">
+            <Checkbox
+              id="break-keep-sound"
+              checked={breakKeepFocusSound}
+              onCheckedChange={setBreakKeepFocusSound}
+              disabled={isDisabled}
+            />
+            <Label htmlFor="break-keep-sound" className="text-sm font-normal">
+              Keep Focus Music During Breaks
+            </Label>
+          </div>
+          
           <PlaylistSearch
             onSelect={handleBreakPlaylistSelect}
             selectedPlaylist={localBreakPlaylist}
+            disabled={breakKeepFocusSound}
           />
-        </div>
-
-        <Separator />
-
-        {/* Break Sound Option */}
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <Label htmlFor="break-keep-sound" className="text-base flex items-center gap-2">
-              {breakKeepFocusSound ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-              Keep Focus Music During Breaks
-            </Label>
-            <div className="text-sm text-muted-foreground">
-              Continue playing focus music during break sessions
+          
+          {breakKeepFocusSound && (
+            <div className="text-xs text-muted-foreground mt-1">
+              Break playlist is disabled because focus music will continue playing during breaks.
             </div>
-          </div>
-          <Switch
-            id="break-keep-sound"
-            checked={breakKeepFocusSound}
-            onCheckedChange={setBreakKeepFocusSound}
-            disabled={isDisabled}
-          />
+          )}
         </div>
 
         <Separator />
