@@ -70,6 +70,16 @@ const handleSpotifyPlayback = async (mode: "focus" | "break") => {
     return;
   }
 
+  // Initialize Spotify player if not ready
+  if (!spotifyStore.isReady && !spotifyStore.isInitializing) {
+    console.log('Initializing Spotify player...');
+    await spotifyStore.initialize();
+    // Wait a moment for initialization to complete
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Get fresh state after initialization
+    spotifyStore = useSpotifyStore.getState();
+  }
+
   // Check if Spotify player is ready
   if (!spotifyStore.isReady) {
     console.log('Spotify player is not ready');
