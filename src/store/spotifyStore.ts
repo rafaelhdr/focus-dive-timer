@@ -1,6 +1,6 @@
-
 import { create } from 'zustand';
 import { getSpotifyAccessToken } from '@/services/spotifyService';
+import { saveSpotifySettings, getSpotifySettings } from '@/services/integrationService';
 
 declare global {
   interface Window {
@@ -35,6 +35,13 @@ interface SpotifyStore {
   searchResults: any[];
   isSearching: boolean;
   
+  // New Spotify settings
+  spotifyEnabled: boolean;
+  focusPlaylist: any | null;
+  breakPlaylist: any | null;
+  breakKeepFocusSound: boolean;
+  isSavingSettings: boolean;
+  
   // Internal player references
   player: any;
   deviceId: string;
@@ -57,6 +64,14 @@ interface SpotifyStore {
   searchPlaylists: (query: string) => Promise<void>;
   setPlaylistSearchQuery: (query: string) => void;
   getAllPlaylists: () => any[];
+  
+  // New Spotify settings actions
+  loadSpotifySettings: () => Promise<void>;
+  saveSpotifySettingsToBackend: () => Promise<boolean>;
+  setSpotifyEnabled: (enabled: boolean) => void;
+  setFocusPlaylist: (playlist: any) => void;
+  setBreakPlaylist: (playlist: any) => void;
+  setBreakKeepFocusSound: (keepSound: boolean) => void;
 }
 
 export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
@@ -76,6 +91,13 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
   player: null,
   deviceId: '',
   accessToken: '',
+  
+  // New settings state
+  spotifyEnabled: false,
+  focusPlaylist: null,
+  breakPlaylist: null,
+  breakKeepFocusSound: false,
+  isSavingSettings: false,
 
   initialize: async () => {
     const state = get();
@@ -507,5 +529,75 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
       ...playlist,
       isPublic: false
     }));
+  },
+
+  loadSpotifySettings: async () => {
+    try {
+      console.log('Loading Spotify settings from backend...');
+      const settings = await getSpotifySettings();
+      
+      set({
+        spotifyEnabled: settings.spotify_enable || false,
+        focusPlaylist: settings.spotify_focus_playlist || null,
+        breakPlaylist: settings.spotify_break_playlist || null,
+        breakKeepFocusSound: settings.spotify_break_keep_focus_sound || false,
+      });
+      
+      console.log('Spotify settings loaded:', settings);
+    } catch (error) {
+      console.error('Error loading Spotify settings:', error);
+      set({ error: 'Failed to load Spotify settings' });
+    }
+  },
+
+  saveSpotifySettingsToBackend: async () => {
+    const { spotifyEnabled, focusPlaylist, breakPlaylist, breakKeepFocusSound } = get();
+    
+    set({ isSavingSettings: true });
+    
+    try {
+      console.log('Saving Spotify settings to backend...');
+      
+      const settings = {
+        spotify_enable: spotifyEnabled,
+        spotify_focus_playlist: focusPlaylist,
+        spotify_break_playlist: breakPlaylist,
+        spotify_break_keep_focus_sound: breakKeepFocusSound,
+      };
+      
+      const success = await saveSpotifySettings(settings);
+      
+      if (success) {
+        console.log('Spotify settings saved successfully');
+      } else {
+        console.error('Failed to save Spotify settings');
+        set({ error: 'Failed to save Spotify settings' });
+      }
+      
+      set({ isSavingSettings: false });
+      return success;
+    } catch (error) {
+      console.error('Error saving Spotify settings:', error);
+      set({ error: 'Failed to save Spotify settings', isSavingSettings: false });
+      return false;
+    }
+  },
+
+  setSpotifyEnabled: (enabled: boolean) => {
+    set({ spotifyEnabled: enabled });
+  },
+
+  setFocusPlaylist: (playlist: any) => {
+    set({ focusPlaylist: playlist });
+    console.log('Focus playlist set:', playlist);
+  },
+
+  setBreakPlaylist: (playlist: any) => {
+    set({ breakPlaylist: playlist });
+    console.log('Break playlist set:', playlist);
+  },
+
+  setBreakKeepFocusSound: (keepSound: boolean) => {
+    set({ breakKeepFocusSound: keepSound });
   },
 }));
