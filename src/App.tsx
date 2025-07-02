@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,7 +10,7 @@ import SentryErrorBoundary from "./components/SentryErrorBoundary";
 import MiniSpotifyPlayer from "./components/MiniSpotifyPlayer";
 import Index from "./pages/Index";
 import Settings from "./pages/Settings";
-import BlockDistractions from "./pages/BlockDistractions";
+import Integrations from "./pages/Integrations";
 import SlackConnect from "./pages/SlackConnect";
 import SpotifyConnect from "./pages/SpotifyConnect";
 import Login from "./pages/Login";
@@ -36,7 +37,7 @@ const App = () => (
                 <Route path="/login" element={<Login />} />
                 <Route path="/" element={<Index />} />
                 <Route path="/settings" element={<Settings />} />
-                <Route path="/integrations" element={<BlockDistractions />} />
+                <Route path="/integrations" element={<Integrations />} />
                 <Route path="/slack/connect" element={<SlackConnect />} />
                 <Route path="/spotify/connect" element={<SpotifyConnect />} />
                 <Route path="/subscriptions" element={<Subscriptions />} />

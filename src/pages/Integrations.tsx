@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { SLACK_AUTH_URL } from '@/config/env';
 import { checkSlackConnection } from '@/services/slackService';
@@ -20,7 +19,7 @@ import SpotifyPlayer from '@/components/SpotifyPlayer';
 import SpotifyConfigForm from '@/components/SpotifyConfigForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-const BlockDistractions = () => {
+const Integrations = () => {
   const [isSlackConnected, setIsSlackConnected] = useState<boolean | null>(null);
   const [isSpotifyConnected, setIsSpotifyConnected] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -309,4 +308,4 @@ const BlockDistractions = () => {
   );
 };
 
-export default BlockDistractions;
+export default Integrations;
