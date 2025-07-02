@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,8 +36,12 @@ const SpotifyConfigForm = ({ isConnected, isAuthenticated }: SpotifyConfigFormPr
   } = useSpotifyStore();
 
   const { toast } = useToast();
+  
+  // Local state for form data
+  const [localSpotifyEnabled, setLocalSpotifyEnabled] = useState(false);
   const [localFocusPlaylist, setLocalFocusPlaylist] = useState('');
   const [localBreakPlaylist, setLocalBreakPlaylist] = useState('');
+  const [localBreakKeepFocusSound, setLocalBreakKeepFocusSound] = useState(false);
 
   // Load settings when component mounts
   useEffect(() => {
@@ -52,7 +57,11 @@ const SpotifyConfigForm = ({ isConnected, isAuthenticated }: SpotifyConfigFormPr
     }
   }, [isReady, isConnected, fetchUserPlaylists]);
 
-  // Update local state when store state changes
+  // Update local state when store state changes (from backend)
+  useEffect(() => {
+    setLocalSpotifyEnabled(spotifyEnabled);
+  }, [spotifyEnabled]);
+
   useEffect(() => {
     setLocalFocusPlaylist(focusPlaylist?.id || '');
   }, [focusPlaylist]);
@@ -61,50 +70,56 @@ const SpotifyConfigForm = ({ isConnected, isAuthenticated }: SpotifyConfigFormPr
     setLocalBreakPlaylist(breakPlaylist?.id || '');
   }, [breakPlaylist]);
 
+  useEffect(() => {
+    setLocalBreakKeepFocusSound(breakKeepFocusSound);
+  }, [breakKeepFocusSound]);
+
   // Set default value for spotify enabled when component loads
   useEffect(() => {
     if (isAuthenticated && isConnected && !spotifyEnabled) {
-      setSpotifyEnabled(true);
+      setLocalSpotifyEnabled(true);
     }
-  }, [isAuthenticated, isConnected, spotifyEnabled, setSpotifyEnabled]);
+  }, [isAuthenticated, isConnected, spotifyEnabled]);
 
-  const handleSpotifyEnabledChange = async (enabled: boolean) => {
-    setSpotifyEnabled(enabled);
-    
-    // Auto-save when toggling Spotify integration
-    const success = await saveSpotifySettingsToBackend();
-    
-    if (success) {
-      toast({
-        title: enabled ? 'Spotify Enabled' : 'Spotify Disabled',
-        description: `Spotify integration has been ${enabled ? 'enabled' : 'disabled'}.`,
-      });
-    } else {
-      // Revert the change if save failed
-      setSpotifyEnabled(!enabled);
-      toast({ 
-        title: 'Error',
-        description: 'Failed to save Spotify settings. Please try again.',
-        variant: 'destructive',
-      });
-    }
+  const handleSpotifyEnabledChange = (enabled: boolean) => {
+    setLocalSpotifyEnabled(enabled);
   };
 
   const handleFocusPlaylistSelect = (playlistId: string) => {
     setLocalFocusPlaylist(playlistId);
-    const allPlaylists = getAllPlaylists();
-    const selectedPlaylist = allPlaylists.find(p => p.id === playlistId);
-    setFocusPlaylist(selectedPlaylist || null);
   };
 
   const handleBreakPlaylistSelect = (playlistId: string) => {
     setLocalBreakPlaylist(playlistId);
-    const allPlaylists = getAllPlaylists();
-    const selectedPlaylist = allPlaylists.find(p => p.id === playlistId);
-    setBreakPlaylist(selectedPlaylist || null);
+  };
+
+  const handleBreakKeepFocusSoundChange = (keepSound: boolean) => {
+    setLocalBreakKeepFocusSound(keepSound);
   };
 
   const handleSaveSettings = async () => {
+    // Update store with local values first
+    setSpotifyEnabled(localSpotifyEnabled);
+    setBreakKeepFocusSound(localBreakKeepFocusSound);
+    
+    // Handle playlist selections
+    const allPlaylists = getAllPlaylists();
+    
+    if (localFocusPlaylist) {
+      const selectedFocusPlaylist = allPlaylists.find(p => p.id === localFocusPlaylist);
+      setFocusPlaylist(selectedFocusPlaylist || null);
+    } else {
+      setFocusPlaylist(null);
+    }
+    
+    if (localBreakPlaylist) {
+      const selectedBreakPlaylist = allPlaylists.find(p => p.id === localBreakPlaylist);
+      setBreakPlaylist(selectedBreakPlaylist || null);
+    } else {
+      setBreakPlaylist(null);
+    }
+    
+    // Save to backend
     const success = await saveSpotifySettingsToBackend();
     
     if (success) {
@@ -163,7 +178,7 @@ const SpotifyConfigForm = ({ isConnected, isAuthenticated }: SpotifyConfigFormPr
           </div>
           <Switch
             id="spotify-enable"
-            checked={spotifyEnabled}
+            checked={localSpotifyEnabled}
             onCheckedChange={handleSpotifyEnabledChange}
             disabled={isDisabled || isSavingSettings}
           />
@@ -182,7 +197,7 @@ const SpotifyConfigForm = ({ isConnected, isAuthenticated }: SpotifyConfigFormPr
           <PlaylistSearch
             onSelect={handleFocusPlaylistSelect}
             selectedPlaylist={localFocusPlaylist}
-            disabled={!spotifyEnabled || isDisabled}
+            disabled={!localSpotifyEnabled || isDisabled}
           />
         </div>
 
@@ -201,9 +216,9 @@ const SpotifyConfigForm = ({ isConnected, isAuthenticated }: SpotifyConfigFormPr
           <div className="flex items-center space-x-2 mb-3">
             <Checkbox
               id="break-keep-sound"
-              checked={breakKeepFocusSound}
-              onCheckedChange={setBreakKeepFocusSound}
-              disabled={!spotifyEnabled || isDisabled}
+              checked={localBreakKeepFocusSound}
+              onCheckedChange={handleBreakKeepFocusSoundChange}
+              disabled={!localSpotifyEnabled || isDisabled}
             />
             <Label htmlFor="break-keep-sound" className="text-sm font-normal">
               Keep Focus Music During Breaks
@@ -213,10 +228,10 @@ const SpotifyConfigForm = ({ isConnected, isAuthenticated }: SpotifyConfigFormPr
           <PlaylistSearch
             onSelect={handleBreakPlaylistSelect}
             selectedPlaylist={localBreakPlaylist}
-            disabled={!spotifyEnabled || breakKeepFocusSound || isDisabled}
+            disabled={!localSpotifyEnabled || localBreakKeepFocusSound || isDisabled}
           />
           
-          {breakKeepFocusSound && (
+          {localBreakKeepFocusSound && (
             <div className="text-xs text-muted-foreground mt-1">
               Break playlist is disabled because focus music will continue playing during breaks.
             </div>
