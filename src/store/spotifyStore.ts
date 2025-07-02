@@ -49,7 +49,7 @@ interface SpotifyStore {
   
   // Actions
   initialize: () => Promise<void>;
-  loadPlaylist: (playlistId?: string) => Promise<void>;
+  loadPlaylist: (playlist?: string | any) => Promise<void>;
   togglePlayback: () => Promise<void>;
   updatePlayerState: () => Promise<void>;
   transferPlaybackToDevice: () => Promise<{ success: boolean; error?: string }>;
@@ -219,8 +219,8 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
     }
   },
 
-  loadPlaylist: async (playlistId) => {
-    const { isReady, deviceId, accessToken, transferPlaybackToDevice, isShuffleEnabled, userPlaylists, searchResults } = get();
+  loadPlaylist: async (playlist) => {
+    const { isReady, deviceId, accessToken, transferPlaybackToDevice, isShuffleEnabled } = get();
     
     if (!isReady || !deviceId) {
       set({ error: 'Player not ready' });
@@ -228,28 +228,48 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
       return;
     }
 
-    if (!playlistId) {
-      set({ error: 'No playlist selected' });
-      console.error('No playlist ID provided for loading');
-      return;
-    }
-
-    // Find the playlist in user playlists first, then in search results
-    let playlist = userPlaylists.find(p => p.id === playlistId);
-    if (!playlist) {
-      playlist = searchResults.find(p => p.id === playlistId);
-    }
+    // Handle both string ID (legacy) and playlist object
+    let playlistId: string;
+    let playlistName: string;
     
-    if (!playlist) {
-      set({ error: 'Playlist not found' });
-      console.error(`Playlist with ID ${playlistId} not found in user playlists or search results`);
+    if (typeof playlist === 'string') {
+      // Legacy: playlist ID passed as string
+      playlistId = playlist;
+      
+      if (!playlistId) {
+        set({ error: 'No playlist selected' });
+        console.error('No playlist ID provided for loading');
+        return;
+      }
+
+      // Find the playlist in user playlists first, then in search results
+      const { userPlaylists, searchResults } = get();
+      let playlistObj = userPlaylists.find(p => p.id === playlistId);
+      if (!playlistObj) {
+        playlistObj = searchResults.find(p => p.id === playlistId);
+      }
+      
+      if (!playlistObj) {
+        set({ error: 'Playlist not found' });
+        console.error(`Playlist with ID ${playlistId} not found in user playlists or search results`);
+        return;
+      }
+      
+      playlistName = playlistObj.name;
+    } else if (playlist && playlist.id) {
+      // New: full playlist object passed
+      playlistId = playlist.id;
+      playlistName = playlist.name;
+    } else {
+      set({ error: 'No playlist provided' });
+      console.error('No valid playlist provided for loading');
       return;
     }
 
     set({ isLoadingPlaylist: true, error: '' });
 
     try {
-      console.log(`Loading playlist: ${playlist.name}`);
+      console.log(`Loading playlist: ${playlistName} (ID: ${playlistId})`);
       
       // First, try to transfer playback to this device
       const transferResult = await transferPlaybackToDevice();
