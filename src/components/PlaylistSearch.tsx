@@ -1,4 +1,5 @@
 
+
 import React, { useEffect, useState } from 'react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -26,7 +27,9 @@ const PlaylistSearch = ({ onSelect, selectedPlaylist, disabled = false }: Playli
     searchPlaylists,
     setPlaylistSearchQuery,
     clearError,
-    isReady
+    isReady,
+    focusPlaylist,
+    breakPlaylist
   } = useSpotifyStore();
 
   // Fetch user playlists when component mounts and player is ready
@@ -63,6 +66,16 @@ const PlaylistSearch = ({ onSelect, selectedPlaylist, disabled = false }: Playli
     const searchPlaylist = searchResults.find(p => p.id === selectedPlaylist);
     if (searchPlaylist) {
       return searchPlaylist.name;
+    }
+    
+    // Check if this matches the focus playlist from settings
+    if (focusPlaylist && focusPlaylist.id === selectedPlaylist) {
+      return focusPlaylist.name;
+    }
+    
+    // Check if this matches the break playlist from settings
+    if (breakPlaylist && breakPlaylist.id === selectedPlaylist) {
+      return breakPlaylist.name;
     }
     
     return 'Select playlist...';
@@ -190,3 +203,4 @@ const PlaylistSearch = ({ onSelect, selectedPlaylist, disabled = false }: Playli
 };
 
 export default PlaylistSearch;
+
