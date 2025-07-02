@@ -17,25 +17,6 @@ interface SpotifyPlayerState {
   };
 }
 
-// Hardcoded public playlists for focus/work music
-const PUBLIC_PLAYLISTS = {
-  'lofi-beats': {
-    id: '37i9dQZF1DWWQRwui0ExPn', 
-    name: 'Lo-Fi Beats',
-    description: 'Chill beats to help you focus'
-  },
-  'peaceful-piano': {
-    id: '37i9dQZF1DX4sWSpwq3LiO',
-    name: 'Peaceful Piano',
-    description: 'Relaxing piano music for concentration'
-  },
-  'focus-flow': {
-    id: '37i9dQZF1DX0XUsuxWHRQd',
-    name: 'Focus Flow',
-    description: 'Instrumental beats to keep you in the zone'
-  },
-};
-
 interface SpotifyStore {
   // State
   isInitializing: boolean;
@@ -46,7 +27,7 @@ interface SpotifyStore {
   selectedPlaylist: string;
   isShuffleEnabled: boolean;
   
-  // New playlist search state
+  // Playlist search state
   userPlaylists: any[];
   isLoadingPlaylists: boolean;
   playlistSearchQuery: string;
@@ -70,7 +51,7 @@ interface SpotifyStore {
   disconnect: () => void;
   clearError: () => void;
   
-  // New actions
+  // Playlist actions
   fetchUserPlaylists: () => Promise<void>;
   searchPlaylists: (query: string) => Promise<void>;
   setPlaylistSearchQuery: (query: string) => void;
@@ -453,6 +434,7 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
       const result = await getUserPlaylists();
 
       if (result.success) {
+        console.log('User playlists loaded and cached for search');
         set({ 
           userPlaylists: result.playlists || [],
           isLoadingPlaylists: false 
@@ -474,6 +456,8 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
   },
 
   searchPlaylists: async (query: string) => {
+    const { userPlaylists } = get();
+    
     set({ playlistSearchQuery: query, isSearching: true });
 
     if (!query.trim()) {
@@ -482,10 +466,12 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
     }
 
     try {
+      console.log('Starting playlist search with query:', query);
       const { searchUserPlaylists } = await import('@/services/spotifyService');
-      const result = await searchUserPlaylists(query);
+      const result = await searchUserPlaylists(query, userPlaylists);
 
       if (result.success) {
+        console.log('Search completed successfully, results:', result.playlists?.length || 0);
         set({ 
           searchResults: result.playlists || [],
           isSearching: false 
@@ -494,14 +480,16 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
         console.error('Failed to search playlists:', result.error);
         set({ 
           searchResults: [],
-          isSearching: false 
+          isSearching: false,
+          error: result.error || 'Search failed'
         });
       }
     } catch (error) {
       console.error('Error searching playlists:', error);
       set({ 
         searchResults: [],
-        isSearching: false 
+        isSearching: false,
+        error: 'Search failed'
       });
     }
   },

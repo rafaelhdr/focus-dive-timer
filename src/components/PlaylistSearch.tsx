@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
-import { Check, ChevronsUpDown, Music, User, Loader2 } from 'lucide-react';
+import { Check, ChevronsUpDown, Music, User, Loader2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSpotifyStore } from '@/store/spotifyStore';
 
@@ -20,25 +20,31 @@ const PlaylistSearch = ({ onSelect, selectedPlaylist }: PlaylistSearchProps) => 
     playlistSearchQuery,
     searchResults,
     isSearching,
+    error,
     fetchUserPlaylists,
     searchPlaylists,
     setPlaylistSearchQuery,
+    clearError,
     isReady
   } = useSpotifyStore();
 
   // Fetch user playlists when component mounts and player is ready
   useEffect(() => {
     if (isReady && userPlaylists.length === 0 && !isLoadingPlaylists) {
+      console.log('Fetching user playlists for search...');
       fetchUserPlaylists();
     }
   }, [isReady, userPlaylists.length, isLoadingPlaylists, fetchUserPlaylists]);
 
   // Handle search with debouncing
   useEffect(() => {
+    if (!playlistSearchQuery.trim()) {
+      return;
+    }
+
     const timer = setTimeout(() => {
-      if (playlistSearchQuery.trim()) {
-        searchPlaylists(playlistSearchQuery);
-      }
+      console.log('Debounced search triggered for:', playlistSearchQuery);
+      searchPlaylists(playlistSearchQuery);
     }, 300);
 
     return () => clearTimeout(timer);
@@ -57,9 +63,21 @@ const PlaylistSearch = ({ onSelect, selectedPlaylist }: PlaylistSearchProps) => 
   // Get playlists to display based on search
   const playlistsToShow = () => {
     if (playlistSearchQuery.trim()) {
+      console.log('Showing search results:', searchResults.length);
       return searchResults;
     }
+    console.log('Showing all user playlists:', userPlaylists.length);
     return userPlaylists;
+  };
+
+  const handlePlaylistSelect = (playlistId: string) => {
+    console.log('Playlist selected:', playlistId);
+    onSelect(playlistId);
+    setOpen(false);
+    setPlaylistSearchQuery('');
+    if (error) {
+      clearError();
+    }
   };
 
   return (
@@ -79,7 +97,7 @@ const PlaylistSearch = ({ onSelect, selectedPlaylist }: PlaylistSearchProps) => 
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0" align="start">
-        <Command>
+        <Command shouldFilter={false}>
           <CommandInput 
             placeholder="Search playlists..." 
             value={playlistSearchQuery}
@@ -97,6 +115,11 @@ const PlaylistSearch = ({ onSelect, selectedPlaylist }: PlaylistSearchProps) => 
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Searching...
                 </div>
+              ) : error ? (
+                <div className="flex items-center gap-2 justify-center py-2 text-red-500">
+                  <AlertCircle className="h-4 w-4" />
+                  Search failed
+                </div>
               ) : (
                 'No playlists found.'
               )}
@@ -109,11 +132,7 @@ const PlaylistSearch = ({ onSelect, selectedPlaylist }: PlaylistSearchProps) => 
                   <CommandItem
                     key={playlist.id}
                     value={playlist.id}
-                    onSelect={() => {
-                      onSelect(playlist.id);
-                      setOpen(false);
-                      setPlaylistSearchQuery('');
-                    }}
+                    onSelect={() => handlePlaylistSelect(playlist.id)}
                   >
                     <div className="flex items-center gap-2 flex-1">
                       <User className="h-4 w-4 text-muted-foreground" />

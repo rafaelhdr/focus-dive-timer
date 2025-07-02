@@ -1,4 +1,3 @@
-
 import { API_URL } from "@/config/env";
 import { getCommonHeaders } from "@/utils/apiUtils";
 
@@ -307,15 +306,15 @@ export const getUserPlaylists = async (limit: number = 50, offset: number = 0): 
 };
 
 /**
- * Search user's playlists by name using /me/playlists endpoint with client-side filtering
+ * Search playlists using Spotify's search API and filter by user's playlists
  */
-export const searchUserPlaylists = async (query: string): Promise<{ success: boolean; playlists?: any[]; error?: string }> => {
+export const searchUserPlaylists = async (query: string, userPlaylists: any[]): Promise<{ success: boolean; playlists?: any[]; error?: string }> => {
   if (!query.trim()) {
     return { success: true, playlists: [] };
   }
 
   try {
-    console.log('Searching user playlists for:', query);
+    console.log('Searching playlists for:', query);
     
     // First get a fresh access token
     const tokenResult = await getSpotifyAccessToken();
@@ -323,58 +322,39 @@ export const searchUserPlaylists = async (query: string): Promise<{ success: boo
       return { success: false, error: tokenResult.error || 'Failed to get access token' };
     }
 
-    // Fetch all user playlists (we'll fetch in batches to get all of them)
-    let allPlaylists: any[] = [];
-    let offset = 0;
-    const limit = 50;
-    let hasMore = true;
-
-    while (hasMore) {
-      const response = await fetch(`https://api.spotify.com/v1/me/playlists?limit=${limit}&offset=${offset}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${tokenResult.token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('Failed to fetch user playlists for search:', errorData);
-        return { 
-          success: false, 
-          error: errorData.error?.message || 'Failed to search playlists' 
-        };
-      }
-
-      const data = await response.json();
-      const playlists = data.items || [];
-      
-      allPlaylists = [...allPlaylists, ...playlists];
-      
-      // Check if there are more playlists to fetch
-      hasMore = playlists.length === limit && data.next;
-      offset += limit;
-      
-      // Safety limit to prevent infinite loops (max 1000 playlists)
-      if (offset >= 1000) {
-        hasMore = false;
-      }
-    }
-
-    // Filter playlists by query (case-insensitive search in name and description)
-    const queryLower = query.toLowerCase();
-    const filteredPlaylists = allPlaylists.filter(playlist => {
-      const nameMatch = playlist.name?.toLowerCase().includes(queryLower);
-      const descriptionMatch = playlist.description?.toLowerCase().includes(queryLower);
-      return nameMatch || descriptionMatch;
+    // Use Spotify's search API to find playlists
+    const searchUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=playlist&limit=50`;
+    const response = await fetch(searchUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${tokenResult.token}`,
+        'Content-Type': 'application/json',
+      },
     });
 
-    console.log(`Found ${filteredPlaylists.length} user playlists matching "${query}" out of ${allPlaylists.length} total playlists`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Failed to search playlists:', errorData);
+      return { 
+        success: false, 
+        error: errorData.error?.message || 'Failed to search playlists' 
+      };
+    }
+
+    const data = await response.json();
+    const searchResults = data.playlists?.items || [];
     
-    return { success: true, playlists: filteredPlaylists };
+    // Create a map of user playlist IDs for fast lookup
+    const userPlaylistIds = new Set(userPlaylists.map(p => p.id));
+    
+    // Filter search results to only include user's playlists
+    const filteredResults = searchResults.filter(playlist => userPlaylistIds.has(playlist.id));
+    
+    console.log(`Found ${filteredResults.length} user playlists matching "${query}" from ${searchResults.length} total search results`);
+    
+    return { success: true, playlists: filteredResults };
   } catch (error) {
-    console.error('Error searching user playlists:', error);
+    console.error('Error searching playlists:', error);
     return { 
       success: false, 
       error: 'Network error occurred while searching playlists' 
