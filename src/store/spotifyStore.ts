@@ -224,11 +224,13 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
     
     if (!isReady || !deviceId) {
       set({ error: 'Player not ready' });
+      console.error('Spotify player not ready or device ID missing');
       return;
     }
 
     if (!playlistId) {
       set({ error: 'No playlist selected' });
+      console.error('No playlist ID provided for loading');
       return;
     }
 
@@ -240,6 +242,7 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
     
     if (!playlist) {
       set({ error: 'Playlist not found' });
+      console.error(`Playlist with ID ${playlistId} not found in user playlists or search results`);
       return;
     }
 
