@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -52,9 +51,16 @@ const PlaylistSearch = ({ onSelect, selectedPlaylist }: PlaylistSearchProps) => 
 
   // Get display name for selected playlist
   const getSelectedPlaylistName = () => {
+    // First check user playlists
     const userPlaylist = userPlaylists.find(p => p.id === selectedPlaylist);
     if (userPlaylist) {
       return userPlaylist.name;
+    }
+    
+    // Then check search results
+    const searchPlaylist = searchResults.find(p => p.id === selectedPlaylist);
+    if (searchPlaylist) {
+      return searchPlaylist.name;
     }
     
     return 'Select playlist...';
