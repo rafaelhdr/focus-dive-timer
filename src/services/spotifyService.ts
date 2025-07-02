@@ -308,7 +308,7 @@ export const getUserPlaylists = async (limit: number = 50, offset: number = 0): 
 /**
  * Search playlists using Spotify's search API and filter by user's playlists
  */
-export const searchUserPlaylists = async (query: string, userPlaylists: any[]): Promise<{ success: boolean; playlists?: any[]; error?: string }> => {
+export const searchUserPlaylists = async (query: string): Promise<{ success: boolean; playlists?: any[]; error?: string }> => {
   if (!query.trim()) {
     return { success: true, playlists: [] };
   }
@@ -344,11 +344,8 @@ export const searchUserPlaylists = async (query: string, userPlaylists: any[]): 
     const data = await response.json();
     const searchResults = data.playlists?.items || [];
     
-    // Create a map of user playlist IDs for fast lookup
-    const userPlaylistIds = new Set(userPlaylists.map(p => p.id));
-    
     // Filter search results to only include user's playlists
-    const filteredResults = searchResults.filter(playlist => userPlaylistIds.has(playlist.id));
+    const filteredResults = searchResults.filter(playlist => !!playlist?.id)
     
     console.log(`Found ${filteredResults.length} user playlists matching "${query}" from ${searchResults.length} total search results`);
     

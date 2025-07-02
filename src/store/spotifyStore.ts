@@ -456,8 +456,6 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
   },
 
   searchPlaylists: async (query: string) => {
-    const { userPlaylists } = get();
-    
     set({ playlistSearchQuery: query, isSearching: true });
 
     if (!query.trim()) {
@@ -468,7 +466,7 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
     try {
       console.log('Starting playlist search with query:', query);
       const { searchUserPlaylists } = await import('@/services/spotifyService');
-      const result = await searchUserPlaylists(query, userPlaylists);
+      const result = await searchUserPlaylists(query);
 
       if (result.success) {
         console.log('Search completed successfully, results:', result.playlists?.length || 0);
