@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -73,13 +72,6 @@ const SpotifyConfigForm = ({ isConnected, isAuthenticated }: SpotifyConfigFormPr
   useEffect(() => {
     setLocalBreakKeepFocusSound(breakKeepFocusSound);
   }, [breakKeepFocusSound]);
-
-  // Set default value for spotify enabled when component loads
-  useEffect(() => {
-    if (isAuthenticated && isConnected && !spotifyEnabled) {
-      setLocalSpotifyEnabled(true);
-    }
-  }, [isAuthenticated, isConnected, spotifyEnabled]);
 
   const handleSpotifyEnabledChange = (enabled: boolean) => {
     setLocalSpotifyEnabled(enabled);
