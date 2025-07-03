@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Clock, Settings, Link2, UserRound, LogOut, HelpCircle, Menu } from 'lucide-react';
@@ -32,6 +33,9 @@ const Navigation: React.FC = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const isMobile = useIsMobile();
   
+  // Check if current path is integrations related
+  const isIntegrationsPath = location.pathname.startsWith('/integrations');
+  
   const NavigationLinks = ({ onItemClick }: { onItemClick?: () => void }) => (
     <>
       <Link to="/" onClick={onItemClick}>
@@ -44,9 +48,9 @@ const Navigation: React.FC = () => {
           Timer
         </Button>
       </Link>
-      <Link to="/integrations" onClick={onItemClick}>
+      <Link to="/integrations/slack" onClick={onItemClick}>
         <Button 
-          variant={location.pathname === '/integrations' ? 'default' : 'ghost'} 
+          variant={isIntegrationsPath ? 'default' : 'ghost'} 
           size="sm"
           className="gap-2 w-full justify-start"
         >

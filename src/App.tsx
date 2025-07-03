@@ -38,6 +38,8 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/integrations" element={<Integrations />} />
+                <Route path="/integrations/slack" element={<Integrations />} />
+                <Route path="/integrations/spotify" element={<Integrations />} />
                 <Route path="/slack/connect" element={<SlackConnect />} />
                 <Route path="/spotify/connect" element={<SpotifyConnect />} />
                 <Route path="/subscriptions" element={<Subscriptions />} />

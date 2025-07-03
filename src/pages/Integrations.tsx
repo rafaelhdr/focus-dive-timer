@@ -1,4 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { SLACK_AUTH_URL } from '@/config/env';
 import { checkSlackConnection } from '@/services/slackService';
 import { checkSpotifyConnection, disconnectSpotify, getSpotifyAuthUrl } from '@/services/spotifyService';
@@ -19,11 +21,21 @@ import SpotifyConfigForm from '@/components/SpotifyConfigForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const Integrations = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [isSlackConnected, setIsSlackConnected] = useState<boolean | null>(null);
   const [isSpotifyConnected, setIsSpotifyConnected] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const { auth } = useAuth();
+
+  // Determine active tab based on current route
+  const getActiveTab = () => {
+    if (location.pathname === '/integrations/spotify') return 'spotify';
+    return 'slack'; // Default to slack for /integrations and /integrations/slack
+  };
+
+  const activeTab = getActiveTab();
 
   useEffect(() => {
     const checkConnections = async () => {
@@ -54,6 +66,14 @@ const Integrations = () => {
 
     checkConnections();
   }, [toast, auth.isAuthenticated]);
+
+  const handleTabChange = (value: string) => {
+    if (value === 'slack') {
+      navigate('/integrations/slack');
+    } else if (value === 'spotify') {
+      navigate('/integrations/spotify');
+    }
+  };
 
   const handleSlackConnect = () => {
     window.location.href = SLACK_AUTH_URL;
@@ -147,7 +167,7 @@ const Integrations = () => {
           </Alert>
         )}
 
-        <Tabs defaultValue="slack" className="w-full">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="slack" className="flex items-center gap-2">
               <Slack className="h-4 w-4" />
