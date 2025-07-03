@@ -4,10 +4,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { SLACK_AUTH_URL } from '@/config/env';
 import { checkSlackConnection } from '@/services/slackService';
 import { checkSpotifyConnection, disconnectSpotify, getSpotifyAuthUrl } from '@/services/spotifyService';
+import { fetchUserSubscriptionData, requestSpotifyAccess } from '@/services/userApi';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle, Slack, Info, Music } from 'lucide-react';
+import { CheckCircle, Slack, Info, Music, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
@@ -18,6 +19,7 @@ import SlackConfigForm from '@/components/SlackConfigForm';
 import SlackDisconnectDialog from '@/components/SlackDisconnectDialog';
 import SlackPermissionsDialog from '@/components/SlackPermissionsDialog';
 import SpotifyConfigForm from '@/components/SpotifyConfigForm';
+import SpotifyRequestModal from '@/components/SpotifyRequestModal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const Integrations = () => {
@@ -25,7 +27,9 @@ const Integrations = () => {
   const navigate = useNavigate();
   const [isSlackConnected, setIsSlackConnected] = useState<boolean | null>(null);
   const [isSpotifyConnected, setIsSpotifyConnected] = useState<boolean | null>(null);
+  const [isSpotifyApproved, setIsSpotifyApproved] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRequestingAccess, setIsRequestingAccess] = useState(false);
   const { toast } = useToast();
   const { auth } = useAuth();
 
@@ -42,15 +46,18 @@ const Integrations = () => {
       try {
         setIsLoading(true);
         if (auth.isAuthenticated) {
-          const [slackConnected, spotifyConnected] = await Promise.all([
+          const [slackConnected, spotifyConnected, userData] = await Promise.all([
             checkSlackConnection(),
-            checkSpotifyConnection()
+            checkSpotifyConnection(),
+            fetchUserSubscriptionData()
           ]);
           setIsSlackConnected(slackConnected);
           setIsSpotifyConnected(spotifyConnected);
+          setIsSpotifyApproved(userData?.spotify_approved || false);
         } else {
           setIsSlackConnected(false);
           setIsSpotifyConnected(false);
+          setIsSpotifyApproved(false);
         }
       } catch (error) {
         console.error('Error checking connections:', error);
@@ -134,6 +141,35 @@ const Integrations = () => {
         description: 'An error occurred while disconnecting your Spotify account.',
         variant: 'destructive',
       });
+    }
+  };
+
+  const handleRequestSpotifyAccess = async () => {
+    setIsRequestingAccess(true);
+    try {
+      const result = await requestSpotifyAccess();
+      
+      if (result.success) {
+        toast({
+          title: 'Request Submitted',
+          description: result.message || 'Your Spotify access request has been submitted. We\'ll review it and get back to you soon.',
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: result.error || 'Failed to submit Spotify access request.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Error requesting Spotify access:', error);
+      toast({
+        title: 'Error',
+        description: 'An error occurred while submitting your request.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsRequestingAccess(false);
     }
   };
 
@@ -264,6 +300,44 @@ const Integrations = () => {
                 {isLoading ? (
                   <div className="flex justify-center py-4">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  </div>
+                ) : !isSpotifyApproved ? (
+                  <div className="space-y-4">
+                    <Alert className="bg-orange-50 border-orange-200 dark:bg-orange-900/20 dark:border-orange-900">
+                      <Info className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                      <AlertTitle>Access Required</AlertTitle>
+                      <AlertDescription>
+                        Due to Spotify's developer terms, we need to manually approve access to the Spotify integration. 
+                        Please request access below and we'll review your request.
+                      </AlertDescription>
+                    </Alert>
+                    
+                    <div className="flex gap-2">
+                      <Button 
+                        onClick={handleRequestSpotifyAccess}
+                        disabled={!auth.isAuthenticated || isRequestingAccess}
+                        className="gap-2"
+                      >
+                        {isRequestingAccess ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Requesting...
+                          </>
+                        ) : (
+                          <>
+                            <Music className="h-4 w-4" />
+                            Request Spotify Access
+                          </>
+                        )}
+                      </Button>
+                      <SpotifyRequestModal />
+                    </div>
+                    
+                    {!auth.isAuthenticated && (
+                      <p className="text-sm text-muted-foreground">
+                        Please login to request Spotify access
+                      </p>
+                    )}
                   </div>
                 ) : isSpotifyConnected ? (
                   <div>
