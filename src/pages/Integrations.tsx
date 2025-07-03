@@ -15,7 +15,6 @@ import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
 import SlackConfigForm from '@/components/SlackConfigForm';
 import SlackDisconnectDialog from '@/components/SlackDisconnectDialog';
 import SlackPermissionsDialog from '@/components/SlackPermissionsDialog';
-import SpotifyPlayer from '@/components/SpotifyPlayer';
 import SpotifyConfigForm from '@/components/SpotifyConfigForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -267,9 +266,6 @@ const Integrations = () => {
                         </Button>
                       )}
                     </div>
-                    
-                    {/* Spotify Player Component */}
-                    {auth.isAuthenticated && <SpotifyPlayer />}
                     
                     {/* Spotify Configuration Form */}
                     {auth.isAuthenticated && (
