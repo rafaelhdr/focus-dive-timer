@@ -100,10 +100,10 @@ const SlackConnect = () => {
             <Button 
               className="gap-2" 
               size="lg" 
-              onClick={() => navigate('/integrations/spotify')}
+              onClick={() => navigate('/integrations/slack')}
             >
               <Home className="h-4 w-4" /> 
-              Continue to Spotify Integration
+              Continue to Slack Integration
             </Button>
           </div>
         )}
