@@ -8,7 +8,7 @@ import { fetchUserSubscriptionData, requestSpotifyAccess } from '@/services/user
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle, Slack, Info, Music, Loader2 } from 'lucide-react';
+import { CheckCircle, Slack, Info, Music, Loader2, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
@@ -28,6 +28,7 @@ const Integrations = () => {
   const [isSlackConnected, setIsSlackConnected] = useState<boolean | null>(null);
   const [isSpotifyConnected, setIsSpotifyConnected] = useState<boolean | null>(null);
   const [isSpotifyApproved, setIsSpotifyApproved] = useState<boolean | null>(null);
+  const [isSpotifyAccessRequested, setIsSpotifyAccessRequested] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRequestingAccess, setIsRequestingAccess] = useState(false);
   const { toast } = useToast();
@@ -54,10 +55,12 @@ const Integrations = () => {
           setIsSlackConnected(slackConnected);
           setIsSpotifyConnected(spotifyConnected);
           setIsSpotifyApproved(userData?.spotify_approved || false);
+          setIsSpotifyAccessRequested(userData?.spotify_access_requested || false);
         } else {
           setIsSlackConnected(false);
           setIsSpotifyConnected(false);
           setIsSpotifyApproved(false);
+          setIsSpotifyAccessRequested(false);
         }
       } catch (error) {
         console.error('Error checking connections:', error);
@@ -150,6 +153,7 @@ const Integrations = () => {
       const result = await requestSpotifyAccess();
       
       if (result.success) {
+        setIsSpotifyAccessRequested(true);
         toast({
           title: 'Request Submitted',
           description: result.message || 'Your Spotify access request has been submitted. We\'ll review it and get back to you soon.',
@@ -312,16 +316,31 @@ const Integrations = () => {
                       </AlertDescription>
                     </Alert>
                     
+                    {isSpotifyAccessRequested && (
+                      <Alert className="bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-900">
+                        <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                        <AlertTitle>Request Submitted</AlertTitle>
+                        <AlertDescription>
+                          Your Spotify access request has been submitted and is waiting for review. We'll get back to you soon!
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    
                     <div className="flex gap-2">
                       <Button 
                         onClick={handleRequestSpotifyAccess}
-                        disabled={!auth.isAuthenticated || isRequestingAccess}
+                        disabled={!auth.isAuthenticated || isRequestingAccess || isSpotifyAccessRequested}
                         className="gap-2"
                       >
                         {isRequestingAccess ? (
                           <>
                             <Loader2 className="h-4 w-4 animate-spin" />
                             Requesting...
+                          </>
+                        ) : isSpotifyAccessRequested ? (
+                          <>
+                            <Clock className="h-4 w-4" />
+                            Request Submitted - Waiting for Review
                           </>
                         ) : (
                           <>

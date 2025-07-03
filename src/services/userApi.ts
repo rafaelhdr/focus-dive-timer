@@ -6,6 +6,7 @@ export interface UserSubscriptionData {
   email: string;
   has_subscription: boolean;
   spotify_approved?: boolean;
+  spotify_access_requested?: boolean;
 }
 
 export const fetchUserSubscriptionData = async (): Promise<UserSubscriptionData | null> => {
