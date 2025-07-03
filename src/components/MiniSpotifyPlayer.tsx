@@ -1,15 +1,21 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, Music } from 'lucide-react';
+import { Play, Pause, Music, Settings } from 'lucide-react';
 import { useSpotifyStore } from '@/store/spotifyStore';
 
 const MiniSpotifyPlayer = () => {
   const { isReady, playerState, togglePlayback } = useSpotifyStore();
+  const navigate = useNavigate();
 
   if (!isReady || !playerState?.track) {
     return null;
   }
+
+  const handleSettingsClick = () => {
+    navigate('/integrations/spotify');
+  };
 
   return (
     <div className="fixed bottom-4 right-4 bg-background border rounded-lg shadow-lg p-3 z-50 max-w-xs">
@@ -45,6 +51,15 @@ const MiniSpotifyPlayer = () => {
             <Music className="h-4 w-4 text-muted-foreground" />
           </div>
         )}
+        
+        <Button
+          onClick={handleSettingsClick}
+          size="sm"
+          variant="ghost"
+          className="h-8 w-8 p-0"
+        >
+          <Settings className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   );
