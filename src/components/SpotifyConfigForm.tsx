@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Save, Music } from 'lucide-react';
+import { Loader2, Save } from 'lucide-react';
 import { useSpotifyStore } from '@/store/spotifyStore';
 import PlaylistSearch from './PlaylistSearch';
 import { useToast } from '@/hooks/use-toast';
@@ -131,129 +130,118 @@ const SpotifyConfigForm = ({ isConnected, isAuthenticated }: SpotifyConfigFormPr
   const isDisabled = !isAuthenticated || !isConnected;
 
   return (
-    <Card className="mt-6">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Music className="h-5 w-5" />
-          Spotify Configuration
-        </CardTitle>
-        <CardDescription>
-          Configure your Spotify playlists for focus and break sessions.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {!isAuthenticated && (
-          <Alert>
-            <AlertDescription>
-              Please login to configure Spotify settings.
-            </AlertDescription>
-          </Alert>
-        )}
+    <div className="space-y-6">
+      {!isAuthenticated && (
+        <Alert>
+          <AlertDescription>
+            Please login to configure Spotify settings.
+          </AlertDescription>
+        </Alert>
+      )}
 
-        {!isConnected && isAuthenticated && (
-          <Alert>
-            <AlertDescription>
-              Please connect your Spotify account to configure these settings.
-            </AlertDescription>
-          </Alert>
-        )}
+      {!isConnected && isAuthenticated && (
+        <Alert>
+          <AlertDescription>
+            Please connect your Spotify account to configure these settings.
+          </AlertDescription>
+        </Alert>
+      )}
 
-        {/* Enable/Disable Spotify Integration */}
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <Label htmlFor="spotify-enable" className="text-base">
-              Enable Spotify Integration
-            </Label>
-            <div className="text-sm text-muted-foreground">
-              Allow Focus Dive to control your Spotify playback during sessions
-            </div>
+      {/* Enable/Disable Spotify Integration */}
+      <div className="flex items-center justify-between">
+        <div className="space-y-0.5">
+          <Label htmlFor="spotify-enable" className="text-base">
+            Enable Spotify Integration
+          </Label>
+          <div className="text-sm text-muted-foreground">
+            Allow Focus Dive to control your Spotify playback during sessions
           </div>
-          <Switch
-            id="spotify-enable"
-            checked={localSpotifyEnabled}
-            onCheckedChange={handleSpotifyEnabledChange}
-            disabled={isDisabled || isSavingSettings}
-          />
         </div>
+        <Switch
+          id="spotify-enable"
+          checked={localSpotifyEnabled}
+          onCheckedChange={handleSpotifyEnabledChange}
+          disabled={isDisabled || isSavingSettings}
+        />
+      </div>
 
-        <Separator />
+      <Separator />
 
-        {/* Focus Playlist Selection */}
-        <div className="space-y-3">
-          <div className="space-y-0.5">
-            <Label className="text-base">Focus Playlist</Label>
-            <div className="text-sm text-muted-foreground">
-              Music to play during focus sessions
-            </div>
+      {/* Focus Playlist Selection */}
+      <div className="space-y-3">
+        <div className="space-y-0.5">
+          <Label className="text-base">Focus Playlist</Label>
+          <div className="text-sm text-muted-foreground">
+            Music to play during focus sessions
           </div>
-          <PlaylistSearch
-            onSelect={handleFocusPlaylistSelect}
-            selectedPlaylist={localFocusPlaylist}
+        </div>
+        <PlaylistSearch
+          onSelect={handleFocusPlaylistSelect}
+          selectedPlaylist={localFocusPlaylist}
+          disabled={!localSpotifyEnabled || isDisabled}
+        />
+      </div>
+
+      <Separator />
+
+      {/* Break Playlist Selection */}
+      <div className="space-y-3">
+        <div className="space-y-0.5">
+          <Label className="text-base">Break Playlist</Label>
+          <div className="text-sm text-muted-foreground">
+            Music to play during break sessions (optional)
+          </div>
+        </div>
+        
+        {/* Keep Focus Music During Breaks Checkbox */}
+        <div className="flex items-center space-x-2 mb-3">
+          <Checkbox
+            id="break-keep-sound"
+            checked={localBreakKeepFocusSound}
+            onCheckedChange={handleBreakKeepFocusSoundChange}
             disabled={!localSpotifyEnabled || isDisabled}
           />
+          <Label htmlFor="break-keep-sound" className="text-sm font-normal">
+            Keep Focus Music During Breaks
+          </Label>
         </div>
-
-        <Separator />
-
-        {/* Break Playlist Selection */}
-        <div className="space-y-3">
-          <div className="space-y-0.5">
-            <Label className="text-base">Break Playlist</Label>
-            <div className="text-sm text-muted-foreground">
-              Music to play during break sessions (optional)
-            </div>
+        
+        <PlaylistSearch
+          onSelect={handleBreakPlaylistSelect}
+          selectedPlaylist={localBreakPlaylist}
+          disabled={!localSpotifyEnabled || localBreakKeepFocusSound || isDisabled}
+        />
+        
+        {localBreakKeepFocusSound && (
+          <div className="text-xs text-muted-foreground mt-1">
+            Break playlist is disabled because focus music will continue playing during breaks.
           </div>
-          
-          {/* Keep Focus Music During Breaks Checkbox */}
-          <div className="flex items-center space-x-2 mb-3">
-            <Checkbox
-              id="break-keep-sound"
-              checked={localBreakKeepFocusSound}
-              onCheckedChange={handleBreakKeepFocusSoundChange}
-              disabled={!localSpotifyEnabled || isDisabled}
-            />
-            <Label htmlFor="break-keep-sound" className="text-sm font-normal">
-              Keep Focus Music During Breaks
-            </Label>
-          </div>
-          
-          <PlaylistSearch
-            onSelect={handleBreakPlaylistSelect}
-            selectedPlaylist={localBreakPlaylist}
-            disabled={!localSpotifyEnabled || localBreakKeepFocusSound || isDisabled}
-          />
-          
-          {localBreakKeepFocusSound && (
-            <div className="text-xs text-muted-foreground mt-1">
-              Break playlist is disabled because focus music will continue playing during breaks.
-            </div>
+        )}
+      </div>
+
+      <Separator />
+
+      {/* Save Button */}
+      <div className="flex justify-end">
+        <Button
+          onClick={handleSaveSettings}
+          disabled={isDisabled || isSavingSettings}
+          className="flex items-center gap-2"
+        >
+          {isSavingSettings ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4" />
+              Save Settings
+            </>
           )}
-        </div>
-
-        <Separator />
-
-        {/* Save Button */}
-        <div className="flex justify-end">
-          <Button
-            onClick={handleSaveSettings}
-            disabled={isDisabled || isSavingSettings}
-            className="flex items-center gap-2"
-          >
-            {isSavingSettings ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="h-4 w-4" />
-                Save Settings
-              </>
-            )}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+        </Button>
+      </div>
+    </div>
   );
 };
 
