@@ -307,15 +307,6 @@ const Integrations = () => {
                   </div>
                 ) : !isSpotifyApproved ? (
                   <div className="space-y-4">
-                    <Alert className="bg-orange-50 border-orange-200 dark:bg-orange-900/20 dark:border-orange-900">
-                      <Info className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                      <AlertTitle>Access Required</AlertTitle>
-                      <AlertDescription>
-                        Due to Spotify's developer terms, we need to manually approve access to the Spotify integration. 
-                        Please request access below and we'll review your request.
-                      </AlertDescription>
-                    </Alert>
-                    
                     {isSpotifyAccessRequested && (
                       <Alert className="bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-900">
                         <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
