@@ -7,7 +7,7 @@ import { analytics } from "@/utils/analytics";
 import { timerSocketService } from "@/services/timerSocketService";
 import { wakeLockService } from "@/services/wakeLockService";
 
-const TEST_TIMER = true; // Set to true for testing purposes
+const TEST_TIMER = false; // Set to true for testing purposes
 
 interface TimerState {
   // Timer state
