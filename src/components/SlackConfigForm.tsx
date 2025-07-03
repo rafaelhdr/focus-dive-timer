@@ -180,6 +180,11 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
   // Determine if form fields should be disabled
   const isFormDisabled = !isAuthenticated;
 
+  // Only show configuration sections if connected to Slack
+  if (!isConnected) {
+    return null;
+  }
+
   return (
     <div className="space-y-6 py-4">
       <div>
