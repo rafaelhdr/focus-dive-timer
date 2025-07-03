@@ -2,11 +2,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, Music, Settings } from 'lucide-react';
+import { Play, Pause, Music, Settings, SkipBack, SkipForward } from 'lucide-react';
 import { useSpotifyStore } from '@/store/spotifyStore';
 
 const MiniSpotifyPlayer = () => {
-  const { isReady, playerState, togglePlayback } = useSpotifyStore();
+  const { isReady, playerState, togglePlayback, nextTrack, previousTrack } = useSpotifyStore();
   const navigate = useNavigate();
 
   if (!isReady || !playerState?.track) {
@@ -19,19 +19,39 @@ const MiniSpotifyPlayer = () => {
 
   return (
     <div className="fixed bottom-4 right-4 bg-background border rounded-lg shadow-lg p-3 z-50 max-w-xs">
-      <div className="flex items-center gap-3">
-        <Button
-          onClick={togglePlayback}
-          size="sm"
-          variant="ghost"
-          className="h-8 w-8 p-0"
-        >
-          {playerState.isPlaying ? (
-            <Pause className="h-4 w-4" />
-          ) : (
-            <Play className="h-4 w-4" />
-          )}
-        </Button>
+      <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          <Button
+            onClick={previousTrack}
+            size="sm"
+            variant="ghost"
+            className="h-8 w-8 p-0"
+          >
+            <SkipBack className="h-4 w-4" />
+          </Button>
+          
+          <Button
+            onClick={togglePlayback}
+            size="sm"
+            variant="ghost"
+            className="h-8 w-8 p-0"
+          >
+            {playerState.isPlaying ? (
+              <Pause className="h-4 w-4" />
+            ) : (
+              <Play className="h-4 w-4" />
+            )}
+          </Button>
+          
+          <Button
+            onClick={nextTrack}
+            size="sm"
+            variant="ghost"
+            className="h-8 w-8 p-0"
+          >
+            <SkipForward className="h-4 w-4" />
+          </Button>
+        </div>
         
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium truncate">{playerState.track.name}</p>

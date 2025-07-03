@@ -51,6 +51,8 @@ interface SpotifyStore {
   initialize: () => Promise<void>;
   loadPlaylist: (playlist?: string | any) => Promise<void>;
   togglePlayback: () => Promise<void>;
+  nextTrack: () => Promise<void>;
+  previousTrack: () => Promise<void>;
   updatePlayerState: () => Promise<void>;
   transferPlaybackToDevice: () => Promise<{ success: boolean; error?: string }>;
   setSelectedPlaylist: (playlist: string) => void;
@@ -379,6 +381,40 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
     } catch (error) {
       console.error('Error toggling playback:', error);
       set({ error: 'Failed to control playback' });
+    }
+  },
+
+  nextTrack: async () => {
+    const { player, isReady } = get();
+    
+    if (!player || !isReady) {
+      console.error('Spotify player not ready');
+      return;
+    }
+
+    try {
+      await player.nextTrack();
+      setTimeout(() => get().updatePlayerState(), 500);
+    } catch (error) {
+      console.error('Error skipping to next track:', error);
+      set({ error: 'Failed to skip track' });
+    }
+  },
+
+  previousTrack: async () => {
+    const { player, isReady } = get();
+    
+    if (!player || !isReady) {
+      console.error('Spotify player not ready');
+      return;
+    }
+
+    try {
+      await player.previousTrack();
+      setTimeout(() => get().updatePlayerState(), 500);
+    } catch (error) {
+      console.error('Error going to previous track:', error);
+      set({ error: 'Failed to go to previous track' });
     }
   },
 
