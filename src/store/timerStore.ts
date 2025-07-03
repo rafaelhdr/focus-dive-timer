@@ -1,4 +1,3 @@
-
 import { create } from "zustand";
 import { TimerData } from "@/hooks/types";
 import { toast } from "sonner";
@@ -88,7 +87,17 @@ const handleSpotifyPlayback = async (mode: "focus" | "break") => {
   let playlistToLoad = null;
 
   if (mode === "focus") {
-    // For focus mode, use focus playlist
+    // For focus mode, check if we should keep playing during break transitions
+    if (spotifyStore.breakKeepFocusSound) {
+      // Check if music is already playing and we have a track
+      const currentState = spotifyStore.playerState;
+      if (currentState && currentState.track && currentState.isPlaying) {
+        console.log('Keeping focus music playing during break-to-focus transition');
+        return; // Don't reload playlist, just keep playing
+      }
+    }
+    
+    // Load focus playlist if not already playing or if it's the first time
     playlistToLoad = spotifyStore.focusPlaylist;
   } else {
     // For break mode, check if we should keep focus sound or use break playlist
