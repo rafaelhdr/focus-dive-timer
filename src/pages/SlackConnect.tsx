@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -99,10 +100,10 @@ const SlackConnect = () => {
             <Button 
               className="gap-2" 
               size="lg" 
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/integrations/spotify')}
             >
               <Home className="h-4 w-4" /> 
-              Return to Timer
+              Continue to Spotify Integration
             </Button>
           </div>
         )}
