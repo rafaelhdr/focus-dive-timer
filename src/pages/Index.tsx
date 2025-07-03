@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import Timer from '@/components/Timer';
 import TimerControls from '@/components/TimerControls';
@@ -10,6 +11,8 @@ import { useTimer } from '@/hooks/useTimer';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchUserSubscriptionData, UserSubscriptionData } from '@/services/userApi';
 import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
+import { Slack, Music } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
   const { 
@@ -25,6 +28,7 @@ const Index = () => {
   } = useTimer();
 
   const { auth } = useAuth();
+  const navigate = useNavigate();
   const [userSubscriptionData, setUserSubscriptionData] = useState<UserSubscriptionData | null>(null);
   const [showSubscriptionAlert, setShowSubscriptionAlert] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -75,6 +79,14 @@ const Index = () => {
     addFocusMinutes(5);
   };
 
+  const handleSlackClick = () => {
+    navigate('/integrations/slack');
+  };
+
+  const handleSpotifyClick = () => {
+    navigate('/integrations/spotify');
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background transition-colors duration-300">
       <Navigation />
@@ -82,11 +94,29 @@ const Index = () => {
       <div className="pt-16 flex flex-col items-center justify-center flex-1 w-full max-w-md mx-auto p-4">
         <header className="mb-8 text-center w-full">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Focus Dive</h1>
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-2 mb-4">
             <p className="text-muted-foreground">
               Block Distractions and Deep Work
             </p>
             <IntegrationsInfoDialog />
+          </div>
+          
+          {/* Integration Icons */}
+          <div className="flex items-center justify-center gap-4">
+            <button
+              onClick={handleSlackClick}
+              className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+              title="Slack Integration"
+            >
+              <Slack className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+            </button>
+            <button
+              onClick={handleSpotifyClick}
+              className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+              title="Spotify Integration"
+            >
+              <Music className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+            </button>
           </div>
         </header>
 
