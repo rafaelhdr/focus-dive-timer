@@ -43,8 +43,8 @@ const SpotifyConnect = () => {
           
           // Redirect to integrations page after a short delay
           setTimeout(() => {
-            navigate('/integrations');
-          }, 2000);
+            navigate('/integrations/spotify')
+          }, 3000);
         } else {
           setStatus('error');
           setError(result.error || 'Failed to connect to Spotify');
@@ -60,7 +60,7 @@ const SpotifyConnect = () => {
   }, [searchParams, navigate]);
 
   const handleRetry = () => {
-    navigate('/integrations');
+    navigate('/integrations/spotify');
   };
 
   return (
@@ -105,7 +105,7 @@ const SpotifyConnect = () => {
                 </AlertDescription>
               </Alert>
               <Button onClick={handleRetry} variant="outline">
-                Back to Integrations
+                Back to Spotify Integrations
               </Button>
             </div>
           )}
