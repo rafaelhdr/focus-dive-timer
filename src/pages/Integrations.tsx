@@ -245,13 +245,13 @@ const Integrations = () => {
                           Your Slack account is connected and ready to use with Focus Dive.
                         </AlertDescription>
                       </Alert>
-                      
-                      {auth.isAuthenticated && (
-                        <div className="flex justify-end">
-                          <SlackDisconnectDialog onDisconnected={handleSlackDisconnected} />
-                        </div>
-                      )}
                     </div>
+                    
+                    {auth.isAuthenticated && (
+                      <div className="flex justify-end mb-4">
+                        <SlackDisconnectDialog onDisconnected={handleSlackDisconnected} />
+                      </div>
+                    )}
                     
                     <SlackConfigForm 
                       isConnected={!!isSlackConnected} 
@@ -353,7 +353,7 @@ const Integrations = () => {
                   </div>
                 ) : isSpotifyConnected ? (
                   <div>
-                    <div className="space-y-4 mb-4">
+                    <div className="space-y-4 mb-6">
                       <Alert className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900">
                         <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
                         <AlertTitle>Connected to Spotify</AlertTitle>
@@ -361,19 +361,19 @@ const Integrations = () => {
                           Your Spotify account is connected and ready to use with Focus Dive.
                         </AlertDescription>
                       </Alert>
-                      
-                      {auth.isAuthenticated && (
-                        <div className="flex justify-end">
-                          <Button 
-                            variant="outline" 
-                            onClick={handleSpotifyDisconnect}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            Disconnect
-                          </Button>
-                        </div>
-                      )}
                     </div>
+                    
+                    {auth.isAuthenticated && (
+                      <div className="flex justify-end mb-4">
+                        <Button 
+                          variant="outline" 
+                          onClick={handleSpotifyDisconnect}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          Disconnect
+                        </Button>
+                      </div>
+                    )}
                     
                     {/* Spotify Configuration Form */}
                     {auth.isAuthenticated && (
