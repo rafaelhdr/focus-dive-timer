@@ -237,8 +237,8 @@ const Integrations = () => {
                   </div>
                 ) : isSlackConnected ? (
                   <div>
-                    <div className="flex items-left justify-between mb-6">
-                      <Alert className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900 flex-1 mr-4">
+                    <div className="space-y-4 mb-6">
+                      <Alert className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900">
                         <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
                         <AlertTitle>Connected to Slack</AlertTitle>
                         <AlertDescription>
@@ -247,7 +247,9 @@ const Integrations = () => {
                       </Alert>
                       
                       {auth.isAuthenticated && (
-                        <SlackDisconnectDialog onDisconnected={handleSlackDisconnected} />
+                        <div className="flex justify-end">
+                          <SlackDisconnectDialog onDisconnected={handleSlackDisconnected} />
+                        </div>
                       )}
                     </div>
                     
@@ -351,8 +353,8 @@ const Integrations = () => {
                   </div>
                 ) : isSpotifyConnected ? (
                   <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <Alert className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900 flex-1 mr-4">
+                    <div className="space-y-4 mb-4">
+                      <Alert className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900">
                         <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
                         <AlertTitle>Connected to Spotify</AlertTitle>
                         <AlertDescription>
@@ -361,13 +363,15 @@ const Integrations = () => {
                       </Alert>
                       
                       {auth.isAuthenticated && (
-                        <Button 
-                          variant="outline" 
-                          onClick={handleSpotifyDisconnect}
-                          className="text-destructive hover:text-destructive"
-                        >
-                          Disconnect
-                        </Button>
+                        <div className="flex justify-end">
+                          <Button 
+                            variant="outline" 
+                            onClick={handleSpotifyDisconnect}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            Disconnect
+                          </Button>
+                        </div>
                       )}
                     </div>
                     
