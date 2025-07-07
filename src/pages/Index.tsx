@@ -11,7 +11,7 @@ import { useTimer } from '@/hooks/useTimer';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchUserSubscriptionData, UserSubscriptionData } from '@/services/userApi';
 import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
-import { Slack, Music } from 'lucide-react';
+import { SiSlack, SiSpotify } from 'react-icons/si';
 import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
@@ -108,14 +108,14 @@ const Index = () => {
               className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
               title="Slack Integration"
             >
-              <Slack className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+              <SiSlack className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
             </button>
             <button
               onClick={handleSpotifyClick}
               className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
               title="Spotify Integration"
             >
-              <Music className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+              <SiSpotify className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
             </button>
           </div>
         </header>

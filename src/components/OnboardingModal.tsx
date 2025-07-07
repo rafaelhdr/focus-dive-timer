@@ -8,7 +8,8 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Clock, Slack, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Clock, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { SiSlack } from 'react-icons/si';
 import { analytics } from '@/utils/analytics';
 
 interface OnboardingModalProps {
@@ -61,7 +62,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
         return (
           <div className="text-center space-y-4">
             <div className="mx-auto w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center">
-              <Slack className="w-8 h-8 text-emerald-500" />
+              <SiSlack className="w-8 h-8 text-emerald-500" />
             </div>
             <DialogHeader>
               <DialogTitle className="text-xl">Smart Integrations</DialogTitle>

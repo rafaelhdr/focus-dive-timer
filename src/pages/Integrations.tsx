@@ -8,7 +8,8 @@ import { fetchUserSubscriptionData, requestSpotifyAccess } from '@/services/user
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle, Slack, Info, Music, Loader2, Clock, Unlink } from 'lucide-react';
+import { CheckCircle, Info, Loader2, Clock, Unlink } from 'lucide-react';
+import { SiSlack, SiSpotify } from 'react-icons/si';
 import { useToast } from '@/hooks/use-toast';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
@@ -210,11 +211,11 @@ const Integrations = () => {
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="slack" className="flex items-center gap-2">
-              <Slack className="h-4 w-4" />
+              <SiSlack className="h-4 w-4" />
               Slack
             </TabsTrigger>
             <TabsTrigger value="spotify" className="flex items-center gap-2">
-              <Music className="h-4 w-4" />
+              <SiSpotify className="h-4 w-4" />
               Spotify
             </TabsTrigger>
           </TabsList>
@@ -223,7 +224,7 @@ const Integrations = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Slack className="h-5 w-5" />
+                  <SiSlack className="h-5 w-5" />
                   Slack Integration
                 </CardTitle>
                 <CardDescription>
@@ -269,7 +270,7 @@ const Integrations = () => {
                           className="gap-2" 
                           disabled={!auth.isAuthenticated}
                         >
-                          <Slack className="h-4 w-4" />
+                          <SiSlack className="h-4 w-4" />
                           Connect to Slack
                         </Button>
                         <SlackPermissionsDialog />
@@ -296,7 +297,7 @@ const Integrations = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Music className="h-5 w-5" />
+                  <SiSpotify className="h-5 w-5" />
                   Spotify Integration
                 </CardTitle>
                 <CardDescription>
@@ -336,12 +337,12 @@ const Integrations = () => {
                             <Clock className="h-4 w-4" />
                             Request Submitted - Waiting for Review
                           </>
-                        ) : (
-                          <>
-                            <Music className="h-4 w-4" />
-                            Request Spotify Access
-                          </>
-                        )}
+                          ) : (
+                            <>
+                              <SiSpotify className="h-4 w-4" />
+                              Request Spotify Access
+                            </>
+                          )}
                       </Button>
                       <SpotifyRequestModal />
                     </div>
@@ -394,7 +395,7 @@ const Integrations = () => {
                       className="gap-2" 
                       disabled={!auth.isAuthenticated}
                     >
-                      <Music className="h-4 w-4" />
+                      <SiSpotify className="h-4 w-4" />
                       Connect to Spotify
                     </Button>
                     {!auth.isAuthenticated && (
