@@ -13,6 +13,7 @@ import { fetchUserSubscriptionData, UserSubscriptionData } from '@/services/user
 import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
 import { SiSlack, SiSpotify } from 'react-icons/si';
 import { useNavigate } from 'react-router-dom';
+import { getIntegrationSettings } from '@/services/integrationService';
 
 const Index = () => {
   const { 
@@ -32,6 +33,9 @@ const Index = () => {
   const [userSubscriptionData, setUserSubscriptionData] = useState<UserSubscriptionData | null>(null);
   const [showSubscriptionAlert, setShowSubscriptionAlert] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [slackEnabled, setSlackEnabled] = useState(false);
+  const [spotifyEnabled, setSpotifyEnabled] = useState(false);
+  const [integrationsLoading, setIntegrationsLoading] = useState(false);
 
   // Check if onboarding should be shown
   useEffect(() => {
@@ -41,6 +45,32 @@ const Index = () => {
     if (!hasSeenOnboarding && !auth.isAuthenticated) {
       setShowOnboarding(true);
     }
+  }, [auth.isAuthenticated]);
+
+  // Load integration settings to determine icon colors
+  useEffect(() => {
+    const loadIntegrationSettings = async () => {
+      if (!auth.isAuthenticated) {
+        setSlackEnabled(false);
+        setSpotifyEnabled(false);
+        return;
+      }
+
+      setIntegrationsLoading(true);
+      try {
+        const settings = await getIntegrationSettings();
+        setSlackEnabled(settings.slack_enabled || false);
+        setSpotifyEnabled(settings.spotify_enable || false);
+      } catch (error) {
+        console.error('Error loading integration settings:', error);
+        setSlackEnabled(false);
+        setSpotifyEnabled(false);
+      } finally {
+        setIntegrationsLoading(false);
+      }
+    };
+
+    loadIntegrationSettings();
   }, [auth.isAuthenticated]);
 
   // Check if subscription alert should be shown
@@ -108,14 +138,26 @@ const Index = () => {
               className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
               title="Slack Integration"
             >
-              <SiSlack className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+              <SiSlack 
+                className={`h-5 w-5 transition-colors ${
+                  slackEnabled 
+                    ? "text-[#4A154B] hover:text-[#4A154B]/80" 
+                    : "text-muted-foreground hover:text-foreground"
+                }`} 
+              />
             </button>
             <button
               onClick={handleSpotifyClick}
               className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
               title="Spotify Integration"
             >
-              <SiSpotify className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+              <SiSpotify 
+                className={`h-5 w-5 transition-colors ${
+                  spotifyEnabled 
+                    ? "text-[#1DB954] hover:text-[#1DB954]/80" 
+                    : "text-muted-foreground hover:text-foreground"
+                }`} 
+              />
             </button>
           </div>
         </header>
