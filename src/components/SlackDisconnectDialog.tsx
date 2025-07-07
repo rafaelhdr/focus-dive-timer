@@ -57,7 +57,7 @@ const SlackDisconnectDialog: React.FC<SlackDisconnectDialogProps> = ({ onDisconn
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button variant="outline" className="gap-2 text-destructive hover:text-destructive">
           <Unlink className="h-4 w-4" />
           Disconnect
         </Button>

@@ -8,7 +8,7 @@ import { fetchUserSubscriptionData, requestSpotifyAccess } from '@/services/user
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle, Slack, Info, Music, Loader2, Clock } from 'lucide-react';
+import { CheckCircle, Slack, Info, Music, Loader2, Clock, Unlink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
@@ -247,6 +247,7 @@ const Integrations = () => {
                       </Alert>
                     </div>
                     
+                    
                     {auth.isAuthenticated && (
                       <div className="flex justify-end mb-4">
                         <SlackDisconnectDialog onDisconnected={handleSlackDisconnected} />
@@ -363,13 +364,15 @@ const Integrations = () => {
                       </Alert>
                     </div>
                     
+                    
                     {auth.isAuthenticated && (
                       <div className="flex justify-end mb-4">
                         <Button 
                           variant="outline" 
                           onClick={handleSpotifyDisconnect}
-                          className="text-destructive hover:text-destructive"
+                          className="gap-2 text-destructive hover:text-destructive"
                         >
+                          <Unlink className="h-4 w-4" />
                           Disconnect
                         </Button>
                       </div>
