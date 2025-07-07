@@ -3,6 +3,7 @@ import { API_URL } from "@/config/env";
 import { getCommonHeaders } from "@/utils/apiUtils";
 
 interface SlackIntegrationSettings {
+  slack_enabled?: boolean;
   slack_dnd_emoji?: string;
   slack_dnd_text?: string;
 }

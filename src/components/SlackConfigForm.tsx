@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { getIntegrationSettings, saveIntegrationSettings } from "@/services/integrationService";
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,6 +27,7 @@ interface SlackConfigFormProps {
 }
 
 const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthenticated }) => {
+  const [slackEnabled, setSlackEnabled] = useState<boolean>(false);
   const [selectedEmoji, setSelectedEmoji] = useState<string>(":person_in_lotus_position:");
   const [statusText, setStatusText] = useState<string>("Focus time");
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -42,6 +45,9 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
   const loadSettings = async () => {
     try {
       const settings = await getIntegrationSettings();
+      if (settings.slack_enabled !== undefined) {
+        setSlackEnabled(settings.slack_enabled);
+      }
       if (settings.slack_dnd_emoji) {
         setSelectedEmoji(settings.slack_dnd_emoji);
       }
@@ -63,6 +69,7 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
       console.log("Saving settings:", { emoji: selectedEmoji, text: statusText });
       
       const success = await saveIntegrationSettings({
+        slack_enabled: slackEnabled,
         slack_dnd_emoji: selectedEmoji,
         slack_dnd_text: statusText,
       });
@@ -178,15 +185,56 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
   };
 
   // Determine if form fields should be disabled
-  const isFormDisabled = !isAuthenticated;
+  const isFormDisabled = !isAuthenticated || !slackEnabled;
 
   // Only show configuration sections if connected to Slack
   if (!isConnected) {
-    return null;
+    return (
+      <div className="space-y-6">
+        {/* Enable/Disable Slack Integration */}
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label htmlFor="slack-enable" className="text-base">
+              Enable Slack Integration
+            </Label>
+            <div className="text-sm text-muted-foreground">
+              Allow Focus Dive to control your Slack status during sessions
+            </div>
+          </div>
+          <Switch
+            id="slack-enable"
+            checked={false}
+            onCheckedChange={() => {}}
+            disabled={true}
+          />
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6 py-4">
+    <div className="space-y-6">
+      {/* Enable/Disable Slack Integration */}
+      <div className="flex items-center justify-between">
+        <div className="space-y-0.5">
+          <Label htmlFor="slack-enable" className="text-base">
+            Enable Slack Integration
+          </Label>
+          <div className="text-sm text-muted-foreground">
+            Allow Focus Dive to control your Slack status during sessions
+          </div>
+        </div>
+        <Switch
+          id="slack-enable"
+          checked={slackEnabled}
+          onCheckedChange={setSlackEnabled}
+          disabled={!isAuthenticated || !isConnected}
+        />
+      </div>
+
+      <Separator />
+
+      <div className="space-y-6 py-4">
       <div>
         <h3 className="text-lg font-medium mb-2">Status Text</h3>
         <p className="text-sm text-muted-foreground mb-3">
@@ -274,12 +322,13 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
 
       <Button
         onClick={handleSave}
-        disabled={isFormDisabled || isSaving}
+        disabled={!isAuthenticated || !isConnected || isSaving}
         className="mt-4"
         type="button"
       >
         {isSaving ? "Saving..." : "Save Slack Settings"}
       </Button>
+      </div>
     </div>
   );
 };
