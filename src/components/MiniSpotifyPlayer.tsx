@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Music, Settings, SkipBack, SkipForward, ExternalLink } from 'lucide-react';
 import { useSpotifyStore } from '@/store/spotifyStore';
+import { useTimerStore } from '@/store/timerStore';
 
 const MiniSpotifyPlayer = () => {
   const { 
@@ -15,6 +16,7 @@ const MiniSpotifyPlayer = () => {
     previousTrack,
     loadPlaylist 
   } = useSpotifyStore();
+  const { isActive: isTimerActive, mode: timerMode } = useTimerStore();
   const navigate = useNavigate();
 
   // Auto-load focus playlist if no track is playing
@@ -23,6 +25,13 @@ const MiniSpotifyPlayer = () => {
       loadPlaylist(focusPlaylist);
     }
   }, [isReady, playerState?.track, focusPlaylist, loadPlaylist]);
+
+  // Auto-start playlist when timer becomes active
+  useEffect(() => {
+    if (isReady && isTimerActive && playerState?.track && !playerState.isPlaying) {
+      togglePlayback();
+    }
+  }, [isReady, isTimerActive, playerState?.track, playerState?.isPlaying, togglePlayback]);
 
   if (!isReady) {
     return null;
