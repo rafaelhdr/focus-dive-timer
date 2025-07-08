@@ -17,16 +17,16 @@ const MiniSpotifyPlayer = () => {
   } = useSpotifyStore();
   const navigate = useNavigate();
 
-  if (!isReady) {
-    return null;
-  }
-
   // Auto-load focus playlist if no track is playing
   useEffect(() => {
     if (isReady && !playerState?.track && focusPlaylist) {
       loadPlaylist(focusPlaylist);
     }
   }, [isReady, playerState?.track, focusPlaylist, loadPlaylist]);
+
+  if (!isReady) {
+    return null;
+  }
 
   const handleSettingsClick = () => {
     navigate('/integrations/spotify');
