@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Play, Pause, Music, Settings, SkipBack, SkipForward, ExternalLink } from 'lucide-react';
 import { useSpotifyStore } from '@/store/spotifyStore';
 import { useTimerStore } from '@/store/timerStore';
-import { Badge } from '@/components/ui/badge';
 
 const MiniSpotifyPlayer = () => {
   const { 
@@ -44,7 +43,7 @@ const MiniSpotifyPlayer = () => {
 
   // Show when ready, even without a track
   return (
-    <div className="fixed bottom-4 right-4 bg-background border rounded-lg shadow-lg p-3 z-50 max-w-xs relative">
+    <div className="fixed bottom-4 right-4 bg-background border rounded-lg shadow-lg p-3 z-50 max-w-xs">
       <div className="flex items-center gap-2">
         {/* Show controls only if there's a track */}
         {playerState?.track ? (
@@ -143,13 +142,6 @@ const MiniSpotifyPlayer = () => {
           <Settings className="h-4 w-4" />
         </Button>
       </div>
-      
-      <Badge 
-        variant="secondary" 
-        className="absolute -top-1 -right-1 text-[10px] px-1 py-0 h-3 min-w-0 leading-none"
-      >
-        Beta
-      </Badge>
     </div>
   );
 };
