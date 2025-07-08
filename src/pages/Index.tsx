@@ -193,7 +193,7 @@ const Index = () => {
               />
               <Badge 
                 variant="secondary" 
-                className="absolute -top-1 -right-1 text-xs px-1.5 py-0.5 h-auto min-w-0"
+                className="absolute -top-0.5 -right-0.5 text-[10px] px-1 py-0 h-3 min-w-0 leading-none"
               >
                 Beta
               </Badge>
