@@ -13,6 +13,7 @@ import { fetchUserSubscriptionData, UserSubscriptionData } from '@/services/user
 import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
 import { SiSlack, SiSpotify } from 'react-icons/si';
 import { useNavigate } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
 import { getIntegrationSettings } from '@/services/integrationService';
 
 const Index = () => {
@@ -180,7 +181,7 @@ const Index = () => {
             </button>
             <button
               onClick={handleSpotifyClick}
-              className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+              className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors relative"
               title="Spotify Integration"
             >
               <SiSpotify 
@@ -190,6 +191,12 @@ const Index = () => {
                     : "text-muted-foreground hover:text-foreground"
                 }`} 
               />
+              <Badge 
+                variant="secondary" 
+                className="absolute -top-1 -right-1 text-xs px-1.5 py-0.5 h-auto min-w-0"
+              >
+                Beta
+              </Badge>
             </button>
           </div>
         </header>

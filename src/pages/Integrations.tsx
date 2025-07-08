@@ -22,6 +22,7 @@ import SlackPermissionsDialog from '@/components/SlackPermissionsDialog';
 import SpotifyConfigForm from '@/components/SpotifyConfigForm';
 import SpotifyRequestModal from '@/components/SpotifyRequestModal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 
 const Integrations = () => {
   const location = useLocation();
@@ -217,6 +218,7 @@ const Integrations = () => {
             <TabsTrigger value="spotify" className="flex items-center gap-2">
               <SiSpotify className="h-4 w-4" />
               Spotify
+              <Badge variant="secondary" className="text-xs">Beta</Badge>
             </TabsTrigger>
           </TabsList>
 
