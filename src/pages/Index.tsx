@@ -11,6 +11,7 @@ import { useTimer } from '@/hooks/useTimer';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchUserSubscriptionData, UserSubscriptionData } from '@/services/userApi';
 import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
+import MiniSpotifyPlayer from '@/components/MiniSpotifyPlayer';
 import { SiSlack, SiSpotify } from 'react-icons/si';
 import { useNavigate } from 'react-router-dom';
 import { getIntegrationSettings } from '@/services/integrationService';
@@ -224,6 +225,9 @@ const Index = () => {
       </div>
       
       <Footer />
+      
+      {/* Mini Spotify Player */}
+      {spotifyEnabled && <MiniSpotifyPlayer />}
       
       <OnboardingModal 
         isOpen={showOnboarding} 
