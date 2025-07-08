@@ -80,6 +80,12 @@ const Index = () => {
         return;
       }
 
+      // Check if Spotify SDK is loaded
+      if (!window.Spotify) {
+        console.log('Spotify SDK not loaded yet, will retry when ready');
+        return;
+      }
+
       const { useSpotifyStore } = await import('@/store/spotifyStore');
       const spotifyStore = useSpotifyStore.getState();
       
@@ -94,7 +100,9 @@ const Index = () => {
       }
     };
 
-    initializeSpotify();
+    // Add a small delay to allow SDK to load
+    const timer = setTimeout(initializeSpotify, 1000);
+    return () => clearTimeout(timer);
   }, [auth.isAuthenticated, spotifyEnabled]);
 
   // Check if subscription alert should be shown
