@@ -73,6 +73,30 @@ const Index = () => {
     loadIntegrationSettings();
   }, [auth.isAuthenticated]);
 
+  // Initialize Spotify player when Spotify integration is enabled
+  useEffect(() => {
+    const initializeSpotify = async () => {
+      if (!auth.isAuthenticated || !spotifyEnabled) {
+        return;
+      }
+
+      const { useSpotifyStore } = await import('@/store/spotifyStore');
+      const spotifyStore = useSpotifyStore.getState();
+      
+      // Load Spotify settings if not already loaded
+      if (!spotifyStore.focusPlaylist && !spotifyStore.breakPlaylist) {
+        await spotifyStore.loadSpotifySettings();
+      }
+
+      // Initialize Spotify player if not ready and not initializing
+      if (!spotifyStore.isReady && !spotifyStore.isInitializing) {
+        await spotifyStore.initialize();
+      }
+    };
+
+    initializeSpotify();
+  }, [auth.isAuthenticated, spotifyEnabled]);
+
   // Check if subscription alert should be shown
   useEffect(() => {
     const checkSubscriptionAlert = async () => {
