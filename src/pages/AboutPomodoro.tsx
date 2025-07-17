@@ -3,10 +3,8 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Clock, Coffee, Brain, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-
 const AboutPomodoro: React.FC = () => {
-  return (
-    <div className="min-h-screen pt-16 pb-8">
+  return <div className="min-h-screen pt-16 pb-8">
       <div className="container max-w-4xl mx-auto px-4">
         {/* Back Button */}
         <Link to="/">
@@ -140,24 +138,11 @@ const AboutPomodoro: React.FC = () => {
                 Want to dive deeper into the Pomodoro Technique? Here are some great resources:
               </p>
               <div className="space-y-2">
-                <a 
-                  href="https://en.wikipedia.org/wiki/Pomodoro_Technique" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center text-primary hover:underline"
-                >
+                <a href="https://en.wikipedia.org/wiki/Pomodoro_Technique" target="_blank" rel="noopener noreferrer" className="flex items-center text-primary hover:underline">
                   <ExternalLink className="h-4 w-4 mr-2" />
                   Pomodoro Technique on Wikipedia
                 </a>
-                <a 
-                  href="https://francescocirillo.com/pages/pomodoro-technique" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center text-primary hover:underline"
-                >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Official Pomodoro Technique Website
-                </a>
+                
               </div>
             </div>
           </CardContent>
@@ -172,8 +157,6 @@ const AboutPomodoro: React.FC = () => {
           </Link>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default AboutPomodoro;
