@@ -7,7 +7,7 @@ import { useTimer } from '@/hooks/useTimer';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import ThemeToggle from '@/components/ThemeToggle';
-import OnboardingModal from '@/components/OnboardingModal';
+
 import { useIsMobile } from '@/hooks/use-mobile';
 import {
   DropdownMenu,
@@ -30,7 +30,7 @@ const Navigation: React.FC = () => {
   const { isActive, formattedTime, mode } = useTimer();
   const { auth, logout } = useAuth();
   const showTimer = location.pathname !== '/' && isActive;
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  
   const isMobile = useIsMobile();
   
   // Check if current path is integrations related
@@ -85,14 +85,15 @@ const Navigation: React.FC = () => {
             ) : (
               <div className="flex items-center">
                 <Link to="/" className={`${isMobile ? 'text-sm' : 'text-lg'} font-bold mr-2`}>Focus Dive</Link>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6"
-                  onClick={() => setShowOnboarding(true)}
-                >
-                  <HelpCircle className="h-4 w-4" />
-                </Button>
+                <Link to="/about-pomodoro">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                  >
+                    <HelpCircle className="h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
             )}
           </div>
@@ -215,11 +216,6 @@ const Navigation: React.FC = () => {
           )}
         </div>
       </div>
-      
-      <OnboardingModal 
-        isOpen={showOnboarding} 
-        onClose={() => setShowOnboarding(false)} 
-      />
     </>
   );
 };

@@ -21,6 +21,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Support from "./pages/Support";
 import TermsOfService from "./pages/TermsOfService";
 import SubProcessors from "./pages/SubProcessors";
+import AboutPomodoro from "./pages/AboutPomodoro";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
               <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/" element={<Index />} />
+                <Route path="/about-pomodoro" element={<AboutPomodoro />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/integrations" element={<Integrations />} />
                 <Route path="/integrations/slack" element={<Integrations />} />

@@ -6,7 +6,7 @@ import SettingsPanel from '@/components/SettingsPanel';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SubscriptionAlert from '@/components/SubscriptionAlert';
-import OnboardingModal from '@/components/OnboardingModal';
+
 import { useTimer } from '@/hooks/useTimer';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchUserSubscriptionData, UserSubscriptionData } from '@/services/userApi';
@@ -33,20 +33,11 @@ const Index = () => {
   const navigate = useNavigate();
   const [userSubscriptionData, setUserSubscriptionData] = useState<UserSubscriptionData | null>(null);
   const [showSubscriptionAlert, setShowSubscriptionAlert] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  
   const [slackEnabled, setSlackEnabled] = useState(false);
   const [spotifyEnabled, setSpotifyEnabled] = useState(false);
   const [integrationsLoading, setIntegrationsLoading] = useState(false);
 
-  // Check if onboarding should be shown
-  useEffect(() => {
-    const hasSeenOnboarding = localStorage.getItem('focus_dive_onboarding_dismissed') === 'true';
-    
-    // Show onboarding if user hasn't seen it and is not authenticated
-    if (!hasSeenOnboarding && !auth.isAuthenticated) {
-      setShowOnboarding(true);
-    }
-  }, [auth.isAuthenticated]);
 
   // Load integration settings to determine icon colors
   useEffect(() => {
@@ -231,11 +222,6 @@ const Index = () => {
       </div>
       
       <Footer />
-      
-      <OnboardingModal 
-        isOpen={showOnboarding} 
-        onClose={() => setShowOnboarding(false)} 
-      />
     </div>
   );
 };
