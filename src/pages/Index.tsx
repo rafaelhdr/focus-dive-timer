@@ -14,6 +14,7 @@ import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
 import { SiSlack, SiSpotify } from 'react-icons/si';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { getIntegrationSettings } from '@/services/integrationService';
 
 const Index = () => {
@@ -37,7 +38,14 @@ const Index = () => {
   const [slackEnabled, setSlackEnabled] = useState(false);
   const [spotifyEnabled, setSpotifyEnabled] = useState(false);
   const [integrationsLoading, setIntegrationsLoading] = useState(false);
+  const [showPomodoroButton, setShowPomodoroButton] = useState(true);
 
+
+  // Check if Pomodoro button should be shown
+  useEffect(() => {
+    const pomodoroButtonClicked = localStorage.getItem('pomodoro_button_clicked') === 'true';
+    setShowPomodoroButton(!pomodoroButtonClicked);
+  }, []);
 
   // Load integration settings to determine icon colors
   useEffect(() => {
@@ -141,6 +149,12 @@ const Index = () => {
     navigate('/integrations/spotify');
   };
 
+  const handlePomodoroButtonClick = () => {
+    localStorage.setItem('pomodoro_button_clicked', 'true');
+    setShowPomodoroButton(false);
+    navigate('/about-pomodoro');
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background transition-colors duration-300">
       <Navigation />
@@ -154,6 +168,20 @@ const Index = () => {
             </p>
             <IntegrationsInfoDialog />
           </div>
+          
+          {/* Pomodoro Technique Button */}
+          {showPomodoroButton && (
+            <div className="mb-4">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handlePomodoroButtonClick}
+                className="text-sm"
+              >
+                What is Pomodoro Technique?
+              </Button>
+            </div>
+          )}
           
           {/* Integration Icons */}
           <div className="flex items-center justify-center gap-4">
