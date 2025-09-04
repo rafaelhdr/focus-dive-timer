@@ -13,6 +13,10 @@
     "web:lint": "pnpm --filter focusdive_web lint",
     "web:typecheck": "pnpm --filter focusdive_web typecheck",
 
+    "extension:dev": "pnpm --filter focusdive_extension dev",
+    "extension:build": "pnpm --filter focusdive_extension build",
+    "extension:build:dev": "pnpm --filter focusdive_extension build:dev",
+
     "dev": "pnpm run web:dev",
     "build": "pnpm run web:build",
     "start": "pnpm run web:start"
