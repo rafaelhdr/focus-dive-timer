@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { Timer } from '@focusdive/ui';
 import { Button } from "@focusdive/ui";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Timer, Settings, LogOut, Zap, Play, RotateCcw, Coffee, Target } from "lucide-react";
+import { Settings, LogOut, Zap, Play, RotateCcw, Coffee, Target } from "lucide-react";
 
 interface DashboardProps {
   onLogout: () => void;
@@ -24,6 +25,12 @@ export const Dashboard = ({ onLogout }: DashboardProps) => {
     onLogout();
   };
 
+  // placeholders
+  const formattedTime = "25:00";
+  const mode = "focus"; // or "break"
+  const isActive = false;
+  const handleAddFocusMinutes = () => console.log
+
   return (
     <div className="w-full max-w-md mx-auto p-4">
       <div className="flex items-center justify-between mb-4">
@@ -33,19 +40,12 @@ export const Dashboard = ({ onLogout }: DashboardProps) => {
         <ThemeToggle />
       </div>
 
-      {/* Focus Timer */}
-      <Card className="mb-4 bg-gradient-to-br from-cyan-500 to-blue-600 text-white">
-        <CardContent className="p-6 text-center relative">
-          <div className="absolute bottom-3 right-3">
-            <Badge variant="secondary" className="bg-white/20 text-white">
-              +5 Focus
-            </Badge>
-          </div>
-          <div className="mb-3">
-            <div className="text-6xl font-bold tracking-tight">25:00</div>
-          </div>
-        </CardContent>
-      </Card>
+      <Timer 
+        time={formattedTime} 
+        mode={mode} 
+        isActive={isActive}
+        onAddFocusMinutes={handleAddFocusMinutes}
+      />
 
       {/* Timer Controls */}
       <div className="flex gap-2 mb-4">

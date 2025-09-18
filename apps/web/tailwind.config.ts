@@ -1,5 +1,7 @@
-
 import type { Config } from "tailwindcss";
+import path from 'node:path'
+import { createRequire } from 'node:module'
+const require = createRequire(import.meta.url)
 
 export default {
 	darkMode: ["class"],
@@ -8,6 +10,8 @@ export default {
 		"./components/**/*.{ts,tsx}",
 		"./app/**/*.{ts,tsx}",
 		"./src/**/*.{ts,tsx}",
+    // "../../packages/ui/**/*.{ts,tsx}",
+    path.join(path.dirname(require.resolve('@focusdive/ui')), '**/*.{ts,tsx}'),
 	],
 	prefix: "",
 	theme: {

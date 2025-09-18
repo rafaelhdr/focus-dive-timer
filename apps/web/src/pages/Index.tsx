@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
-import Timer from '@/components/Timer';
+import { Timer } from '@focusdive/ui';
+// import Timer from '@/components/Timer';
 import TimerControls from '@/components/TimerControls';
 import SettingsPanel from '@/components/SettingsPanel';
 import Navigation from '@/components/Navigation';
