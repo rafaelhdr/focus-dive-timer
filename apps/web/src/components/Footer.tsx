@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@focusdive/ui";
 import { Link } from 'react-router-dom';
 
 const Footer: React.FC = () => {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@focusdive/ui";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
@@ -49,15 +49,15 @@ export const Dashboard = ({ onLogout }: DashboardProps) => {
 
       {/* Timer Controls */}
       <div className="flex gap-2 mb-4">
-        <Button variant="outline" className="px-4 flex-1">
+        <Button variant="default" className="px-4 flex-1">
           <Play className="w-4 h-4 mr-2" />
           Start
         </Button>
-        <Button variant="outline" className="px-4">
+        <Button variant="default" className="px-4">
           <RotateCcw className="w-4 h-4 mr-2" />
           Reset
         </Button>
-        <Button variant="outline" className="px-4">
+        <Button variant="secondary" className="px-4">
           <Coffee className="w-4 h-4 mr-2" />
           Switch to Break
         </Button>

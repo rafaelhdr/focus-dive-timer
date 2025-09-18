@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Volume2, Volume, VolumeX, Clock } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@focusdive/ui";
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';

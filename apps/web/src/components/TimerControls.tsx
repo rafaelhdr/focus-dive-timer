@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@focusdive/ui";
 import { Play, Pause, RotateCcw, Coffee, Brain } from 'lucide-react';
 
 interface TimerControlsProps {

@@ -2,7 +2,7 @@
 import React from "react";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { HelpCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@focusdive/ui";
 
 const IntegrationsInfoDialog: React.FC = () => {
   const [open, setOpen] = React.useState(false);

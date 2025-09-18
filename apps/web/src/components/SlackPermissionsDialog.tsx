@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { Button } from "@focusdive/ui";
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Info, Shield } from 'lucide-react';
 

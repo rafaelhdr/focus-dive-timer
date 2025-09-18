@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { exchangeSpotifyCode } from '@/services/spotifyService';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
+import { Button } from "@focusdive/ui";
 import { CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 const SpotifyConnect = () => {

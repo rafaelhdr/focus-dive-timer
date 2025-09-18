@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
+import { Button } from "@focusdive/ui";
 import { Check, ChevronsUpDown, Music, User, Loader2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSpotifyStore } from '@/store/spotifyStore';

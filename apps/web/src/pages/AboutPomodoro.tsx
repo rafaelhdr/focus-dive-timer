@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Clock, Coffee, Brain, ExternalLink } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@focusdive/ui";
 import { Card, CardContent } from '@/components/ui/card';
 const AboutPomodoro: React.FC = () => {
   return <div className="min-h-screen pt-16 pb-8">

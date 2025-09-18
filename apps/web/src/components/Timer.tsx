@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Button } from "@focusdive/ui";
 import { cn } from '@/lib/utils';
 
 interface TimerProps {

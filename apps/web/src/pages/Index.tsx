@@ -14,7 +14,7 @@ import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
 import { SiSlack, SiSpotify } from 'react-icons/si';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Button } from "@focusdive/ui";
 import { getIntegrationSettings } from '@/services/integrationService';
 
 const Index = () => {

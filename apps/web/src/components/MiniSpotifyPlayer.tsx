@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Button } from "@focusdive/ui";
 import { Play, Pause, Music, Settings, SkipBack, SkipForward, ExternalLink } from 'lucide-react';
 import { useSpotifyStore } from '@/store/spotifyStore';
 import { useTimerStore } from '@/store/timerStore';

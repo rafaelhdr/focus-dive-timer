@@ -5,7 +5,7 @@ import { API_URL } from '@/config/env';
 import { getCommonHeaders } from '@/utils/apiUtils';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, XCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@focusdive/ui";
 import Navigation from '@/components/Navigation';
 
 const StripeFallback: React.FC = () => {

@@ -5,7 +5,7 @@ import { SLACK_AUTH_URL } from '@/config/env';
 import { checkSlackConnection } from '@/services/slackService';
 import { checkSpotifyConnection, disconnectSpotify, getSpotifyAuthUrl } from '@/services/spotifyService';
 import { fetchUserSubscriptionData, requestSpotifyAccess } from '@/services/userApi';
-import { Button } from '@/components/ui/button';
+import { Button } from "@focusdive/ui";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { CheckCircle, Info, Loader2, Clock, Unlink } from 'lucide-react';

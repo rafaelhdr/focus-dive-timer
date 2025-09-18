@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@focusdive/ui";
 import {
   AlertDialog,
   AlertDialogAction,
