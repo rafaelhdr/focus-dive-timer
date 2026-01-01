@@ -1,6 +1,6 @@
 
 import { io, Socket } from "socket.io-client";
-import { API_URL } from "@/config/env";
+import { apiUrl } from "@focusdive/config";
 import { TimerData } from "@/hooks/types";
 import { getAccessToken } from "@/services/authApi";
 
@@ -20,14 +20,14 @@ class TimerSocketService {
     // Skip if socket already exists
     if (this.socket) return this.socket;
 
-    console.log("Initializing WebSocket connection to:", `${API_URL}/timer`);
+    console.log("Initializing WebSocket connection to:", `${apiUrl}/timer`);
 
     try {
       // Get authentication token
       const accessToken = getAccessToken();
 
       // Create socket connection with token as query parameter
-      this.socket = io(`${API_URL}/timer`, {
+      this.socket = io(`${apiUrl}/timer`, {
         withCredentials: true,
         query: {
           token: accessToken

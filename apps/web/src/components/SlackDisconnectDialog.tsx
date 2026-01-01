@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@focusdive/ui";
 import {
@@ -14,7 +13,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Unlink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { API_URL } from '@/config/env';
+import { apiUrl } from '@focusdive/config';
 import { getCommonHeaders } from '@/utils/apiUtils';
 
 interface SlackDisconnectDialogProps {
@@ -30,7 +29,7 @@ const SlackDisconnectDialog: React.FC<SlackDisconnectDialogProps> = ({ onDisconn
     setIsDisconnecting(true);
     
     try {
-      const response = await fetch(`${API_URL}/slack/disconnect`, {
+      const response = await fetch(`${apiUrl}/slack/disconnect`, {
         method: 'POST',
         headers: getCommonHeaders(),
         credentials: 'include',

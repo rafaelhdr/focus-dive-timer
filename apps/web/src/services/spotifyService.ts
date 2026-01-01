@@ -1,4 +1,4 @@
-import { API_URL } from "@/config/env";
+import { apiUrl } from "@focusdive/config";
 import { getCommonHeaders } from "@/utils/apiUtils";
 
 /**
@@ -8,7 +8,7 @@ export const refreshSpotifyToken = async (): Promise<{ success: boolean; error?:
   try {
     console.log('Refreshing Spotify access token...');
     
-    const response = await fetch(`${API_URL}/spotify/refresh-token`, {
+    const response = await fetch(`${apiUrl}/spotify/refresh-token`, {
       method: 'POST',
       headers: getCommonHeaders(),
       credentials: 'include',
@@ -43,7 +43,7 @@ export const refreshSpotifyToken = async (): Promise<{ success: boolean; error?:
  */
 export const checkSpotifyConnection = async (): Promise<boolean> => {
   try {
-    const response = await fetch(`${API_URL}/spotify/status`, {
+    const response = await fetch(`${apiUrl}/spotify/status`, {
       method: 'GET',
       headers: getCommonHeaders(),
       credentials: 'include',
@@ -57,7 +57,7 @@ export const checkSpotifyConnection = async (): Promise<boolean> => {
         
         if (refreshResult.success) {
           // Retry the original request after successful refresh
-          const retryResponse = await fetch(`${API_URL}/spotify/status`, {
+          const retryResponse = await fetch(`${apiUrl}/spotify/status`, {
             method: 'GET',
             headers: getCommonHeaders(),
             credentials: 'include',
@@ -89,7 +89,7 @@ export const getSpotifyAuthUrl = async (): Promise<{ success: boolean; url?: str
   try {
     console.log('Getting Spotify auth URL...');
     
-    const response = await fetch(`${API_URL}/spotify/connect`, {
+    const response = await fetch(`${apiUrl}/spotify/connect`, {
       method: 'GET',
       headers: getCommonHeaders(),
       credentials: 'include',
@@ -126,7 +126,7 @@ export const exchangeSpotifyCode = async (code: string): Promise<{ success: bool
   try {
     console.log('Exchanging Spotify code for token...');
     
-    const response = await fetch(`${API_URL}/spotify/connect`, {
+    const response = await fetch(`${apiUrl}/spotify/connect`, {
       method: 'POST',
       headers: getCommonHeaders(),
       body: JSON.stringify({
@@ -166,7 +166,7 @@ export const disconnectSpotify = async (): Promise<boolean> => {
   try {
     console.log('Disconnecting Spotify account...');
     
-    const response = await fetch(`${API_URL}/spotify/disconnect`, {
+    const response = await fetch(`${apiUrl}/spotify/disconnect`, {
       method: 'POST',
       headers: getCommonHeaders(),
       credentials: 'include',
@@ -182,7 +182,7 @@ export const disconnectSpotify = async (): Promise<boolean> => {
         
         if (refreshResult.success) {
           // Retry the disconnect request after successful refresh
-          const retryResponse = await fetch(`${API_URL}/spotify/disconnect`, {
+          const retryResponse = await fetch(`${apiUrl}/spotify/disconnect`, {
             method: 'POST',
             headers: getCommonHeaders(),
             credentials: 'include',
@@ -212,7 +212,7 @@ export const getSpotifyAccessToken = async (): Promise<{ success: boolean; token
   try {
     console.log('Getting Spotify access token...');
     
-    const response = await fetch(`${API_URL}/spotify/refresh-token`, {
+    const response = await fetch(`${apiUrl}/spotify/refresh-token`, {
       method: 'POST',
       headers: getCommonHeaders(),
       credentials: 'include',
@@ -228,7 +228,7 @@ export const getSpotifyAccessToken = async (): Promise<{ success: boolean; token
         
         if (refreshResult.success) {
           // Retry the original request after successful refresh
-          const retryResponse = await fetch(`${API_URL}/spotify/refresh-token`, {
+          const retryResponse = await fetch(`${apiUrl}/spotify/refresh-token`, {
             method: 'POST',
             headers: getCommonHeaders(),
             credentials: 'include',

@@ -1,5 +1,4 @@
-
-import { API_URL } from "@/config/env";
+import { apiUrl } from "@focusdive/config";
 import { getCommonHeaders } from "@/utils/apiUtils";
 
 interface SlackIntegrationSettings {
@@ -22,7 +21,7 @@ interface IntegrationSettings extends SlackIntegrationSettings, SpotifyIntegrati
  */
 export const getIntegrationSettings = async (): Promise<IntegrationSettings> => {
   try {
-    const response = await fetch(`${API_URL}/integrations`, {
+    const response = await fetch(`${apiUrl}/integrations`, {
       method: 'GET',
       headers: getCommonHeaders(),
       credentials: 'include',
@@ -50,7 +49,7 @@ export const saveIntegrationSettings = async (settings: IntegrationSettings): Pr
     console.log('Saving integration settings with headers:', getCommonHeaders());
     console.log('Settings to save:', settings);
     
-    const response = await fetch(`${API_URL}/integrations`, {
+    const response = await fetch(`${apiUrl}/integrations`, {
       method: 'PUT',
       headers: getCommonHeaders(),
       body: JSON.stringify(settings),
@@ -78,7 +77,7 @@ export const saveSpotifySettings = async (settings: SpotifyIntegrationSettings):
   try {
     console.log('Saving Spotify integration settings:', settings);
     
-    const response = await fetch(`${API_URL}/integrations`, {
+    const response = await fetch(`${apiUrl}/integrations`, {
       method: 'PUT',
       headers: getCommonHeaders(),
       body: JSON.stringify(settings),

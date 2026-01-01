@@ -1,5 +1,4 @@
-
-import { API_URL } from "@/config/env";
+import { apiUrl } from "@focusdive/config";
 import { getCommonHeaders } from "@/utils/apiUtils";
 
 /**
@@ -8,7 +7,7 @@ import { getCommonHeaders } from "@/utils/apiUtils";
  */
 export const checkSlackConnection = async (): Promise<boolean> => {
   try {
-    const response = await fetch(`${API_URL}/slack/status`, {
+    const response = await fetch(`${apiUrl}/slack/status`, {
       headers: getCommonHeaders(),
       credentials: 'include',
     });

@@ -1,7 +1,6 @@
-
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { API_URL } from '@/config/env';
+import { apiUrl } from '@focusdive/config';
 import { getCommonHeaders } from '@/utils/apiUtils';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, XCircle } from 'lucide-react';
@@ -39,7 +38,7 @@ const StripeFallback: React.FC = () => {
       
       if (sessionId) {
         try {
-          const response = await fetch(`${API_URL}/subscriptions/stripe-fallback`, {
+          const response = await fetch(`${apiUrl}/subscriptions/stripe-fallback`, {
             method: 'POST',
             headers: getCommonHeaders(),
             credentials: 'include',

@@ -1,12 +1,11 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { SLACK_AUTH_URL } from '@/config/env';
+import { slackAuthUrl } from '@focusdive/config';
 import { checkSlackConnection } from '@/services/slackService';
 import { checkSpotifyConnection, disconnectSpotify, getSpotifyAuthUrl } from '@/services/spotifyService';
 import { fetchUserSubscriptionData, requestSpotifyAccess } from '@/services/userApi';
 import { Button } from "@focusdive/ui";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { CheckCircle, Info, Loader2, Clock, Unlink } from 'lucide-react';
 import { SiSlack, SiSpotify } from 'react-icons/si';
@@ -88,7 +87,7 @@ const Integrations = () => {
   };
 
   const handleSlackConnect = () => {
-    window.location.href = SLACK_AUTH_URL;
+    window.location.href = slackAuthUrl;
   };
 
   const handleSlackDisconnected = () => {

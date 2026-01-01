@@ -1,8 +1,7 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { API_URL } from '@/config/env';
+import { apiUrl } from '@focusdive/config';
 import { Button } from "@focusdive/ui";
 import { Home } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
@@ -43,7 +42,7 @@ const SlackConnect = () => {
         }
 
         // Send the code to our backend with proper headers
-        const response = await fetch(`${API_URL}/slack/connect`, {
+        const response = await fetch(`${apiUrl}/slack/connect`, {
           method: 'POST',
           headers: getCommonHeaders(),
           body: JSON.stringify({ code }),

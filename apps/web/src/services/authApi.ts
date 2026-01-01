@@ -1,4 +1,4 @@
-import { API_URL } from '@/config/env';
+import { apiUrl } from '@focusdive/config';
 import { getCommonHeaders } from '@/utils/apiUtils';
 
 // Types for auth responses
@@ -24,7 +24,7 @@ export interface AuthState {
 export const loginWithEmail = async (email: string): Promise<AuthLoginResponse> => {
   try {
     console.log('Requesting login token for:', email);
-    const response = await fetch(`${API_URL}/auth/login`, {
+    const response = await fetch(`${apiUrl}/auth/login`, {
       method: 'POST',
       headers: getCommonHeaders(),
       body: JSON.stringify({ email }),
@@ -55,7 +55,7 @@ export const loginWithEmail = async (email: string): Promise<AuthLoginResponse> 
 export const verifyToken = async (email: string, token: string): Promise<AuthVerifyResponse> => {
   try {
     console.log('Verifying token for:', email);
-    const response = await fetch(`${API_URL}/auth/verify`, {
+    const response = await fetch(`${apiUrl}/auth/verify`, {
       method: 'POST',
       headers: getCommonHeaders(),
       body: JSON.stringify({ email, token }),
@@ -87,7 +87,7 @@ export const verifyToken = async (email: string, token: string): Promise<AuthVer
 export const refreshAccessToken = async (refreshToken: string): Promise<AuthVerifyResponse> => {
   try {
     console.log('Refreshing access token');
-    const response = await fetch(`${API_URL}/auth/refresh-token`, {
+    const response = await fetch(`${apiUrl}/auth/refresh-token`, {
       method: 'POST',
       headers: getCommonHeaders(refreshToken),
       body: JSON.stringify({ refresh_token: refreshToken }),

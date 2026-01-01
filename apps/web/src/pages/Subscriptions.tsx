@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Check, Users, Calendar, Siren, Info, ExternalLink, Clock } from 'lucide-react';
@@ -9,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { API_URL } from '@/config/env';
+import { apiUrl } from '@focusdive/config';
 import { getCommonHeaders } from '@/utils/apiUtils';
 import Navigation from '@/components/Navigation';
 
@@ -27,7 +26,7 @@ const SubscriptionsPage: React.FC = () => {
       if (!auth.isAuthenticated) return;
       
       try {
-        const response = await fetch(`${API_URL}/subscriptions/has-subscription`, {
+        const response = await fetch(`${apiUrl}/subscriptions/has-subscription`, {
           method: 'GET',
           headers: getCommonHeaders(),
           credentials: 'include',
@@ -60,7 +59,7 @@ const SubscriptionsPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_URL}/subscriptions/create-checkout-session`, {
+      const response = await fetch(`${apiUrl}/subscriptions/create-checkout-session`, {
         method: 'POST',
         headers: getCommonHeaders(),
         credentials: 'include',
@@ -93,7 +92,7 @@ const SubscriptionsPage: React.FC = () => {
     
     setPortalLoading(true);
     try {
-      const response = await fetch(`${API_URL}/subscriptions/create-portal-session`, {
+      const response = await fetch(`${apiUrl}/subscriptions/create-portal-session`, {
         method: 'POST',
         headers: getCommonHeaders(),
         credentials: 'include',
@@ -131,7 +130,7 @@ const SubscriptionsPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_URL}/subscriptions/request-for-teams`, {
+      const response = await fetch(`${apiUrl}/subscriptions/request-for-teams`, {
         method: 'POST',
         headers: getCommonHeaders(),
         credentials: 'include',

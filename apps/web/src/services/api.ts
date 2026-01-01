@@ -1,6 +1,4 @@
-
-import { API_URL } from '@/config/env';
-import { getAccessToken } from './authApi';
+import { apiUrl } from '@focusdive/config';
 import { getCommonHeaders } from '@/utils/apiUtils';
 
 export interface Preferences {
@@ -15,8 +13,8 @@ export interface Preferences {
 
 export const fetchPreferences = async (): Promise<Preferences> => {
   try {
-    console.log('Fetching preferences from:', `${API_URL}/preferences`);
-    const response = await fetch(`${API_URL}/preferences`, {
+    console.log('Fetching preferences from:', `${apiUrl}/preferences`);
+    const response = await fetch(`${apiUrl}/preferences`, {
       method: 'GET',
       headers: getCommonHeaders(),
       // Adding cache control to prevent browser caching issues
@@ -48,8 +46,8 @@ export const fetchPreferences = async (): Promise<Preferences> => {
 
 export const savePreferences = async (preferences: Partial<Preferences>): Promise<boolean> => {
   try {
-    console.log('Saving preferences to:', `${API_URL}/preferences`, preferences);
-    const response = await fetch(`${API_URL}/preferences`, {
+    console.log('Saving preferences to:', `${apiUrl}/preferences`, preferences);
+    const response = await fetch(`${apiUrl}/preferences`, {
       method: 'PUT',
       headers: getCommonHeaders(),
       body: JSON.stringify(preferences),

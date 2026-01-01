@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@focusdive/ui";
 import { Input } from "@/components/ui/input";
@@ -9,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { getIntegrationSettings, saveIntegrationSettings } from "@/services/integrationService";
 import { Card, CardContent } from "@/components/ui/card";
-import { API_URL } from "@/config/env";
+import { apiUrl } from "@focusdive/config";
 import { getCommonHeaders } from "@/utils/apiUtils";
 
 // Available emoji options
@@ -105,7 +104,7 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
 
     setIsTestingStart(true);
     try {
-      const response = await fetch(`${API_URL}/slack/test`, {
+      const response = await fetch(`${apiUrl}/slack/test`, {
         method: 'POST',
         headers: getCommonHeaders(),
         credentials: 'include',
@@ -145,7 +144,7 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
 
     setIsTestingStop(true);
     try {
-      const response = await fetch(`${API_URL}/slack/test`, {
+      const response = await fetch(`${apiUrl}/slack/test`, {
         method: 'POST',
         headers: getCommonHeaders(),
         credentials: 'include',
