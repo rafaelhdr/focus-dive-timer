@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Mail, ShieldCheck } from "lucide-react";
-import { getCommonHeaders, API_URL } from "@/utils/api";
+import { API_URL } from "@/utils/api";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 interface LoginScreenProps {
@@ -41,7 +41,9 @@ export const LoginScreen = ({
     try {
       const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
-        headers: getCommonHeaders(),
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ email }),
         credentials: 'include',
       });
@@ -75,7 +77,9 @@ export const LoginScreen = ({
     try {
       const response = await fetch(`${API_URL}/auth/verify`, {
         method: 'POST',
-        headers: getCommonHeaders(),
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ email, token }),
         credentials: 'include',
       });

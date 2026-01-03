@@ -1,5 +1,5 @@
 import { apiUrl } from "@focusdive/config";
-import { getCommonHeaders } from "@/utils/apiUtils";
+import { getAccessToken } from "@focusdive/auth";
 
 interface SlackIntegrationSettings {
   slack_enabled?: boolean;
@@ -21,9 +21,13 @@ interface IntegrationSettings extends SlackIntegrationSettings, SpotifyIntegrati
  */
 export const getIntegrationSettings = async (): Promise<IntegrationSettings> => {
   try {
+    const accessToken = await getAccessToken();
     const response = await fetch(`${apiUrl}/integrations`, {
       method: 'GET',
-      headers: getCommonHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
       credentials: 'include',
     });
 
@@ -46,12 +50,13 @@ export const getIntegrationSettings = async (): Promise<IntegrationSettings> => 
  */
 export const saveIntegrationSettings = async (settings: IntegrationSettings): Promise<boolean> => {
   try {
-    console.log('Saving integration settings with headers:', getCommonHeaders());
-    console.log('Settings to save:', settings);
-    
+    const accessToken = await getAccessToken();
     const response = await fetch(`${apiUrl}/integrations`, {
       method: 'PUT',
-      headers: getCommonHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
       body: JSON.stringify(settings),
       credentials: 'include',
     });
@@ -77,9 +82,13 @@ export const saveSpotifySettings = async (settings: SpotifyIntegrationSettings):
   try {
     console.log('Saving Spotify integration settings:', settings);
     
+    const accessToken = await getAccessToken();
     const response = await fetch(`${apiUrl}/integrations`, {
       method: 'PUT',
-      headers: getCommonHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
       body: JSON.stringify(settings),
       credentials: 'include',
     });

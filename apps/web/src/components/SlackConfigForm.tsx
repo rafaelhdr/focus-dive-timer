@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getIntegrationSettings, saveIntegrationSettings } from "@/services/integrationService";
 import { Card, CardContent } from "@/components/ui/card";
 import { apiUrl } from "@focusdive/config";
-import { getCommonHeaders } from "@/utils/apiUtils";
+import { getAccessToken } from "@focusdive/auth";
 
 // Available emoji options
 const emojiOptions = [
@@ -104,9 +104,13 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
 
     setIsTestingStart(true);
     try {
+      const accessToken = await getAccessToken();
       const response = await fetch(`${apiUrl}/slack/test`, {
         method: 'POST',
-        headers: getCommonHeaders(),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
         credentials: 'include',
         body: JSON.stringify({
           action: 'start',
@@ -144,9 +148,13 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
 
     setIsTestingStop(true);
     try {
+      const accessToken = await getAccessToken();
       const response = await fetch(`${apiUrl}/slack/test`, {
         method: 'POST',
-        headers: getCommonHeaders(),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
         credentials: 'include',
         body: JSON.stringify({
           action: 'stop',

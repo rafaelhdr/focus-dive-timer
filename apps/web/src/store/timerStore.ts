@@ -339,8 +339,8 @@ export const useTimerStore = create<TimerState>((set, get) => {
     },
     
     // Initialize WebSocket connection
-    initSocket: () => {
-      const socket = timerSocketService.initialize({
+    initSocket: async () => {
+      await timerSocketService.initialize({
         onConnected: () => {
           set({ isSocketConnected: true });
         },

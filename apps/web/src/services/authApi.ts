@@ -1,5 +1,5 @@
 import { apiUrl } from '@focusdive/config';
-import { getCommonHeaders } from '@/utils/apiUtils';
+import { getAccessToken } from "@focusdive/auth";
 
 // Types for auth responses
 export interface AuthLoginResponse {
@@ -24,9 +24,13 @@ export interface AuthState {
 export const loginWithEmail = async (email: string): Promise<AuthLoginResponse> => {
   try {
     console.log('Requesting login token for:', email);
+    const accessToken = await getAccessToken();
     const response = await fetch(`${apiUrl}/auth/login`, {
       method: 'POST',
-      headers: getCommonHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
       body: JSON.stringify({ email }),
       credentials: 'include',
     });
@@ -55,9 +59,13 @@ export const loginWithEmail = async (email: string): Promise<AuthLoginResponse> 
 export const verifyToken = async (email: string, token: string): Promise<AuthVerifyResponse> => {
   try {
     console.log('Verifying token for:', email);
+    const accessToken = await getAccessToken();
     const response = await fetch(`${apiUrl}/auth/verify`, {
       method: 'POST',
-      headers: getCommonHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
       body: JSON.stringify({ email, token }),
       credentials: 'include',
     });
@@ -83,47 +91,10 @@ export const verifyToken = async (email: string, token: string): Promise<AuthVer
   }
 };
 
-// Refresh access token using refresh token
-export const refreshAccessToken = async (refreshToken: string): Promise<AuthVerifyResponse> => {
-  try {
-    console.log('Refreshing access token');
-    const response = await fetch(`${apiUrl}/auth/refresh-token`, {
-      method: 'POST',
-      headers: getCommonHeaders(refreshToken),
-      body: JSON.stringify({ refresh_token: refreshToken }),
-      credentials: 'include',
-    });
-    
-    if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.message || `Failed to refresh token (status: ${response.status})`);
-    }
-    
-    const data = await response.json();
-    console.log('Token refresh successful');
-    return {
-      success: true,
-      access_token: data.access_token,
-      refresh_token: data.refresh_token || refreshToken, // Use new refresh token if provided
-    };
-  } catch (error: any) {
-    console.error('Token refresh failed:', error);
-    return {
-      success: false,
-      message: error.message || 'Failed to refresh token',
-    };
-  }
-};
-
 // Function to check if user is authenticated
 export const isAuthenticated = (): boolean => {
   const accessToken = localStorage.getItem('focus_dive_access_token');
   return !!accessToken;
-};
-
-// Function to get the current access token
-export const getAccessToken = (): string | null => {
-  return localStorage.getItem('focus_dive_access_token');
 };
 
 // Function to get the current refresh token
@@ -143,13 +114,4 @@ export const clearAuthTokens = (): void => {
   localStorage.removeItem('focus_dive_access_token');
   localStorage.removeItem('focus_dive_refresh_token');
   localStorage.removeItem('focus_dive_user_email');
-};
-
-// Add authorization header to requests - keep this helper for backward compatibility
-export const addAuthHeader = (headers: Record<string, string>): Record<string, string> => {
-  const accessToken = getAccessToken();
-  if (accessToken) {
-    return { ...headers, Authorization: `Bearer ${accessToken}` };
-  }
-  return headers;
 };

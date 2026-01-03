@@ -1,5 +1,5 @@
 import { apiUrl } from '@focusdive/config';
-import { getCommonHeaders } from '@/utils/apiUtils';
+import { getAccessToken } from '@focusdive/auth'
 
 export interface UserSubscriptionData {
   email: string;
@@ -11,9 +11,12 @@ export interface UserSubscriptionData {
 export const fetchUserSubscriptionData = async (): Promise<UserSubscriptionData | null> => {
   try {
     console.log('Fetching user subscription data from:', `${apiUrl}/auth/me`);
+    const accessToken = await getAccessToken();
     const response = await fetch(`${apiUrl}/auth/me`, {
       method: 'GET',
-      headers: getCommonHeaders(),
+      headers: {
+        Authorization: `Beader ${accessToken}`,
+      },
       credentials: 'include',
     });
     
@@ -34,9 +37,13 @@ export const fetchUserSubscriptionData = async (): Promise<UserSubscriptionData 
 export const requestSpotifyAccess = async (): Promise<{ success: boolean; message?: string; error?: string }> => {
   try {
     console.log('Requesting Spotify access...');
+    const accessToken = await getAccessToken();
     const response = await fetch(`${apiUrl}/spotify/request-access`, {
       method: 'POST',
-      headers: getCommonHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
       credentials: 'include',
     });
     

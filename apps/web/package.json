@@ -62,6 +62,7 @@
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
+    "@focusdive/auth": "workspace:*",
     "@focusdive/ui": "workspace:*",
     "@focusdive/config": "workspace:*",
     "vaul": "^1.1.2",

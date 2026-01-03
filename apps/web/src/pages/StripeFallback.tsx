@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { apiUrl } from '@focusdive/config';
-import { getCommonHeaders } from '@/utils/apiUtils';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { Button } from "@focusdive/ui";
 import Navigation from '@/components/Navigation';
+import { getAccessToken } from '@focusdive/auth'
 
 const StripeFallback: React.FC = () => {
   const location = useLocation();
@@ -38,9 +38,13 @@ const StripeFallback: React.FC = () => {
       
       if (sessionId) {
         try {
+          const accessToken = await getAccessToken();
           const response = await fetch(`${apiUrl}/subscriptions/stripe-fallback`, {
             method: 'POST',
-            headers: getCommonHeaders(),
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
             credentials: 'include',
             body: JSON.stringify({ session_id: sessionId }),
           });

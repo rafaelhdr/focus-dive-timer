@@ -1,5 +1,5 @@
 import { apiUrl } from "@focusdive/config";
-import { getCommonHeaders } from "@/utils/apiUtils";
+import { getAccessToken } from "@focusdive/auth";
 
 /**
  * Check if the user is connected to Slack
@@ -7,8 +7,12 @@ import { getCommonHeaders } from "@/utils/apiUtils";
  */
 export const checkSlackConnection = async (): Promise<boolean> => {
   try {
+    const accessToken = await getAccessToken();
     const response = await fetch(`${apiUrl}/slack/status`, {
-      headers: getCommonHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
       credentials: 'include',
     });
 

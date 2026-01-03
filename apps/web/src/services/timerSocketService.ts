@@ -2,7 +2,7 @@
 import { io, Socket } from "socket.io-client";
 import { apiUrl } from "@focusdive/config";
 import { TimerData } from "@/hooks/types";
-import { getAccessToken } from "@/services/authApi";
+import { getAccessToken } from "@focusdive/auth";
 
 interface TimerSocketCallbacks {
   onTimerState: (data: TimerData) => void;
@@ -16,7 +16,7 @@ class TimerSocketService {
   private socket: Socket | null = null;
   private callbacks: TimerSocketCallbacks | null = null;
 
-  initialize(callbacks: TimerSocketCallbacks): Socket | null {
+  async initialize(callbacks: TimerSocketCallbacks): Promise<Socket | null> {
     // Skip if socket already exists
     if (this.socket) return this.socket;
 
@@ -24,7 +24,7 @@ class TimerSocketService {
 
     try {
       // Get authentication token
-      const accessToken = getAccessToken();
+      const accessToken = await getAccessToken();
 
       // Create socket connection with token as query parameter
       this.socket = io(`${apiUrl}/timer`, {

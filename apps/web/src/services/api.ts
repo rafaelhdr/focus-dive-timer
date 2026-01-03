@@ -1,5 +1,5 @@
 import { apiUrl } from '@focusdive/config';
-import { getCommonHeaders } from '@/utils/apiUtils';
+import { getAccessToken } from "@focusdive/auth";
 
 export interface Preferences {
   focus_beep_enabled: boolean;
@@ -14,9 +14,13 @@ export interface Preferences {
 export const fetchPreferences = async (): Promise<Preferences> => {
   try {
     console.log('Fetching preferences from:', `${apiUrl}/preferences`);
+    const accessToken = await getAccessToken();
     const response = await fetch(`${apiUrl}/preferences`, {
       method: 'GET',
-      headers: getCommonHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
       // Adding cache control to prevent browser caching issues
       cache: 'no-cache',
       credentials: 'include',
@@ -47,9 +51,13 @@ export const fetchPreferences = async (): Promise<Preferences> => {
 export const savePreferences = async (preferences: Partial<Preferences>): Promise<boolean> => {
   try {
     console.log('Saving preferences to:', `${apiUrl}/preferences`, preferences);
+    const accessToken = await getAccessToken();
     const response = await fetch(`${apiUrl}/preferences`, {
       method: 'PUT',
-      headers: getCommonHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
       body: JSON.stringify(preferences),
       credentials: 'include',
     });

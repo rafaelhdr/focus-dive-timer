@@ -14,7 +14,7 @@ import {
 import { Unlink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiUrl } from '@focusdive/config';
-import { getCommonHeaders } from '@/utils/apiUtils';
+import { getAccessToken } from '@focusdive/auth'
 
 interface SlackDisconnectDialogProps {
   onDisconnected: () => void;
@@ -29,9 +29,13 @@ const SlackDisconnectDialog: React.FC<SlackDisconnectDialogProps> = ({ onDisconn
     setIsDisconnecting(true);
     
     try {
+      const accessToken = await getAccessToken();
       const response = await fetch(`${apiUrl}/slack/disconnect`, {
         method: 'POST',
-        headers: getCommonHeaders(),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
         credentials: 'include',
       });
 

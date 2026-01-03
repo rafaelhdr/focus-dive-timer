@@ -1,0 +1,19 @@
+{
+  "name": "@focusdive/auth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@focusdive/config": "workspace:*"
+  },
+  "license": "ISC",
+  "packageManager": "pnpm@10.15.1"
+}

@@ -18,6 +18,9 @@ catalogs:
     react-dom:
       specifier: 18.3.1
       version: 18.3.1
+    zustand:
+      specifier: 5.0.9
+      version: 5.0.9
 
 importers:
 
@@ -233,9 +236,15 @@ importers:
 
   apps/web:
     dependencies:
+      '@focusdive/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
       '@focusdive/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@focusdive/timer':
+        specifier: workspace:*
+        version: link:../../packages/timer
       '@focusdive/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -454,7 +463,19 @@ importers:
         specifier: ^5.4.1
         version: 5.4.19(@types/node@22.18.0)
 
+  packages/auth:
+    dependencies:
+      '@focusdive/config':
+        specifier: workspace:*
+        version: link:../config
+
   packages/config: {}
+
+  packages/timer:
+    dependencies:
+      zustand:
+        specifier: 'catalog:'
+        version: 5.0.9(@types/react@18.3.3)(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))
 
   packages/ui:
     dependencies:
@@ -3241,6 +3262,24 @@ packages:
       react:
         optional: true
 
+  zustand@5.0.9:
+    resolution: {integrity: sha512-ALBtUj0AfjJt3uNRQoL1tL2tMvj6Gp/6e39dnfT6uzpelGru8v1tPOGBzayOWbPJvujM8JojDk3E1LxeFisBNg==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      '@types/react': '>=18.0.0'
+      immer: '>=9.0.6'
+      react: '>=18.0.0'
+      use-sync-external-store: '>=1.2.0'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      immer:
+        optional: true
+      react:
+        optional: true
+      use-sync-external-store:
+        optional: true
+
 snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
@@ -5889,3 +5928,9 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.3
       react: 18.3.1
+
+  zustand@5.0.9(@types/react@18.3.3)(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1)):
+    optionalDependencies:
+      '@types/react': 18.3.3
+      react: 18.3.1
+      use-sync-external-store: 1.5.0(react@18.3.1)

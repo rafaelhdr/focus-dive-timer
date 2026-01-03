@@ -6,7 +6,7 @@ import { Button } from "@focusdive/ui";
 import { Home } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/contexts/AuthContext';
-import { getCommonHeaders } from '@/utils/apiUtils';
+import { getAccessToken } from "@focusdive/auth";
 
 const SlackConnect = () => {
   const navigate = useNavigate();
@@ -42,9 +42,13 @@ const SlackConnect = () => {
         }
 
         // Send the code to our backend with proper headers
+        const accessToken = await getAccessToken();
         const response = await fetch(`${apiUrl}/slack/connect`, {
           method: 'POST',
-          headers: getCommonHeaders(),
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
           body: JSON.stringify({ code }),
           credentials: 'include',
         });

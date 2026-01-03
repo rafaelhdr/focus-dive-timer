@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { apiUrl } from '@focusdive/config';
-import { getCommonHeaders } from '@/utils/apiUtils';
+import { getAccessToken } from "@focusdive/auth";
 import Navigation from '@/components/Navigation';
 
 const SubscriptionsPage: React.FC = () => {
@@ -26,9 +26,13 @@ const SubscriptionsPage: React.FC = () => {
       if (!auth.isAuthenticated) return;
       
       try {
+        const accessToken = await getAccessToken();
         const response = await fetch(`${apiUrl}/subscriptions/has-subscription`, {
           method: 'GET',
-          headers: getCommonHeaders(),
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
           credentials: 'include',
         });
 
@@ -59,9 +63,13 @@ const SubscriptionsPage: React.FC = () => {
 
     setIsLoading(true);
     try {
+      const accessToken = await getAccessToken();
       const response = await fetch(`${apiUrl}/subscriptions/create-checkout-session`, {
         method: 'POST',
-        headers: getCommonHeaders(),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
         credentials: 'include',
         body: JSON.stringify({
           lookup_key: billingPeriod === 'monthly' ? 'focusdive_premium_monthly' : 'focusdive_premium_yearly'
@@ -92,9 +100,13 @@ const SubscriptionsPage: React.FC = () => {
     
     setPortalLoading(true);
     try {
+      const accessToken = await getAccessToken();
       const response = await fetch(`${apiUrl}/subscriptions/create-portal-session`, {
         method: 'POST',
-        headers: getCommonHeaders(),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
         credentials: 'include',
       });
 
@@ -130,9 +142,13 @@ const SubscriptionsPage: React.FC = () => {
 
     setIsLoading(true);
     try {
+      const accessToken = await getAccessToken();
       const response = await fetch(`${apiUrl}/subscriptions/request-for-teams`, {
         method: 'POST',
-        headers: getCommonHeaders(),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
         credentials: 'include',
       });
 

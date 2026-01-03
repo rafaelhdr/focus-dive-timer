@@ -1,5 +1,5 @@
 import { apiUrl } from "@focusdive/config";
-import { getCommonHeaders } from "@/utils/apiUtils";
+import { getAccessToken } from "@focusdive/auth";
 
 /**
  * Refresh Spotify access token
@@ -8,9 +8,13 @@ export const refreshSpotifyToken = async (): Promise<{ success: boolean; error?:
   try {
     console.log('Refreshing Spotify access token...');
     
+    const accessToken = await getAccessToken();
     const response = await fetch(`${apiUrl}/spotify/refresh-token`, {
       method: 'POST',
-      headers: getCommonHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
       credentials: 'include',
     });
 
@@ -43,9 +47,13 @@ export const refreshSpotifyToken = async (): Promise<{ success: boolean; error?:
  */
 export const checkSpotifyConnection = async (): Promise<boolean> => {
   try {
+    const accessToken = await getAccessToken();
     const response = await fetch(`${apiUrl}/spotify/status`, {
       method: 'GET',
-      headers: getCommonHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
       credentials: 'include',
     });
 
@@ -59,7 +67,10 @@ export const checkSpotifyConnection = async (): Promise<boolean> => {
           // Retry the original request after successful refresh
           const retryResponse = await fetch(`${apiUrl}/spotify/status`, {
             method: 'GET',
-            headers: getCommonHeaders(),
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
             credentials: 'include',
           });
           
@@ -89,9 +100,13 @@ export const getSpotifyAuthUrl = async (): Promise<{ success: boolean; url?: str
   try {
     console.log('Getting Spotify auth URL...');
     
+    const accessToken = await getAccessToken();
     const response = await fetch(`${apiUrl}/spotify/connect`, {
       method: 'GET',
-      headers: getCommonHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
       credentials: 'include',
     });
 
@@ -126,9 +141,13 @@ export const exchangeSpotifyCode = async (code: string): Promise<{ success: bool
   try {
     console.log('Exchanging Spotify code for token...');
     
+    const accessToken = await getAccessToken();
     const response = await fetch(`${apiUrl}/spotify/connect`, {
       method: 'POST',
-      headers: getCommonHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
       body: JSON.stringify({
         code,
       }),
@@ -166,9 +185,13 @@ export const disconnectSpotify = async (): Promise<boolean> => {
   try {
     console.log('Disconnecting Spotify account...');
     
+    const accessToken = await getAccessToken();
     const response = await fetch(`${apiUrl}/spotify/disconnect`, {
       method: 'POST',
-      headers: getCommonHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
       credentials: 'include',
     });
 
@@ -184,7 +207,10 @@ export const disconnectSpotify = async (): Promise<boolean> => {
           // Retry the disconnect request after successful refresh
           const retryResponse = await fetch(`${apiUrl}/spotify/disconnect`, {
             method: 'POST',
-            headers: getCommonHeaders(),
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
             credentials: 'include',
           });
           
@@ -212,9 +238,13 @@ export const getSpotifyAccessToken = async (): Promise<{ success: boolean; token
   try {
     console.log('Getting Spotify access token...');
     
+    const accessToken = await getAccessToken();
     const response = await fetch(`${apiUrl}/spotify/refresh-token`, {
       method: 'POST',
-      headers: getCommonHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
       credentials: 'include',
     });
 
@@ -230,7 +260,10 @@ export const getSpotifyAccessToken = async (): Promise<{ success: boolean; token
           // Retry the original request after successful refresh
           const retryResponse = await fetch(`${apiUrl}/spotify/refresh-token`, {
             method: 'POST',
-            headers: getCommonHeaders(),
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
             credentials: 'include',
           });
           
