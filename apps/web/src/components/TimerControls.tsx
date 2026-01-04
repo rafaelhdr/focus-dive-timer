@@ -1,23 +1,22 @@
-
 import React from 'react';
 import { Button } from "@focusdive/ui";
 import { Play, Pause, RotateCcw, Coffee, Brain } from 'lucide-react';
+import { useTimer } from '@focusdive/timer';
+import { startTimer, resetTimer } from '@focusdive/timer';
 
-interface TimerControlsProps {
-  isActive: boolean;
-  mode: 'focus' | 'break';
-  onToggleTimer: () => void;
-  onReset: () => void;
-  onToggleMode: () => void;
-}
+const TimerControls: React.FC = () => {
+  const { mode, isRunning, pause, setMode } = useTimer()
+  const onToggleTimer = () => {
+    if (!isRunning) {
+      startTimer();
+    } else {
+      pause();
+    }
+  }
+  const onToggleMode = () => {
+    setMode(mode === 'focus' ? 'break' : 'focus');
+  }
 
-const TimerControls: React.FC<TimerControlsProps> = ({
-  isActive,
-  mode,
-  onToggleTimer,
-  onReset,
-  onToggleMode,
-}) => {
   return (
     <div className="flex flex-col md:flex-row gap-4 w-full justify-center mt-6">
       <Button 
@@ -26,7 +25,7 @@ const TimerControls: React.FC<TimerControlsProps> = ({
         className="flex-1 py-6 text-lg"
         variant="default"
       >
-        {isActive ? (
+        {isRunning ? (
           <>
             <Pause className="mr-2" /> Pause
           </>
@@ -38,7 +37,7 @@ const TimerControls: React.FC<TimerControlsProps> = ({
       </Button>
       
       <Button 
-        onClick={onReset} 
+        onClick={resetTimer} 
         size="lg"
         className="flex-1 py-6 text-lg"
         variant="outline"

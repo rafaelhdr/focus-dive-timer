@@ -1,7 +1,6 @@
 
-import React, { useEffect, useState } from 'react';
-import { Timer } from '@focusdive/ui';
-// import Timer from '@/components/Timer';
+import { useEffect, useState } from 'react';
+import Timer from '@/components/Timer';
 import TimerControls from '@/components/TimerControls';
 import SettingsPanel from '@/components/SettingsPanel';
 import Navigation from '@/components/Navigation';
@@ -20,14 +19,7 @@ import { getIntegrationSettings } from '@/services/integrationService';
 
 const Index = () => {
   const { 
-    isActive, 
-    mode, 
-    formattedTime, 
     settings,
-    toggleTimer, 
-    resetTimer, 
-    toggleMode,
-    addFocusMinutes,
     updateSettings 
   } = useTimer();
 
@@ -40,7 +32,6 @@ const Index = () => {
   const [spotifyEnabled, setSpotifyEnabled] = useState(false);
   const [integrationsLoading, setIntegrationsLoading] = useState(false);
   const [showPomodoroButton, setShowPomodoroButton] = useState(true);
-
 
   // Check if Pomodoro button should be shown
   useEffect(() => {
@@ -138,10 +129,6 @@ const Index = () => {
     setShowSubscriptionAlert(false);
   };
 
-  const handleAddFocusMinutes = () => {
-    addFocusMinutes(5);
-  };
-
   const handleSlackClick = () => {
     navigate('/integrations/slack');
   };
@@ -225,21 +212,9 @@ const Index = () => {
           {showSubscriptionAlert && (
             <SubscriptionAlert onDismiss={handleDismissAlert} />
           )}
+          <Timer />
 
-          <Timer 
-            time={formattedTime} 
-            mode={mode} 
-            isActive={isActive}
-            onAddFocusMinutes={handleAddFocusMinutes}
-          />
-
-          <TimerControls 
-            isActive={isActive}
-            mode={mode}
-            onToggleTimer={toggleTimer}
-            onReset={resetTimer}
-            onToggleMode={toggleMode}
-          />
+          <TimerControls />
 
           <SettingsPanel 
             focusDuration={settings.focusDuration}

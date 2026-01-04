@@ -6,7 +6,7 @@ interface TimerProps {
   time: string;
   mode: 'focus' | 'break';
   isActive: boolean;
-  onAddFocusMinutes: () => void;
+  onAddFocusMinutes: (minutes: number) => void;
 }
 
 const Timer: React.FC<TimerProps> = ({ time, mode, isActive, onAddFocusMinutes }) => {
@@ -31,7 +31,7 @@ const Timer: React.FC<TimerProps> = ({ time, mode, isActive, onAddFocusMinutes }
       
       {/* +5 Focus Minutes Button - Bottom Right */}
       <Button
-        onClick={onAddFocusMinutes}
+        onClick={() => onAddFocusMinutes(5)}
         size="sm"
         variant="secondary"
         className="absolute bottom-4 right-4 bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"

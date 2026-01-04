@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -23,6 +22,13 @@ import TermsOfService from "./pages/TermsOfService";
 import SubProcessors from "./pages/SubProcessors";
 import AboutPomodoro from "./pages/AboutPomodoro";
 
+import { useTimerRealtime } from "@focusdive/timer";
+
+function TimerRealtimeBridge() {
+  useTimerRealtime();
+  return null;
+}
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -31,6 +37,7 @@ const App = () => (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <AuthProvider>
+            <TimerRealtimeBridge />
             <Toaster />
             <Sonner />
             <BrowserRouter>
