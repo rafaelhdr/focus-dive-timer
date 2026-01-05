@@ -7,14 +7,14 @@
     "packages/*"
   ],
   "scripts": {
-    "web:dev": "pnpm --filter @focusdive/webapp dev",
-    "web:build": "pnpm --filter @focusdive/webapp build",
+    "web:dev": "dotenv -e .env -- pnpm --filter @focusdive/webapp dev",
+    "web:build": "dotenv -e .env -- pnpm --filter @focusdive/webapp build",
     "web:start": "pnpm --filter @focusdive/webapp start",
     "web:lint": "pnpm --filter @focusdive/webapp lint",
     "web:typecheck": "pnpm --filter @focusdive/webapp typecheck",
 
-    "extension:dev": "pnpm --filter @focusdive/extension dev",
-    "extension:build": "pnpm --filter @focusdive/extension build",
+    "extension:dev": "dotenv -e .env -- pnpm --filter @focusdive/extension dev",
+    "extension:build": "dotenv -e .env -- pnpm --filter @focusdive/extension build", 
     "extension:build:dev": "pnpm --filter @focusdive/extension build:dev",
 
     "dev": "pnpm run web:dev",
