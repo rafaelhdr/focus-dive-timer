@@ -8,9 +8,23 @@ export async function startTimer() {
   await pushTimerToServer({ endsAt, remainingTime, mode, isRunning });
 }
 
+export async function pauseTimer() {
+  useTimerStore.getState().pause();
+
+  const { endsAt, remainingTime, mode, isRunning } = useTimerStore.getState();
+  await pushTimerToServer({ endsAt, remainingTime, mode, isRunning });
+}
+
 export async function resetTimer() {
   useTimerStore.getState().reset();
 
   const { endsAt, remainingTime, mode, isRunning } = useTimerStore.getState();
+  await pushTimerToServer({ endsAt, remainingTime, mode, isRunning });
+}
+
+export async function setTimerMode(mode: 'focus' | 'break') {
+  useTimerStore.getState().setMode(mode);
+
+  const { endsAt, remainingTime, isRunning } = useTimerStore.getState();
   await pushTimerToServer({ endsAt, remainingTime, mode, isRunning });
 }

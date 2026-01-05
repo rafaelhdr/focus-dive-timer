@@ -2,19 +2,19 @@ import React from 'react';
 import { Button } from "@focusdive/ui";
 import { Play, Pause, RotateCcw, Coffee, Brain } from 'lucide-react';
 import { useTimer } from '@focusdive/timer';
-import { startTimer, resetTimer } from '@focusdive/timer';
+import { startTimer, pauseTimer, resetTimer, setTimerMode } from '@focusdive/timer';
 
 const TimerControls: React.FC = () => {
-  const { mode, isRunning, pause, setMode } = useTimer()
+  const { mode, isRunning } = useTimer()
   const onToggleTimer = () => {
     if (!isRunning) {
       startTimer();
     } else {
-      pause();
+      pauseTimer();
     }
   }
   const onToggleMode = () => {
-    setMode(mode === 'focus' ? 'break' : 'focus');
+    setTimerMode(mode === 'focus' ? 'break' : 'focus');
   }
 
   return (
