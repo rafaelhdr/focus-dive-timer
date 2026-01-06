@@ -12,13 +12,14 @@
     "web:start": "pnpm --filter @focusdive/webapp start",
     "web:lint": "pnpm --filter @focusdive/webapp lint",
     "web:typecheck": "pnpm --filter @focusdive/webapp typecheck",
-
     "extension:dev": "dotenv -e .env -- pnpm --filter @focusdive/extension dev",
-    "extension:build": "dotenv -e .env -- pnpm --filter @focusdive/extension build", 
+    "extension:build": "dotenv -e .env -- pnpm --filter @focusdive/extension build",
     "extension:build:dev": "pnpm --filter @focusdive/extension build:dev",
-
     "dev": "pnpm run web:dev",
     "build": "pnpm run web:build",
     "start": "pnpm run web:start"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^11.0.0"
   }
 }
