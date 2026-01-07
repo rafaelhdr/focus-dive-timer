@@ -1,5 +1,5 @@
-
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@focusdive/ui";
@@ -11,6 +11,7 @@ import { Mail, ArrowRight, Loader2, ArrowLeft } from 'lucide-react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useRequestLoginToken, useVerifyLoginToken } from '@focusdive/auth';
 
 // Schema for email form validation
 const emailSchema = z.object({
@@ -26,7 +27,6 @@ type EmailFormValues = z.infer<typeof emailSchema>;
 type VerificationFormValues = z.infer<typeof verificationSchema>;
 
 const Login = () => {
-  const { requestLoginCode, verifyLoginCode } = useAuth();
   const [currentStep, setCurrentStep] = useState<'email' | 'verification'>('email');
   const [email, setEmail] = useState('');
   const navigate = useNavigate();
@@ -36,6 +36,8 @@ const Login = () => {
     resolver: zodResolver(emailSchema),
     defaultValues: { email: '' },
   });
+  const requestLoginToken = useRequestLoginToken();
+  const verifyLoginToken = useVerifyLoginToken();
 
   // Verification form
   const verificationForm = useForm<VerificationFormValues>({
@@ -43,20 +45,34 @@ const Login = () => {
     defaultValues: { token: '' },
   });
 
-  // Handle email submission
   const onEmailSubmit = async (values: EmailFormValues) => {
-    const success = await requestLoginCode(values.email);
-    if (success) {
-      setEmail(values.email);
-      setCurrentStep('verification');
+    try {
+      const res = await requestLoginToken.mutateAsync(values.email);
+
+      // Ajuste conforme o retorno real da sua API
+      if (res?.success) {
+        setEmail(values.email);
+        setCurrentStep('verification');
+      }
+    } catch (e) {
+      toast.error('Failed to request login code');
     }
   };
 
-  // Handle verification code submission
   const onVerificationSubmit = async (values: VerificationFormValues) => {
-    const success = await verifyLoginCode(email, values.token);
-    if (success) {
-      navigate('/');
+    try {
+      const res = await verifyLoginToken.mutateAsync({
+        email,
+        token: values.token,
+      });
+
+      if (res?.success) {
+        navigate('/');
+      } else {
+        toast.error(res?.message ?? 'Invalid verification code');
+      }
+    } catch (e) {
+      toast.error('Failed to verify code');
     }
   };
 
@@ -102,9 +118,9 @@ const Login = () => {
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={emailForm.formState.isSubmitting}
+                  disabled={requestLoginToken.isPending}
                 >
-                  {emailForm.formState.isSubmitting ? (
+                  {requestLoginToken.isPending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Sending Code...
@@ -151,9 +167,9 @@ const Login = () => {
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={verificationForm.formState.isSubmitting}
+                  disabled={verifyLoginToken.isPending}
                 >
-                  {verificationForm.formState.isSubmitting ? (
+                  {verifyLoginToken.isPending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Verifying...

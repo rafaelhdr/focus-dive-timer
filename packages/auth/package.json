@@ -12,7 +12,8 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@focusdive/config": "workspace:*"
+    "@focusdive/config": "workspace:*",
+    "@tanstack/react-query": "catalog:"
   },
   "license": "ISC",
   "packageManager": "pnpm@10.15.1"
