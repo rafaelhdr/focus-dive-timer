@@ -2,11 +2,12 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Clock, Settings, Link2, UserRound, LogOut, HelpCircle, Menu } from 'lucide-react';
 import { Button } from "@focusdive/ui";
-import { useTimer } from '@focusdive/timer';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import ThemeToggle from '@/components/ThemeToggle';
 import { useMe } from '@focusdive/auth';
+import { useTimer } from "@focusdive/timer";
+import Timer from './Timer';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import {
@@ -28,7 +29,7 @@ import {
 const Navigation: React.FC = () => {
   const { data: user } = useMe()
   const location = useLocation();
-  const { isRunning, mode } = useTimer();
+  const { isRunning } = useTimer();
   const { logout } = useAuth();
   const showTimer = location.pathname !== '/' && isRunning;
   
@@ -78,11 +79,7 @@ const Navigation: React.FC = () => {
         <div className="container max-w-4xl mx-auto flex justify-between items-center py-2">
           <div className="flex items-center">
             {showTimer ? (
-              <Link to="/" className={`${isMobile ? 'text-base' : 'text-lg'} font-bold mr-4 hover:opacity-80 transition-opacity`}>
-                <span className={mode === 'focus' ? "text-primary" : "text-emerald-500"}>
-                  {formattedTime} {mode === 'focus' ? 'Focus' : 'Break'}
-                </span>
-              </Link>
+              <Timer />
             ) : (
               <div className="flex items-center">
                 <Link to="/" className={`${isMobile ? 'text-sm' : 'text-lg'} font-bold mr-2`}>Focus Dive</Link>
