@@ -1,4 +1,12 @@
+import { getAccessToken } from '../runtime/auth';
 import { apiUrl } from '@focusdive/config';
+
+interface UserSubscriptionData {
+  email: string;
+  has_subscription: boolean;
+  spotify_approved?: boolean;
+  spotify_access_requested?: boolean;
+}
 
 export interface AuthVerifyResponse {
   success: boolean;
@@ -11,6 +19,29 @@ export interface AuthLoginResponse {
   success: boolean;
   message: string;
 }
+
+export const me = async (): Promise<UserSubscriptionData | null> => {
+  try {
+    const accessToken = await getAccessToken();
+    const response = await fetch(`${apiUrl}/auth/me`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      credentials: 'include',
+    });
+    
+    if (!response.ok) {
+      console.error('Failed to fetch user subscription data:', response.status);
+      return null;
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching user subscription data:', error);
+    return null;
+  }
+};
 
 export const loginWithEmail = async (email: string): Promise<AuthLoginResponse> => {
   try {
@@ -46,7 +77,6 @@ export const loginWithEmail = async (email: string): Promise<AuthLoginResponse> 
 
 export const verifyToken = async (email: string, token: string): Promise<AuthVerifyResponse> => {
   try {
-    console.log('Verifying token for:', email);
     const response = await fetch(`${apiUrl}/auth/verify`, {
       method: 'POST',
       headers: {
@@ -62,7 +92,6 @@ export const verifyToken = async (email: string, token: string): Promise<AuthVer
       throw new Error(data.message || 'Failed to verify token');
     }
     
-    console.log('Token verification successful');
     return {
       success: true,
       access_token: data.access_token,
@@ -70,10 +99,7 @@ export const verifyToken = async (email: string, token: string): Promise<AuthVer
     };
   } catch (error: any) {
     console.error('Token verification failed:', error);
-    return {
-      success: false,
-      message: error.message || 'Failed to verify token',
-    };
+    throw new Error(error.message || 'Failed to verify token');
   }
 };
 

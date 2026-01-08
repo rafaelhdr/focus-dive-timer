@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { slackAuthUrl } from '@focusdive/config';
 import { checkSlackConnection } from '@/services/slackService';
@@ -12,7 +12,7 @@ import { SiSlack, SiSpotify } from 'react-icons/si';
 import { useToast } from '@/hooks/use-toast';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
-import { useAuth } from '@/contexts/AuthContext';
+import { useMe } from '@focusdive/auth';
 import { Link } from 'react-router-dom';
 import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
 import SlackConfigForm from '@/components/SlackConfigForm';
@@ -33,7 +33,7 @@ const Integrations = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isRequestingAccess, setIsRequestingAccess] = useState(false);
   const { toast } = useToast();
-  const { auth } = useAuth();
+  const { data: user } = useMe();
 
   // Determine active tab based on current route
   const getActiveTab = () => {
@@ -47,7 +47,7 @@ const Integrations = () => {
     const checkConnections = async () => {
       try {
         setIsLoading(true);
-        if (auth.isAuthenticated) {
+        if (user) {
           const [slackConnected, spotifyConnected, userData] = await Promise.all([
             checkSlackConnection(),
             checkSpotifyConnection(),
@@ -76,7 +76,7 @@ const Integrations = () => {
     };
 
     checkConnections();
-  }, [toast, auth.isAuthenticated]);
+  }, [toast, user]);
 
   const handleTabChange = (value: string) => {
     if (value === 'slack') {
@@ -193,7 +193,7 @@ const Integrations = () => {
           </p>
         </header>
 
-        {!auth.isAuthenticated && (
+        {!user && (
           <Alert className="mb-6 bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-900">
             <Info className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             <AlertTitle>Authentication Required</AlertTitle>
@@ -250,7 +250,7 @@ const Integrations = () => {
                     </div>
                     
                     
-                    {auth.isAuthenticated && (
+                    {user && (
                       <div className="flex justify-end mb-4">
                         <SlackDisconnectDialog onDisconnected={handleSlackDisconnected} />
                       </div>
@@ -258,7 +258,7 @@ const Integrations = () => {
                     
                     <SlackConfigForm 
                       isConnected={!!isSlackConnected} 
-                      isAuthenticated={auth.isAuthenticated}
+                      isAuthenticated={user}
                     />
                   </div>
                 ) : (
@@ -269,14 +269,14 @@ const Integrations = () => {
                         <Button 
                           onClick={handleSlackConnect} 
                           className="gap-2" 
-                          disabled={!auth.isAuthenticated}
+                          disabled={!user}
                         >
                           <SiSlack className="h-4 w-4" />
                           Connect to Slack
                         </Button>
                         <SlackPermissionsDialog />
                       </div>
-                      {!auth.isAuthenticated && (
+                      {!user && (
                         <p className="text-sm text-muted-foreground mt-3">
                           Please login to enable this integration
                         </p>
@@ -286,7 +286,7 @@ const Integrations = () => {
                     {/* Always show the SlackConfigForm, but it will be disabled if not authenticated */}
                     <SlackConfigForm 
                       isConnected={false} 
-                      isAuthenticated={auth.isAuthenticated}
+                      isAuthenticated={!!user}
                     />
                   </div>
                 )}
@@ -325,7 +325,7 @@ const Integrations = () => {
                     <div className="flex flex-col gap-2 sm:flex-row">
                       <Button 
                         onClick={handleRequestSpotifyAccess}
-                        disabled={!auth.isAuthenticated || isRequestingAccess || isSpotifyAccessRequested}
+                        disabled={!user || isRequestingAccess || isSpotifyAccessRequested}
                         className="gap-2"
                       >
                         {isRequestingAccess ? (
@@ -348,7 +348,7 @@ const Integrations = () => {
                       <SpotifyRequestModal />
                     </div>
                     
-                    {!auth.isAuthenticated && (
+                    {!user && (
                       <p className="text-sm text-muted-foreground">
                         Please login to request Spotify access
                       </p>
@@ -367,7 +367,7 @@ const Integrations = () => {
                     </div>
                     
                     
-                    {auth.isAuthenticated && (
+                    {user && (
                       <div className="flex justify-end mb-4">
                         <Button 
                           variant="outline" 
@@ -381,10 +381,10 @@ const Integrations = () => {
                     )}
                     
                     {/* Spotify Configuration Form */}
-                    {auth.isAuthenticated && (
+                    {user && (
                       <SpotifyConfigForm 
                         isConnected={!!isSpotifyConnected} 
-                        isAuthenticated={auth.isAuthenticated}
+                        isAuthenticated={!!user}
                       />
                     )}
                   </div>
@@ -394,12 +394,12 @@ const Integrations = () => {
                     <Button 
                       onClick={handleSpotifyConnect} 
                       className="gap-2" 
-                      disabled={!auth.isAuthenticated}
+                      disabled={!user}
                     >
                       <SiSpotify className="h-4 w-4" />
                       Connect to Spotify
                     </Button>
-                    {!auth.isAuthenticated && (
+                    {!user && (
                       <p className="text-sm text-muted-foreground mt-3">
                         Please login to enable this integration
                       </p>

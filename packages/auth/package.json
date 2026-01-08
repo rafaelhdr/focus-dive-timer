@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "@focusdive/config": "workspace:*",
-    "@tanstack/react-query": "catalog:"
+    "@tanstack/react-query": "catalog:",
+    "zustand": "catalog:"
   },
   "license": "ISC",
   "packageManager": "pnpm@10.15.1"

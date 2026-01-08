@@ -8,7 +8,6 @@ import Footer from '@/components/Footer';
 import SubscriptionAlert from '@/components/SubscriptionAlert';
 
 import { useTimer } from '@/hooks/useTimer';
-import { useAuth } from '@/contexts/AuthContext';
 import { fetchUserSubscriptionData, UserSubscriptionData } from '@/services/userApi';
 import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
 import { SiSlack, SiSpotify } from 'react-icons/si';
@@ -16,14 +15,15 @@ import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from "@focusdive/ui";
 import { getIntegrationSettings } from '@/services/integrationService';
+import { useMe } from '@focusdive/auth';
 
 const Index = () => {
   const { 
     settings,
     updateSettings 
   } = useTimer();
+  const { data: user } = useMe();
 
-  const { auth } = useAuth();
   const navigate = useNavigate();
   const [userSubscriptionData, setUserSubscriptionData] = useState<UserSubscriptionData | null>(null);
   const [showSubscriptionAlert, setShowSubscriptionAlert] = useState(false);
@@ -42,7 +42,7 @@ const Index = () => {
   // Load integration settings to determine icon colors
   useEffect(() => {
     const loadIntegrationSettings = async () => {
-      if (!auth.isAuthenticated) {
+      if (!user) {
         setSlackEnabled(false);
         setSpotifyEnabled(false);
         return;
@@ -63,12 +63,12 @@ const Index = () => {
     };
 
     loadIntegrationSettings();
-  }, [auth.isAuthenticated]);
+  }, [user]);
 
   // Initialize Spotify player when Spotify integration is enabled
   useEffect(() => {
     const initializeSpotify = async () => {
-      if (!auth.isAuthenticated || !spotifyEnabled) {
+      if (!user || !spotifyEnabled) {
         return;
       }
 
@@ -95,12 +95,12 @@ const Index = () => {
     // Add a small delay to allow SDK to load
     const timer = setTimeout(initializeSpotify, 1000);
     return () => clearTimeout(timer);
-  }, [auth.isAuthenticated, spotifyEnabled]);
+  }, [user, spotifyEnabled]);
 
   // Check if subscription alert should be shown
   useEffect(() => {
     const checkSubscriptionAlert = async () => {
-      if (!auth.isAuthenticated) {
+      if (!user) {
         setShowSubscriptionAlert(false);
         return;
       }
@@ -122,7 +122,7 @@ const Index = () => {
     };
 
     checkSubscriptionAlert();
-  }, [auth.isAuthenticated]);
+  }, [user]);
 
   const handleDismissAlert = () => {
     localStorage.setItem('dismiss_subscription_alert', 'true');

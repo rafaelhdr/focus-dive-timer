@@ -8,6 +8,7 @@ export interface UserSubscriptionData {
   spotify_access_requested?: boolean;
 }
 
+// Deprecated
 export const fetchUserSubscriptionData = async (): Promise<UserSubscriptionData | null> => {
   try {
     console.log('Fetching user subscription data from:', `${apiUrl}/auth/me`);

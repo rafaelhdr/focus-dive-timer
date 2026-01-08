@@ -6,14 +6,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { apiUrl } from '@focusdive/config';
-import { getAccessToken } from "@focusdive/auth";
+import { useMe, getAccessToken } from "@focusdive/auth";
 import Navigation from '@/components/Navigation';
 
 const SubscriptionsPage: React.FC = () => {
-  const { auth } = useAuth();
+  const { data: user } = useMe();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
@@ -23,7 +22,7 @@ const SubscriptionsPage: React.FC = () => {
 
   useEffect(() => {
     const checkSubscription = async () => {
-      if (!auth.isAuthenticated) return;
+      if (!user) return;
       
       try {
         const accessToken = await getAccessToken();
@@ -48,10 +47,10 @@ const SubscriptionsPage: React.FC = () => {
     };
 
     checkSubscription();
-  }, [auth.isAuthenticated]);
+  }, [user]);
 
   const handleSubscribe = async () => {
-    if (!auth.isAuthenticated) {
+    if (!user) {
       toast({
         title: "Authentication required",
         description: "Please log in to subscribe to Premium.",
@@ -96,7 +95,7 @@ const SubscriptionsPage: React.FC = () => {
   };
 
   const handlePortalSession = async () => {
-    if (!auth.isAuthenticated) return;
+    if (!user) return;
     
     setPortalLoading(true);
     try {
@@ -130,7 +129,7 @@ const SubscriptionsPage: React.FC = () => {
   };
 
   const handleTeamRequest = async () => {
-    if (!auth.isAuthenticated) {
+    if (!user) {
       toast({
         title: "Authentication required",
         description: "Please log in to request team pricing.",
@@ -183,7 +182,7 @@ const SubscriptionsPage: React.FC = () => {
           </p>
         </div>
 
-        {!auth.isAuthenticated && (
+        {!user && (
           <Alert variant="default" className="mb-8">
             <Info className="h-4 w-4" />
             <AlertDescription>
@@ -192,7 +191,7 @@ const SubscriptionsPage: React.FC = () => {
           </Alert>
         )}
 
-        {auth.isAuthenticated && hasSubscription && (
+        {user && hasSubscription && (
           <div className="mb-8 text-center">
             <Button 
               onClick={handlePortalSession} 
@@ -286,7 +285,7 @@ const SubscriptionsPage: React.FC = () => {
               <Button 
                 className="w-full" 
                 onClick={handleSubscribe}
-                disabled={isLoading || !auth.isAuthenticated || hasSubscription}
+                disabled={isLoading || !user || hasSubscription}
               >
                 {isLoading ? "Processing..." : hasSubscription ? "Already Subscribed" : `Subscribe ${billingPeriod === 'monthly' ? 'Monthly' : 'Yearly'}`}
               </Button>
@@ -328,7 +327,7 @@ const SubscriptionsPage: React.FC = () => {
                 className="w-full" 
                 variant="outline" 
                 onClick={handleTeamRequest}
-                disabled={isLoading || !auth.isAuthenticated}
+                disabled={isLoading || !user}
               >
                 {isLoading ? "Processing..." : "Contact us for Pricing"}
               </Button>

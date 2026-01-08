@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { apiUrl } from '@focusdive/config';
 import { Button } from "@focusdive/ui";
 import { Home } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { useAuth } from '@/contexts/AuthContext';
-import { getAccessToken } from "@focusdive/auth";
+import { useMe, getAccessToken } from "@focusdive/auth";
 
 const SlackConnect = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { auth } = useAuth();
+  const { data: user } = useMe();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('Connecting to Slack...');
 
@@ -76,7 +75,7 @@ const SlackConnect = () => {
     };
 
     connectToSlack();
-  }, [toast, auth.accessToken]);
+  }, [toast, user]);
 
   return (
     <div className="h-screen flex flex-col items-center justify-center p-4">

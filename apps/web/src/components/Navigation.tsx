@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Clock, Settings, Link2, UserRound, LogOut, HelpCircle, Menu } from 'lucide-react';
@@ -7,6 +6,7 @@ import { useTimer } from '@focusdive/timer';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import ThemeToggle from '@/components/ThemeToggle';
+import { useMe } from '@focusdive/auth';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import {
@@ -26,9 +26,10 @@ import {
 } from '@/components/ui/drawer';
 
 const Navigation: React.FC = () => {
+  const { data: user } = useMe()
   const location = useLocation();
   const { isRunning, mode } = useTimer();
-  const { auth, logout } = useAuth();
+  const { logout } = useAuth();
   const showTimer = location.pathname !== '/' && isRunning;
   
   const isMobile = useIsMobile();
@@ -100,7 +101,7 @@ const Navigation: React.FC = () => {
           
           {isMobile ? (
             <div className="flex items-center gap-2">
-              {auth.isAuthenticated ? (
+              {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="relative h-8 w-8 rounded-full">
@@ -167,7 +168,7 @@ const Navigation: React.FC = () => {
             <div className="flex items-center gap-2">
               <NavigationLinks />
               
-              {auth.isAuthenticated ? (
+              {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="relative h-8 w-8 rounded-full">
