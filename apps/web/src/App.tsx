@@ -21,10 +21,12 @@ import TermsOfService from "./pages/TermsOfService";
 import SubProcessors from "./pages/SubProcessors";
 import AboutPomodoro from "./pages/AboutPomodoro";
 
-import { useTimerRealtime } from "@focusdive/timer";
+import { useTimerEngine, useTimerFinished, useTimerRealtime } from "@focusdive/timer";
 
-function TimerRealtimeBridge() {
+function TimerEffects() {
   useTimerRealtime();
+  useTimerEngine();
+  useTimerFinished();
   return null;
 }
 
@@ -35,7 +37,7 @@ const App = () => (
     <ThemeProvider defaultTheme="system" storageKey="focus-dive-theme">
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <TimerRealtimeBridge />
+          <TimerEffects />
           <Toaster />
           <Sonner />
           <BrowserRouter>

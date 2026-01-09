@@ -14,12 +14,13 @@
   "license": "ISC",
   "packageManager": "pnpm@10.15.1",
   "dependencies": {
+    "@focusdive/auth": "workspace:*",
+    "@focusdive/config": "workspace:*",
+    "mitt": "^3.0.1",
     "react": "catalog:",
     "react-dom": "catalog:",
     "socket.io-client": "^4.8.1",
-    "zustand": "catalog:",
-    "@focusdive/config": "workspace:*",
-    "@focusdive/auth": "workspace:*"
+    "zustand": "catalog:"
   },
   "devDependencies": {
     "@types/react": "catalog:",

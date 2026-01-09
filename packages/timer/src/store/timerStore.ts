@@ -1,5 +1,6 @@
 import { isDebug } from "@focusdive/config";
 import { create } from "zustand";
+import { timerEvents } from "../events/timerEvents";
 
 export type TimerMode = "focus" | "break";
 
@@ -21,11 +22,13 @@ export interface TimerState {
   remainingTime: number; // remaining time in ms when paused
 
   isRunning: boolean;
+  finishedAt: number | null; // avoid race conditions on finish
 
   start: () => void;
   pause: () => void;
   reset: () => void;
   setMode: (mode: TimerMode) => void;
+  finish: () => void;
 
   setFromServer: (data: Partial<Pick<TimerState, "mode" | "endsAt" | "remainingTime" | "isRunning">>) => void;
 }
@@ -41,6 +44,7 @@ export const useTimerStore = create<TimerState>((set, get) => ({
   endsAt: null,
   remainingTime: FOCUS_MS,
   isRunning: false,
+  finishedAt: null,
 
   start: () => {
     const mode = get().mode;
@@ -52,7 +56,7 @@ export const useTimerStore = create<TimerState>((set, get) => ({
     set({
       mode,
       isRunning: true,
-      endsAt: Date.now() + ms,
+      endsAt: Date.now() + ms + 1000,
       remainingTime: 0,
     });
   },
@@ -88,4 +92,20 @@ export const useTimerStore = create<TimerState>((set, get) => ({
   },
 
   setFromServer: (data) => set(data),
+
+  finish: () => {
+    const s = get();
+    if (!s.isRunning || !s.endsAt) return;
+
+    if (s.finishedAt && s.finishedAt >= s.endsAt) return;
+
+    set({
+      isRunning: false,
+      endsAt: null,
+      remainingTime: 0,
+      finishedAt: Date.now(),
+    });
+
+    timerEvents.emit("timer_finished", { mode: s.mode });
+  },
 }));

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTimerStore } from "../store/timerStore";
+import { timerEvents } from "../events/timerEvents";
 
 function durationToMMSS(ms: number) {
   const totalSeconds = Math.max(0, Math.floor(ms / 1000));
@@ -41,3 +42,40 @@ export function useTimerDisplay() {
 
   return { mode, isRunning, formattedTime };
 }
+
+export function useTimerEngine() {
+  const endsAt = useTimerStore((s) => s.endsAt);
+  const isRunning = useTimerStore((s) => s.isRunning);
+  const finish = useTimerStore((s) => s.finish);
+
+  useEffect(() => {
+    if (!isRunning || !endsAt) return;
+
+    const delay = Math.max(0, endsAt - Date.now());
+    const id = window.setTimeout(() => finish(), delay);
+
+    return () => window.clearTimeout(id);
+  }, [isRunning, endsAt, finish]);
+}
+
+export function useTimerFinished() {
+  const start = useTimerStore((s) => s.start);
+  const reset = useTimerStore((s) => s.reset);
+  const setMode = useTimerStore((s) => s.setMode);
+
+  useEffect(() => {
+    const timerFinished = timerEvents.on("timer_finished", ({ mode }) => {
+      if (mode === "focus") {
+        setMode("break");
+      } else {
+        setMode("focus");
+      }
+
+      reset();
+      start();
+    });
+
+    return timerFinished;
+  }, [reset, setMode]);
+}
+
