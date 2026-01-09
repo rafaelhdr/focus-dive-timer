@@ -1,6 +1,15 @@
+import { isDebug } from "@focusdive/config";
 import { create } from "zustand";
 
 export type TimerMode = "focus" | "break";
+
+const getResetTime = (mode: TimerMode, focusDuration: number, breakDuration: number) => {
+  const ms = mode === "focus" ? focusDuration : breakDuration;
+  if (isDebug) {
+    return ms / 60;
+  }
+  return ms;
+}
 
 export interface TimerState {
   mode: TimerMode;
@@ -63,7 +72,7 @@ export const useTimerStore = create<TimerState>((set, get) => ({
 
   reset: () => {
     const { mode, focusDuration, breakDuration } = get();
-    const ms = mode === "focus" ? focusDuration : breakDuration;
+    const ms = getResetTime(mode, focusDuration, breakDuration);
 
     set({
       mode,

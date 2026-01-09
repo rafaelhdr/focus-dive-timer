@@ -2,6 +2,7 @@ interface AppConfig {
   apiDomain: string;
   apiUrl: string;
   appUrl: string;
+  isDebug: boolean;
   slackClientId: string;
   sentryDsn: string;
 }
@@ -25,6 +26,7 @@ const config: AppConfig = {
   apiDomain: configApiDomain,
   apiUrl: getEnvVar('VITE_API_URL', `https://${configApiDomain}`),
   appUrl: getEnvVar('VITE_APP_URL', window.location.origin),
+  isDebug: getEnvVar('VITE_DEBUG', 'false').toLowerCase() === 'true',
   slackClientId: getEnvVar('VITE_SLACK_CLIENT_ID', ''),
   sentryDsn: getEnvVar('VITE_SENTRY_DSN', ''),
 };
@@ -37,6 +39,7 @@ export const {
   apiDomain,
   apiUrl,
   appUrl,
+  isDebug,
   slackClientId,
   sentryDsn
 } = config;
