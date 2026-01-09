@@ -105,12 +105,6 @@ const AboutPomodoro: React.FC = () => {
                 This prevents interruptions and helps maintain your flow state throughout the entire 25-minute session.
               </p>
               <p>
-                <strong>Spotify Integration:</strong> Music can be a powerful focus tool, and Focus Dive seamlessly 
-                integrates with your Spotify playlists. Set different playlists for focus sessions and breaks to 
-                create the perfect audio environment for deep work and relaxation. Your music automatically adapts 
-                to your Pomodoro cycle.
-              </p>
-              <p>
                 By combining the proven Pomodoro method with intelligent workspace management, Focus Dive creates 
                 an environment where sustained concentration becomes effortless.
               </p>

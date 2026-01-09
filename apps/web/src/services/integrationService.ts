@@ -7,18 +7,8 @@ interface SlackIntegrationSettings {
   slack_dnd_text?: string;
 }
 
-interface SpotifyIntegrationSettings {
-  spotify_enable?: boolean;
-  spotify_focus_playlist?: any; // Full playlist JSON
-  spotify_break_playlist?: any; // Full playlist JSON
-  spotify_break_keep_focus_sound?: boolean;
-}
+interface IntegrationSettings extends SlackIntegrationSettings {}
 
-interface IntegrationSettings extends SlackIntegrationSettings, SpotifyIntegrationSettings {}
-
-/**
- * Get integration settings
- */
 export const getIntegrationSettings = async (): Promise<IntegrationSettings> => {
   try {
     const accessToken = await getAccessToken();
@@ -45,9 +35,6 @@ export const getIntegrationSettings = async (): Promise<IntegrationSettings> => 
   }
 };
 
-/**
- * Save integration settings
- */
 export const saveIntegrationSettings = async (settings: IntegrationSettings): Promise<boolean> => {
   try {
     const accessToken = await getAccessToken();
@@ -72,55 +59,5 @@ export const saveIntegrationSettings = async (settings: IntegrationSettings): Pr
   } catch (error) {
     console.error('Error saving integration settings:', error);
     return false;
-  }
-};
-
-/**
- * Save Spotify-specific settings
- */
-export const saveSpotifySettings = async (settings: SpotifyIntegrationSettings): Promise<boolean> => {
-  try {
-    console.log('Saving Spotify integration settings:', settings);
-    
-    const accessToken = await getAccessToken();
-    const response = await fetch(`${apiUrl}/integrations`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify(settings),
-      credentials: 'include',
-    });
-
-    console.log('Save Spotify settings response:', response.status, response.statusText);
-
-    if (!response.ok) {
-      console.error('Failed to save Spotify settings:', response.statusText);
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    console.error('Error saving Spotify settings:', error);
-    return false;
-  }
-};
-
-/**
- * Get Spotify-specific settings
- */
-export const getSpotifySettings = async (): Promise<SpotifyIntegrationSettings> => {
-  try {
-    const allSettings = await getIntegrationSettings();
-    return {
-      spotify_enable: allSettings.spotify_enable,
-      spotify_focus_playlist: allSettings.spotify_focus_playlist,
-      spotify_break_playlist: allSettings.spotify_break_playlist,
-      spotify_break_keep_focus_sound: allSettings.spotify_break_keep_focus_sound,
-    };
-  } catch (error) {
-    console.error('Error fetching Spotify settings:', error);
-    return {};
   }
 };

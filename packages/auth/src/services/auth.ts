@@ -4,8 +4,6 @@ import { apiUrl } from '@focusdive/config';
 interface UserSubscriptionData {
   email: string;
   has_subscription: boolean;
-  spotify_approved?: boolean;
-  spotify_access_requested?: boolean;
 }
 
 export interface AuthVerifyResponse {

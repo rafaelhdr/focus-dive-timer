@@ -27,9 +27,6 @@ const IntegrationsInfoDialog: React.FC = () => {
           <p>
             <strong>Slack Integration:</strong> <br />
             When you start a focus session, Focus Dive will automatically set your Slack status to unavailable to help you block distractions.
-            <br /><br />
-            <strong>Spotify Integration:</strong> <br />
-            Connect your Spotify account to automatically control your music during focus sessions. Your music will pause during breaks and resume when you return to focused work, helping you maintain the perfect rhythm for deep work.
           </p>
         </DialogDescription>
         <DialogClose asChild>

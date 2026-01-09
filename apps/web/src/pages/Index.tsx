@@ -10,7 +10,7 @@ import SubscriptionAlert from '@/components/SubscriptionAlert';
 import { useTimer } from '@/hooks/useTimer';
 import { fetchUserSubscriptionData, UserSubscriptionData } from '@/services/userApi';
 import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
-import { SiSlack, SiSpotify } from 'react-icons/si';
+import { SiSlack } from 'react-icons/si';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from "@focusdive/ui";
@@ -29,7 +29,6 @@ const Index = () => {
   const [showSubscriptionAlert, setShowSubscriptionAlert] = useState(false);
   
   const [slackEnabled, setSlackEnabled] = useState(false);
-  const [spotifyEnabled, setSpotifyEnabled] = useState(false);
   const [integrationsLoading, setIntegrationsLoading] = useState(false);
   const [showPomodoroButton, setShowPomodoroButton] = useState(true);
 
@@ -44,7 +43,6 @@ const Index = () => {
     const loadIntegrationSettings = async () => {
       if (!user) {
         setSlackEnabled(false);
-        setSpotifyEnabled(false);
         return;
       }
 
@@ -52,11 +50,9 @@ const Index = () => {
       try {
         const settings = await getIntegrationSettings();
         setSlackEnabled(settings.slack_enabled || false);
-        setSpotifyEnabled(settings.spotify_enable || false);
       } catch (error) {
         console.error('Error loading integration settings:', error);
         setSlackEnabled(false);
-        setSpotifyEnabled(false);
       } finally {
         setIntegrationsLoading(false);
       }
@@ -64,38 +60,6 @@ const Index = () => {
 
     loadIntegrationSettings();
   }, [user]);
-
-  // Initialize Spotify player when Spotify integration is enabled
-  useEffect(() => {
-    const initializeSpotify = async () => {
-      if (!user || !spotifyEnabled) {
-        return;
-      }
-
-      // Check if Spotify SDK is loaded
-      if (!window.Spotify) {
-        console.log('Spotify SDK not loaded yet, will retry when ready');
-        return;
-      }
-
-      const { useSpotifyStore } = await import('@/store/spotifyStore');
-      const spotifyStore = useSpotifyStore.getState();
-      
-      // Load Spotify settings if not already loaded
-      if (!spotifyStore.focusPlaylist && !spotifyStore.breakPlaylist) {
-        await spotifyStore.loadSpotifySettings();
-      }
-
-      // Initialize Spotify player if not ready and not initializing
-      if (!spotifyStore.isReady && !spotifyStore.isInitializing) {
-        await spotifyStore.initialize();
-      }
-    };
-
-    // Add a small delay to allow SDK to load
-    const timer = setTimeout(initializeSpotify, 1000);
-    return () => clearTimeout(timer);
-  }, [user, spotifyEnabled]);
 
   // Check if subscription alert should be shown
   useEffect(() => {
@@ -131,10 +95,6 @@ const Index = () => {
 
   const handleSlackClick = () => {
     navigate('/integrations/slack');
-  };
-
-  const handleSpotifyClick = () => {
-    navigate('/integrations/spotify');
   };
 
   const handlePomodoroButtonClick = () => {
@@ -185,25 +145,6 @@ const Index = () => {
                     : "text-muted-foreground hover:text-foreground"
                 }`} 
               />
-            </button>
-            <button
-              onClick={handleSpotifyClick}
-              className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors relative"
-              title="Spotify Integration"
-            >
-              <SiSpotify 
-                className={`h-5 w-5 transition-colors ${
-                  spotifyEnabled 
-                    ? "text-[#1DB954] hover:text-[#1DB954]/80" 
-                    : "text-muted-foreground hover:text-foreground"
-                }`} 
-              />
-              <Badge 
-                variant="secondary" 
-                className="absolute -top-0.5 -right-0.5 text-[10px] px-1 py-0 h-3 min-w-0 leading-none"
-              >
-                Beta
-              </Badge>
             </button>
           </div>
         </header>

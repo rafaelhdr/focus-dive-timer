@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { TimerData } from "@/hooks/types";
 import { toast } from "sonner";
-import { useSpotifyStore } from "./spotifyStore";
 import { analytics } from "@/utils/analytics";
 import { timerSocketService } from "@/services/timerSocketService";
 import { wakeLockService } from "@/services/wakeLockService";
@@ -35,101 +34,16 @@ interface TimerState {
 const getDurationInSeconds = (
   mode: "focus" | "break",
 ): number => {
-  const { settings } = useSettingsStore.getState();
   const toMinutesMultiplier = TEST_TIMER ? 1 : 60;
   
   if (mode === "focus") {
     // Use the default focus duration from settings
-    const duration = settings.focusDuration;
+    const duration = 25;  // Fixed because it is being deprecated
     return duration * toMinutesMultiplier;
   } else {
     // Use the default break duration from settings
-    const duration = settings.breakDuration;
+    const duration = 5;  // Fixed because it is being deprecated
     return duration * toMinutesMultiplier;
-  }
-};
-
-// Helper function to handle Spotify playback based on timer mode
-const handleSpotifyPlayback = async (mode: "focus" | "break") => {
-  let spotifyStore = useSpotifyStore.getState();
-  
-  // Load Spotify settings if not already loaded
-  if (!spotifyStore.spotifyEnabled && !spotifyStore.focusPlaylist && !spotifyStore.breakPlaylist) {
-    console.log('Loading Spotify settings...');
-    await spotifyStore.loadSpotifySettings();
-    // Get fresh state after loading settings
-    spotifyStore = useSpotifyStore.getState();
-  }
-  
-  // Check if Spotify integration is enabled
-  if (!spotifyStore.spotifyEnabled) {
-    console.log('Spotify integration is disabled');
-    return;
-  }
-
-  // Initialize Spotify player if not ready
-  if (!spotifyStore.isReady && !spotifyStore.isInitializing) {
-    console.log('Initializing Spotify player...');
-    await spotifyStore.initialize();
-    // Wait a moment for initialization to complete
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    // Get fresh state after initialization
-    spotifyStore = useSpotifyStore.getState();
-  }
-
-  // Check if Spotify player is ready
-  if (!spotifyStore.isReady) {
-    console.log('Spotify player is not ready');
-    return;
-  }
-
-  let playlistToLoad = null;
-
-  if (mode === "focus") {
-    // For focus mode, check if we should keep playing during break transitions
-    if (spotifyStore.breakKeepFocusSound) {
-      // Check if music is already playing and we have a track
-      const currentState = spotifyStore.playerState;
-      if (currentState && currentState.track && currentState.isPlaying) {
-        console.log('Keeping focus music playing during break-to-focus transition');
-        return; // Don't reload playlist, just keep playing
-      }
-    }
-    
-    // Load focus playlist if not already playing or if it's the first time
-    playlistToLoad = spotifyStore.focusPlaylist;
-  } else {
-    // For break mode, check if we should keep focus sound or use break playlist
-    if (spotifyStore.breakKeepFocusSound) {
-      // Keep focus music during breaks - don't change playlist
-      console.log('Keeping focus music during break');
-      try {
-        // Just resume playback if paused
-        const currentState = spotifyStore.playerState;
-        if (currentState && !currentState.isPlaying) {
-          await spotifyStore.togglePlayback();
-        }
-      } catch (error) {
-        console.error('Error resuming playback during break:', error);
-      }
-      return;
-    } else {
-      // Use break playlist if configured
-      playlistToLoad = spotifyStore.breakPlaylist;
-    }
-  }
-
-  if (playlistToLoad && playlistToLoad.id) {
-    try {
-      console.log(`Loading ${mode} playlist:`, playlistToLoad.name);
-      // Pass the full playlist object instead of just the ID
-      await spotifyStore.loadPlaylist(playlistToLoad);
-    } catch (error) {
-      console.error(`Error loading ${mode} playlist:`, error);
-      toast.error(`Failed to load ${mode} playlist`);
-    }
-  } else {
-    console.log(`No ${mode} playlist configured`);
   }
 };
 
@@ -190,9 +104,6 @@ export const useTimerStore = create<TimerState>((set, get) => {
         
       // Start new interval
       startTimerInterval();
-
-      // Handle Spotify playback for auto-started timer
-      handleSpotifyPlayback(nextMode);
     } else {
       // Just switch mode without starting timer
       const newDuration = getDurationInSeconds(nextMode);
@@ -392,9 +303,6 @@ export const useTimerStore = create<TimerState>((set, get) => {
         
         // Start countdown interval
         startTimerInterval();
-
-        // Handle Spotify playback when timer starts
-        handleSpotifyPlayback(state.mode);
       } else {
         // Pausing the timer
         
