@@ -2,10 +2,9 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Clock, Settings, Link2, UserRound, LogOut, HelpCircle, Menu } from 'lucide-react';
 import { Button } from "@focusdive/ui";
-import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import ThemeToggle from '@/components/ThemeToggle';
-import { useMe } from '@focusdive/auth';
+import { useMe, logout } from '@focusdive/auth';
 import { useTimer } from "@focusdive/timer";
 import NavigationTimer from './NavigationTimer';
 
@@ -30,7 +29,6 @@ const Navigation: React.FC = () => {
   const { data: user } = useMe()
   const location = useLocation();
   const { isRunning } = useTimer();
-  const { logout } = useAuth();
   const showTimer = location.pathname !== '/' && isRunning;
   
   const isMobile = useIsMobile();
