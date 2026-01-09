@@ -7,7 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeProvider";
 import SentryErrorBoundary from "./components/SentryErrorBoundary";
 import MiniSpotifyPlayer from "./components/MiniSpotifyPlayer";
 import Index from "./pages/Index";
-import Settings from "./pages/Settings";
+import Settings from "./pages/Settings/SettingsPage";
 import Integrations from "./pages/Integrations";
 import SlackConnect from "./pages/SlackConnect";
 import SpotifyConnect from "./pages/SpotifyConnect";

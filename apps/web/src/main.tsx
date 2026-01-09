@@ -1,9 +1,7 @@
-
 import { createRoot } from 'react-dom/client'
 import * as Sentry from "@sentry/react";
 import App from './App.tsx'
 import './index.css'
-import { useTimerStore } from './store/timerStore'
 
 // Initialize Sentry only if DSN is provided
 const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
@@ -29,8 +27,5 @@ if (sentryDsn) {
 } else {
   console.warn('Sentry DSN not provided - error monitoring disabled');
 }
-
-// Initialize the timer store
-useTimerStore.getState().initSocket();
 
 createRoot(document.getElementById("root")!).render(<App />);

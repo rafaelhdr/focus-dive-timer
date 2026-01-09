@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { TimerData } from "@/hooks/types";
 import { toast } from "sonner";
-import { useSettingsStore } from "./settingsStore";
 import { useSpotifyStore } from "./spotifyStore";
 import { analytics } from "@/utils/analytics";
 import { timerSocketService } from "@/services/timerSocketService";
