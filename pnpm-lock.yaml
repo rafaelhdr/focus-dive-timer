@@ -35,6 +35,9 @@ importers:
 
   apps/extension:
     dependencies:
+      '@focusdive/timer':
+        specifier: workspace:*
+        version: link:../../packages/timer
       '@focusdive/ui':
         specifier: workspace:*
         version: link:../../packages/ui

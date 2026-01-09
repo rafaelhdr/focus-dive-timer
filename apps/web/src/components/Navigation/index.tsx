@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import ThemeToggle from '@/components/ThemeToggle';
 import { useMe } from '@focusdive/auth';
 import { useTimer } from "@focusdive/timer";
-import Timer from './Timer';
+import NavigationTimer from './NavigationTimer';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import {
@@ -79,7 +79,7 @@ const Navigation: React.FC = () => {
         <div className="container max-w-4xl mx-auto flex justify-between items-center py-2">
           <div className="flex items-center">
             {showTimer ? (
-              <Timer />
+              <NavigationTimer />
             ) : (
               <div className="flex items-center">
                 <Link to="/" className={`${isMobile ? 'text-sm' : 'text-lg'} font-bold mr-2`}>Focus Dive</Link>

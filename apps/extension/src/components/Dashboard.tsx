@@ -1,18 +1,14 @@
-import { useState } from "react";
-import { Timer } from '@focusdive/ui';
 import { Button } from "@focusdive/ui";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Timer } from "@focusdive/timer";
 import { useToast } from "@/hooks/use-toast";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Settings, LogOut, Zap, Play, RotateCcw, Coffee, Target } from "lucide-react";
+import { LogOut, Play, RotateCcw, Coffee } from "lucide-react";
 
 interface DashboardProps {
   onLogout: () => void;
 }
 
 export const Dashboard = ({ onLogout }: DashboardProps) => {
-  const [userEmail] = useState(() => localStorage.getItem("focusdive_email") || "");
   const { toast } = useToast();
 
   const handleLogout = () => {
@@ -25,12 +21,6 @@ export const Dashboard = ({ onLogout }: DashboardProps) => {
     onLogout();
   };
 
-  // placeholders
-  const formattedTime = "25:00";
-  const mode = "focus"; // or "break"
-  const isActive = false;
-  const handleAddFocusMinutes = () => console.log
-
   return (
     <div className="w-full max-w-md mx-auto p-4">
       <div className="flex items-center justify-between mb-4">
@@ -40,12 +30,7 @@ export const Dashboard = ({ onLogout }: DashboardProps) => {
         <ThemeToggle />
       </div>
 
-      <Timer 
-        time={formattedTime} 
-        mode={mode} 
-        isActive={isActive}
-        onAddFocusMinutes={handleAddFocusMinutes}
-      />
+      <Timer />
 
       {/* Timer Controls */}
       <div className="flex gap-2 mb-4">

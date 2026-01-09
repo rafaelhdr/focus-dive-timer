@@ -8,11 +8,6 @@ function durationToMMSS(ms: number) {
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
-function endsAtToRemainingMs(endsAt: number | null) {
-  if (!endsAt) return 0;
-  return Math.max(0, endsAt - Date.now());
-}
-
 export function useTimer() {
   return useTimerStore((s) => ({
     mode: s.mode,
@@ -26,12 +21,10 @@ export function useTimer() {
 }
 
 export function useTimerDisplay() {
-  const { endsAt, remainingTime, mode, isRunning } = useTimerStore((s) => ({
-    endsAt: s.endsAt,
-    remainingTime: s.remainingTime,
-    mode: s.mode,
-    isRunning: s.isRunning,
-  }));
+  const endsAt = useTimerStore((s) => s.endsAt);
+  const remainingTime = useTimerStore((s) => s.remainingTime);
+  const mode = useTimerStore((s) => s.mode);
+  const isRunning = useTimerStore((s) => s.isRunning);
 
   const [, forceTick] = useState(0);
 
