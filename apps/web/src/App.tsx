@@ -18,6 +18,7 @@ import Support from "./pages/Support";
 import TermsOfService from "./pages/TermsOfService";
 import SubProcessors from "./pages/SubProcessors";
 import AboutPomodoro from "./pages/AboutPomodoro";
+import { useSettingsTimerBridge } from "@/hooks/useSettingsTimerBridge";
 
 import { useTimerEngine, useTimerFinished, useTimerRealtime } from "@focusdive/timer";
 
@@ -25,6 +26,7 @@ function TimerEffects() {
   useTimerRealtime();
   useTimerEngine();
   useTimerFinished();
+  useSettingsTimerBridge();
   return null;
 }
 

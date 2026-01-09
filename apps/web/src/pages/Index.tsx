@@ -157,12 +157,7 @@ const Index = () => {
 
           <TimerControls />
 
-          <SettingsPanel 
-            focusDuration={settings.focusDuration}
-            breakDuration={settings.breakDuration}
-            onUpdateFocusDuration={(value) => updateSettings({ focusDuration: value })}
-            onUpdateBreakDuration={(value) => updateSettings({ breakDuration: value })}
-          />
+          <SettingsPanel />
         </div>
       </div>
       

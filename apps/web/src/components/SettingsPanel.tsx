@@ -1,33 +1,28 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { analytics } from '@/utils/analytics';
+import { useTimer } from '@focusdive/timer';
 
-interface SettingsPanelProps {
-  focusDuration: number;
-  breakDuration: number;
-  onUpdateFocusDuration: (value: number) => void;
-  onUpdateBreakDuration: (value: number) => void;
-}
+const SettingsPanel: React.FC = () => {
+  const {
+    focusDuration,
+    breakDuration,
+    setFocusDuration,
+    setBreakDuration,
+  } = useTimer();
 
-const SettingsPanel: React.FC<SettingsPanelProps> = ({
-  focusDuration,
-  breakDuration,
-  onUpdateFocusDuration,
-  onUpdateBreakDuration,
-}) => {
   const handleFocusDurationChange = (values: number[]) => {
     const newValue = values[0];
     analytics.settingsChanged('focus_duration', newValue);
-    onUpdateFocusDuration(newValue);
+    setFocusDuration(newValue);
   };
 
   const handleBreakDurationChange = (values: number[]) => {
     const newValue = values[0];
     analytics.settingsChanged('break_duration', newValue);
-    onUpdateBreakDuration(newValue);
+    setBreakDuration(newValue);
   };
 
   return (

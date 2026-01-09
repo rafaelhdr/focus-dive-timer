@@ -16,7 +16,12 @@ export interface TimerState {
   mode: TimerMode;
 
   focusDuration: number;
+  setFocusDuration: (minutes: number) => void;
+  autostartFocus: boolean;
   breakDuration: number;
+  setBreakDuration: (minutes: number) => void;
+  autostartBreak: boolean;
+  applyConfig: (config: { focusMinutes: number; breakMinutes: number; autostartFocus: boolean; autostartBreak: boolean }) => void;
 
   endsAt: number | null; // timestamp in ms when the timer will end when running
   remainingTime: number; // remaining time in ms when paused
@@ -39,7 +44,32 @@ const BREAK_MS = 5 * 60 * 1000;
 export const useTimerStore = create<TimerState>((set, get) => ({
   mode: "focus",
   focusDuration: FOCUS_MS,
+  setFocusDuration: (minutes: number) => {
+    set({ focusDuration: minutes * 60 * 1000 });
+    if (!get().isRunning) {
+      get().reset();
+    }
+  },
+  autostartFocus: true,
   breakDuration: BREAK_MS,
+  setBreakDuration: (minutes: number) => {
+    set({ breakDuration: minutes * 60 * 1000 });
+    if (!get().isRunning) {
+      get().reset();
+    }
+  },
+  autostartBreak: true,
+  applyConfig: ({ focusMinutes, breakMinutes, autostartFocus, autostartBreak }) => {
+    set({
+      focusDuration: focusMinutes * 60 * 1000,
+      breakDuration: breakMinutes * 60 * 1000,
+      autostartFocus,
+      autostartBreak,
+    });
+    if (!get().isRunning) {
+      get().reset();
+    }
+  },
 
   endsAt: null,
   remainingTime: FOCUS_MS,

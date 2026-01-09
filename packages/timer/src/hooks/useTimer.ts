@@ -18,6 +18,11 @@ export function useTimer() {
     pause: s.pause,
     reset: s.reset,
     setMode: s.setMode,
+    focusDuration: s.focusDuration / 60000,
+    setFocusDuration: (minutes: number) => s.setFocusDuration(minutes),
+    breakDuration: s.breakDuration / 60000,
+    setBreakDuration: (minutes: number) => s.setBreakDuration(minutes),
+    start: s.start,
   }));
 }
 
