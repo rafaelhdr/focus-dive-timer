@@ -5,7 +5,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from "@focusdive/ui";
 import { Check, ChevronsUpDown, Music, User, Loader2, AlertCircle } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@focusdive/utils';
 import { useSpotifyStore } from '@/store/spotifyStore';
 
 interface PlaylistSearchProps {
