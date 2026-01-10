@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { slackAuthUrl } from '@focusdive/config';
 import { checkSlackConnection } from '@/services/slackService';
-import { fetchUserSubscriptionData } from '@/services/userApi';
 import { Button } from "@focusdive/ui";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -39,7 +38,6 @@ const Integrations = () => {
         if (user) {
           const [slackConnected] = await Promise.all([
             checkSlackConnection(),
-            fetchUserSubscriptionData()
           ]);
           setIsSlackConnected(slackConnected);
         } else {

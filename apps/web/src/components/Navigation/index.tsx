@@ -116,11 +116,6 @@ const Navigation: React.FC = () => {
                       </span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link to="/subscriptions" className="flex items-center cursor-pointer">
-                        Subscription
-                      </Link>
-                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={logout} className="text-red-500 cursor-pointer">
                       <LogOut className="mr-2 h-4 w-4" />
                       Log out
@@ -183,11 +178,6 @@ const Navigation: React.FC = () => {
                       </span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link to="/subscriptions" className="flex items-center cursor-pointer">
-                        Subscription
-                      </Link>
-                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={logout} className="text-red-500 cursor-pointer">
                       <LogOut className="mr-2 h-4 w-4" />
                       Log out

@@ -18,11 +18,6 @@ const TermsOfService = () => {
             <p>Welcome to FocusDive. By using our service, you agree to the following terms:</p>
             
             <div>
-              <h2 className="text-xl font-semibold mb-3">1. Service Description</h2>
-              <p>FocusDive helps you block distractions and stay focused by integrating with Slack and optionally handling payments through Stripe.</p>
-            </div>
-            
-            <div>
               <h2 className="text-xl font-semibold mb-3">2. User Responsibilities</h2>
               <p>You agree to use FocusDive only for lawful purposes and not abuse or interfere with the service.</p>
             </div>
@@ -34,10 +29,9 @@ const TermsOfService = () => {
             
             <div>
               <h2 className="text-xl font-semibold mb-3">4. Third-Party Services</h2>
-              <p className="mb-3">We use Slack, Stripe, AWS, and DigitalOcean as part of our service:</p>
+              <p className="mb-3">We use Slack, AWS, and DigitalOcean as part of our service:</p>
               <ul className="list-disc list-inside space-y-2 ml-4">
                 <li><strong>Slack:</strong> for focus automation</li>
-                <li><strong>Stripe:</strong> for payment processing</li>
                 <li><strong>AWS:</strong> for sending essential account-related emails</li>
                 <li><strong>DigitalOcean:</strong> for hosting our application and database</li>
               </ul>

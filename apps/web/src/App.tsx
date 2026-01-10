@@ -11,8 +11,6 @@ import Integrations from "./pages/Integrations";
 import SlackConnect from "./pages/SlackConnect";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
-import Subscriptions from "./pages/Subscriptions";
-import StripeFallback from "./pages/StripeFallback";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Support from "./pages/Support";
 import TermsOfService from "./pages/TermsOfService";
@@ -49,8 +47,6 @@ const App = () => (
               <Route path="/integrations" element={<Integrations />} />
               <Route path="/integrations/slack" element={<Integrations />} />
               <Route path="/slack/connect" element={<SlackConnect />} />
-              <Route path="/subscriptions" element={<Subscriptions />} />
-              <Route path="/subscriptions/stripe-fallback" element={<StripeFallback />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/support" element={<Support />} />
               <Route path="/terms-of-service" element={<TermsOfService />} />

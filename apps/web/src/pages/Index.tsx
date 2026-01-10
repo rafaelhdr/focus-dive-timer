@@ -5,28 +5,19 @@ import TimerControls from '@/components/TimerControls';
 import SettingsPanel from '@/components/SettingsPanel';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
-import SubscriptionAlert from '@/components/SubscriptionAlert';
 
 import { useTimer } from '@/hooks/useTimer';
-import { fetchUserSubscriptionData, UserSubscriptionData } from '@/services/userApi';
 import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
 import { SiSlack } from 'react-icons/si';
 import { useNavigate } from 'react-router-dom';
-import { Badge } from '@/components/ui/badge';
 import { Button } from "@focusdive/ui";
 import { getIntegrationSettings } from '@/services/integrationService';
 import { useMe } from '@focusdive/auth';
 
 const Index = () => {
-  const { 
-    settings,
-    updateSettings 
-  } = useTimer();
   const { data: user } = useMe();
 
   const navigate = useNavigate();
-  const [userSubscriptionData, setUserSubscriptionData] = useState<UserSubscriptionData | null>(null);
-  const [showSubscriptionAlert, setShowSubscriptionAlert] = useState(false);
   
   const [slackEnabled, setSlackEnabled] = useState(false);
   const [integrationsLoading, setIntegrationsLoading] = useState(false);
@@ -60,38 +51,6 @@ const Index = () => {
 
     loadIntegrationSettings();
   }, [user]);
-
-  // Check if subscription alert should be shown
-  useEffect(() => {
-    const checkSubscriptionAlert = async () => {
-      if (!user) {
-        setShowSubscriptionAlert(false);
-        return;
-      }
-
-      const dismissedAlert = localStorage.getItem('dismiss_subscription_alert') === 'true';
-      if (dismissedAlert) {
-        setShowSubscriptionAlert(false);
-        return;
-      }
-
-      const subscriptionData = await fetchUserSubscriptionData();
-      setUserSubscriptionData(subscriptionData);
-      
-      if (subscriptionData && !subscriptionData.has_subscription) {
-        setShowSubscriptionAlert(true);
-      } else {
-        setShowSubscriptionAlert(false);
-      }
-    };
-
-    checkSubscriptionAlert();
-  }, [user]);
-
-  const handleDismissAlert = () => {
-    localStorage.setItem('dismiss_subscription_alert', 'true');
-    setShowSubscriptionAlert(false);
-  };
 
   const handleSlackClick = () => {
     navigate('/integrations/slack');
@@ -150,9 +109,6 @@ const Index = () => {
         </header>
 
         <div className="w-full max-w-md">
-          {showSubscriptionAlert && (
-            <SubscriptionAlert onDismiss={handleDismissAlert} />
-          )}
           <Timer />
 
           <TimerControls />

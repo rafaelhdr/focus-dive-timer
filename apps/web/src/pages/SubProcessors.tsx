@@ -35,27 +35,7 @@ const SubProcessors = () => {
             </div>
             
             <div>
-              <h2 className="text-xl font-semibold mb-3">2. Stripe</h2>
-              <div className="space-y-2">
-                <p><strong>Purpose:</strong> Payment processing</p>
-                <p><strong>Data Processed:</strong> Billing information (handled directly by Stripe)</p>
-                <p><strong>Location:</strong> United States</p>
-                <p>
-                  <strong>Privacy Policy:</strong>{' '}
-                  <a 
-                    href="https://stripe.com/privacy" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    https://stripe.com/privacy
-                  </a>
-                </p>
-              </div>
-            </div>
-            
-            <div>
-              <h2 className="text-xl font-semibold mb-3">3. AWS (SES)</h2>
+              <h2 className="text-xl font-semibold mb-3">2. AWS (SES)</h2>
               <div className="space-y-2">
                 <p><strong>Purpose:</strong> Email delivery service</p>
                 <p><strong>Data Processed:</strong> Email addresses for sending essential account-related emails</p>
@@ -75,7 +55,7 @@ const SubProcessors = () => {
             </div>
             
             <div>
-              <h2 className="text-xl font-semibold mb-3">4. DigitalOcean</h2>
+              <h2 className="text-xl font-semibold mb-3">3. DigitalOcean</h2>
               <div className="space-y-2">
                 <p><strong>Purpose:</strong> Application and database hosting</p>
                 <p><strong>Data Processed:</strong> Email, Slack user ID, encrypted Slack token</p>

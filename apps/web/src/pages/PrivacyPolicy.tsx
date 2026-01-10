@@ -41,17 +41,6 @@ const PrivacyPolicy = () => {
                   </a>
                 </li>
                 <li>
-                  <strong>Stripe:</strong> Used to handle secure payments.{' '}
-                  <a 
-                    href="https://stripe.com/privacy" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    See Stripe's Privacy Policy.
-                  </a>
-                </li>
-                <li>
                   <strong>AWS (SES):</strong> Used to send essential account-related emails (e.g., confirmations, alerts).{' '}
                   <a 
                     href="https://aws.amazon.com/privacy/" 

@@ -1,9 +1,8 @@
 import { getAccessToken } from '../runtime/auth';
 import { apiUrl } from '@focusdive/config';
 
-interface UserSubscriptionData {
+interface UserData {
   email: string;
-  has_subscription: boolean;
 }
 
 export interface AuthVerifyResponse {
@@ -18,7 +17,7 @@ export interface AuthLoginResponse {
   message: string;
 }
 
-export const me = async (): Promise<UserSubscriptionData | null> => {
+export const me = async (): Promise<UserData | null> => {
   try {
     const accessToken = await getAccessToken();
     const response = await fetch(`${apiUrl}/auth/me`, {
