@@ -1,7 +1,7 @@
-import { useRef } from 'react';
 import { Volume2, Volume, VolumeX, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from "@focusdive/ui";
+import { ALARM_SOUNDS, playAlarm, AlarmSoundId } from "@focusdive/alarm";
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
@@ -15,17 +15,9 @@ import {
 } from '@/components/ui/select';
 import { useAutoSaveSettings } from '@/hooks/useAutoSaveSettings';
 
-const ALARM_SOUNDS = [
-  { id: 'minimalistic', name: 'Minimalistic', path: '/alarm-beeps/minimalistic.mp3' },
-  { id: 'wooden', name: 'Wooden', path: '/alarm-beeps/wooden.mp3' },
-  { id: 'snappy', name: 'Snappy', path: '/alarm-beeps/snappy.mp3' },
-  { id: 'level', name: 'Level', path: '/alarm-beeps/level.mp3' },
-];
-
 const SettingsCards = () => {
   const { draft, patchDraft } = useAutoSaveSettings();
   const handleToggleSound = console.log
-  const audioEl = useRef<HTMLAudioElement>(null);
 
   const getVolumeIcon = () => {
     if (draft.focusBeepVolume === 0) return <VolumeX className="h-5 w-5" />;
@@ -34,17 +26,8 @@ const SettingsCards = () => {
   };
 
   const playTestSound = () => {
-    const element = audioEl.current;
-    if (!element) return;
-    element.volume = draft.focusBeepVolume;
-    element.currentTime = 0;
-    void element.play();
+    playAlarm(draft.alarmSound as AlarmSoundId, { volume: draft.focusBeepVolume });
   };
-
-  const getAlarmSoundPath = (soundId: string) => {
-    const sound = ALARM_SOUNDS.find(s => s.id === soundId);
-    return sound ? sound.path : ALARM_SOUNDS[0].path;
-  }
 
   if (!draft) {
     return null
@@ -52,7 +35,6 @@ const SettingsCards = () => {
 
   return (
     <div className="w-full max-w-md space-y-6">
-      <audio ref={audioEl} src={getAlarmSoundPath(draft.alarmSound)} preload="auto" />
       <Card>
         <CardHeader>
           <CardTitle className="text-xl">Sound Settings</CardTitle>

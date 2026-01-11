@@ -249,6 +249,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@focusdive/alarm':
+        specifier: workspace:*
+        version: link:../../packages/alarm
       '@focusdive/auth':
         specifier: workspace:*
         version: link:../../packages/auth
@@ -478,6 +481,8 @@ importers:
       vite:
         specifier: ^5.4.1
         version: 5.4.19(@types/node@22.18.0)
+
+  packages/alarm: {}
 
   packages/auth:
     dependencies:
