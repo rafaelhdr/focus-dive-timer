@@ -1,5 +1,5 @@
 import type { Socket } from "socket.io-client";
-import type { TimerData } from "../types"; // ajuste o path se necessário
+import type { TimerData } from "../types";
 
 export function attachTimerChannel(socket: Socket) {
   return {
