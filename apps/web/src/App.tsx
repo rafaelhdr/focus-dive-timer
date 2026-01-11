@@ -17,6 +17,7 @@ import TermsOfService from "./pages/TermsOfService";
 import SubProcessors from "./pages/SubProcessors";
 import AboutPomodoro from "./pages/AboutPomodoro";
 import { useSettingsTimerBridge } from "@/hooks/useSettingsTimerBridge";
+import { useTimerFinishedAlarm } from "@/hooks/useTimerFinishedAlarm";
 
 import { useTimerEngine, useTimerFinished, useTimerRealtime } from "@focusdive/timer";
 
@@ -25,6 +26,7 @@ function TimerEffects() {
   useTimerEngine();
   useTimerFinished();
   useSettingsTimerBridge();
+  useTimerFinishedAlarm();
   return null;
 }
 
