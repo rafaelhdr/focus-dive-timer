@@ -2,6 +2,11 @@ import { useEffect, useState } from "react";
 import { useTimerStore } from "../store/timerStore";
 import { timerEvents } from "../events/timerEvents";
 
+type TimerFinishedOptions = {
+  autostartBreak: boolean;
+  autostartFocus: boolean;
+};
+
 function durationToMMSS(ms: number) {
   const totalSeconds = Math.max(0, Math.floor(ms / 1000));
   const minutes = Math.floor(totalSeconds / 60);
@@ -63,24 +68,26 @@ export function useTimerEngine() {
   }, [isRunning, endsAt, finish]);
 }
 
-export function useTimerFinished() {
+export function useTimerFinished(opts: TimerFinishedOptions) {
+  const { autostartBreak, autostartFocus } = opts;
+
   const start = useTimerStore((s) => s.start);
   const reset = useTimerStore((s) => s.reset);
   const setMode = useTimerStore((s) => s.setMode);
 
   useEffect(() => {
-    const timerFinished = timerEvents.on("timer_finished", ({ mode }) => {
-      if (mode === "focus") {
-        setMode("break");
-      } else {
-        setMode("focus");
-      }
+    const off = timerEvents.on("timer_finished", ({ mode }) => {
+      const nextMode = mode === "focus" ? "break" : "focus";
+      setMode(nextMode);
 
       reset();
-      start();
+
+      const shouldAutostart =
+        nextMode === "break" ? autostartBreak : autostartFocus;
+
+      if (shouldAutostart) start();
     });
 
-    return timerFinished;
-  }, [reset, setMode]);
+    return off;
+  }, [autostartBreak, autostartFocus, reset, setMode, start]);
 }
-
