@@ -15,6 +15,9 @@ catalogs:
     '@types/react-dom':
       specifier: 18.3.0
       version: 18.3.0
+    mitt:
+      specifier: 3.0.1
+      version: 3.0.1
     react:
       specifier: 18.3.1
       version: 18.3.1
@@ -35,6 +38,9 @@ importers:
 
   apps/extension:
     dependencies:
+      '@focusdive/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
       '@focusdive/timer':
         specifier: workspace:*
         version: link:../../packages/timer
@@ -492,6 +498,9 @@ importers:
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.90.16(react@18.3.1)
+      mitt:
+        specifier: 'catalog:'
+        version: 3.0.1
       zustand:
         specifier: 'catalog:'
         version: 5.0.9(@types/react@18.3.3)(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))
@@ -519,7 +528,7 @@ importers:
         specifier: workspace:*
         version: link:../config
       mitt:
-        specifier: ^3.0.1
+        specifier: 'catalog:'
         version: 3.0.1
       react:
         specifier: 'catalog:'

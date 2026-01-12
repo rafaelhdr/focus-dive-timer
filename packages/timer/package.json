@@ -16,7 +16,7 @@
   "dependencies": {
     "@focusdive/auth": "workspace:*",
     "@focusdive/config": "workspace:*",
-    "mitt": "^3.0.1",
+    "mitt": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "socket.io-client": "^4.8.1",

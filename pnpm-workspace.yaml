@@ -8,4 +8,5 @@ catalog:
   "@tanstack/react-query": 5.90.16
   "@types/react": 18.3.3
   "@types/react-dom": 18.3.0
+  mitt: 3.0.1
   zustand: 5.0.9

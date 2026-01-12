@@ -4,6 +4,7 @@ import { setTokens } from "../storage/auth";
 import { authKeys } from '../queryKeys';
 import { me } from '../services/auth';
 import { useAuthStore } from "../store/authStore";
+import { authEvents } from "../events/authEvents";
 
 export function useMe() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -18,6 +19,9 @@ export function useMe() {
 export function useRequestLoginToken() {
   return useMutation({
     mutationFn: (email: string) => loginWithEmail(email),
+    onSuccess: (_, email) => {
+      authEvents.emit("login_email_sent", { email });
+    }
   });
 }
 

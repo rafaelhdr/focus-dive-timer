@@ -7,6 +7,11 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Mail, ShieldCheck } from "lucide-react";
 import { API_URL } from "@/utils/api";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useRequestLoginToken } from "@focusdive/auth";
+import {
+  getLoginEmail,
+  getLoginStep,
+} from "@/storage/authFlowStorage";
 
 interface LoginScreenProps {
   onLoginSuccess: () => void;
@@ -23,15 +28,14 @@ export const LoginScreen = ({
     toast
   } = useToast();
 
-  // Restore login state when component mounts
+  const requestLoginToken = useRequestLoginToken();
+
   useEffect(() => {
-    const savedEmail = localStorage.getItem("focusdive_login_email");
-    const savedStep = localStorage.getItem("focusdive_login_step");
-    
-    if (savedEmail && savedStep === "token") {
-      setEmail(savedEmail);
-      setStep("token");
-    }
+    const savedStep = getLoginStep();
+    const savedEmail = getLoginEmail();
+
+    setStep(savedStep);
+    if (savedEmail) setEmail(savedEmail);
   }, []);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
@@ -39,26 +43,8 @@ export const LoginScreen = ({
     if (!email) return;
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-        credentials: 'include',
-      });
-      if (response.ok) {
-        // Save email and step to localStorage for persistence
-        localStorage.setItem("focusdive_login_email", email);
-        localStorage.setItem("focusdive_login_step", "token");
-        setStep("token");
-        toast({
-          title: "Check your email",
-          description: "We've sent you a verification token. You can close this popup and reopen it after checking your email."
-        });
-      } else {
-        throw new Error("Failed to send token");
-      }
+      await requestLoginToken.mutateAsync(email);
+      setStep("token");
     } catch (error) {
       toast({
         title: "Error",
