@@ -5,21 +5,16 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Mail, ShieldCheck } from "lucide-react";
-import { API_URL } from "@/utils/api";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { useRequestLoginToken } from "@focusdive/auth";
+import { useRequestLoginToken, useVerifyLoginToken } from "@focusdive/auth";
 import {
   getLoginEmail,
   getLoginStep,
 } from "@/storage/authFlowStorage";
 
-interface LoginScreenProps {
-  onLoginSuccess: () => void;
-}
+interface LoginScreenProps {}
 
-export const LoginScreen = ({
-  onLoginSuccess
-}: LoginScreenProps) => {
+export const LoginScreen = ({}: LoginScreenProps) => {
   const [email, setEmail] = useState("");
   const [token, setToken] = useState("");
   const [step, setStep] = useState<"email" | "token">("email");
@@ -29,6 +24,7 @@ export const LoginScreen = ({
   } = useToast();
 
   const requestLoginToken = useRequestLoginToken();
+  const verifyLoginToken = useVerifyLoginToken();
 
   useEffect(() => {
     const savedStep = getLoginStep();
@@ -61,30 +57,8 @@ export const LoginScreen = ({
     if (!token) return;
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_URL}/auth/verify`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, token }),
-        credentials: 'include',
-      });
-      if (response.ok) {
-        const data = await response.json();
-        // Clear temporary login state
-        localStorage.removeItem("focusdive_login_email");
-        localStorage.removeItem("focusdive_login_step");
-        // Store auth token in localStorage
-        localStorage.setItem("focusdive_token", data.token || "authenticated");
-        localStorage.setItem("focusdive_email", email);
-        toast({
-          title: "Welcome back!",
-          description: "You've been successfully logged in"
-        });
-        onLoginSuccess();
-      } else {
-        throw new Error("Invalid token");
-      }
+      await verifyLoginToken.mutateAsync({ email, token });
+      setStep(null);
     } catch (error) {
       toast({
         title: "Error",
