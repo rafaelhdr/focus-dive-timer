@@ -4,7 +4,7 @@ import { Clock, Settings, Link2, UserRound, LogOut, HelpCircle, Menu } from 'luc
 import { Button } from "@focusdive/ui";
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import ThemeToggle from '@/components/ThemeToggle';
-import { useMe, logout } from '@focusdive/auth';
+import { useMe, useLogout } from '@focusdive/auth';
 import { useTimer } from "@focusdive/timer";
 import NavigationTimer from './NavigationTimer';
 
@@ -29,6 +29,7 @@ const Navigation: React.FC = () => {
   const { data: user } = useMe()
   const location = useLocation();
   const { isRunning } = useTimer();
+  const logout = useLogout();
   const showTimer = location.pathname !== '/' && isRunning;
   
   const isMobile = useIsMobile();

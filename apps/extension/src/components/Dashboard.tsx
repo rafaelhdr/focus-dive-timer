@@ -2,23 +2,19 @@ import { Button } from "@focusdive/ui";
 import { Timer } from "@focusdive/timer";
 import { useToast } from "@/hooks/use-toast";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useLogout } from "@focusdive/auth";
 import { LogOut, Play, RotateCcw, Coffee } from "lucide-react";
 
-interface DashboardProps {
-  onLogout: () => void;
-}
-
-export const Dashboard = ({ onLogout }: DashboardProps) => {
+export const Dashboard = () => {
   const { toast } = useToast();
+  const logout = useLogout();
 
   const handleLogout = () => {
-    localStorage.removeItem("focusdive_token");
-    localStorage.removeItem("focusdive_email");
+    logout();
     toast({
       title: "Logged out",
       description: "You've been successfully logged out",
     });
-    onLogout();
   };
 
   return (

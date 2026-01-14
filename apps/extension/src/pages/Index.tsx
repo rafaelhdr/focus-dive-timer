@@ -1,6 +1,6 @@
 import { LoginScreen } from "@/components/LoginScreen";
 import { Dashboard } from "@/components/Dashboard";
-import { useMe, logout } from '@focusdive/auth';
+import { useMe } from '@focusdive/auth';
 
 const Index = () => {
   const { data: user, isLoading } = useMe();
@@ -18,7 +18,7 @@ const Index = () => {
   return (
     <div className="bg-background">
       {!!user ? (
-        <Dashboard onLogout={logout} />
+        <Dashboard />
       ) : (
         <LoginScreen />
       )}

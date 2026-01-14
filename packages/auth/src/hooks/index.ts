@@ -5,6 +5,7 @@ import { authKeys } from '../queryKeys';
 import { me } from '../services/auth';
 import { useAuthStore } from "../store/authStore";
 import { authEvents } from "../events/authEvents";
+import { clearTokens } from '../storage/auth';
 
 export function useMe() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -40,4 +41,16 @@ export function useVerifyLoginToken() {
       }
     },
   });
+}
+
+export function useLogout() {
+  const queryClient = useQueryClient();
+  const setAuthenticated = useAuthStore((s) => s.setAuthenticated);
+
+  return () => {
+    clearTokens();
+    setAuthenticated(false);
+
+    queryClient.removeQueries({ queryKey: authKeys.me(), exact: true });
+  };
 }

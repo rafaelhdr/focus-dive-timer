@@ -10,6 +10,7 @@ import { useRequestLoginToken, useVerifyLoginToken } from "@focusdive/auth";
 import {
   getLoginEmail,
   getLoginStep,
+  setLoginStep,
 } from "@/storage/authFlowStorage";
 
 interface LoginScreenProps {}
@@ -41,6 +42,7 @@ export const LoginScreen = ({}: LoginScreenProps) => {
     try {
       await requestLoginToken.mutateAsync(email);
       setStep("token");
+      setLoginStep("token");
     } catch (error) {
       toast({
         title: "Error",
@@ -59,6 +61,7 @@ export const LoginScreen = ({}: LoginScreenProps) => {
     try {
       await verifyLoginToken.mutateAsync({ email, token });
       setStep(null);
+      setLoginStep("email");
     } catch (error) {
       toast({
         title: "Error",
