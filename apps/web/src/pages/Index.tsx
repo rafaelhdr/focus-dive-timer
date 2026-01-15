@@ -6,7 +6,6 @@ import SettingsPanel from '@/components/SettingsPanel';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 
-import { useTimer } from '@/hooks/useTimer';
 import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
 import { SiSlack } from 'react-icons/si';
 import { useNavigate } from 'react-router-dom';
@@ -20,7 +19,6 @@ const Index = () => {
   const navigate = useNavigate();
   
   const [slackEnabled, setSlackEnabled] = useState(false);
-  const [integrationsLoading, setIntegrationsLoading] = useState(false);
   const [showPomodoroButton, setShowPomodoroButton] = useState(true);
 
   // Check if Pomodoro button should be shown
@@ -37,15 +35,12 @@ const Index = () => {
         return;
       }
 
-      setIntegrationsLoading(true);
       try {
         const settings = await getIntegrationSettings();
         setSlackEnabled(settings.slack_enabled || false);
       } catch (error) {
         console.error('Error loading integration settings:', error);
         setSlackEnabled(false);
-      } finally {
-        setIntegrationsLoading(false);
       }
     };
 
