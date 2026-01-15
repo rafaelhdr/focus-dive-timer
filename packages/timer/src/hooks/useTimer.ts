@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTimerStore } from "../store/timerStore";
 import { timerEvents } from "../events/timerEvents";
+import { useShallow } from 'zustand/react/shallow'
 
 type TimerFinishedOptions = {
   autostartBreak: boolean;
@@ -15,27 +16,29 @@ function durationToMMSS(ms: number) {
 }
 
 export function useTimer() {
-  return useTimerStore((s) => ({
-    mode: s.mode,
-    isRunning: s.isRunning,
-    endsAt: s.endsAt,
-    remainingTime: s.remainingTime,
-    pause: s.pause,
-    reset: s.reset,
-    setMode: s.setMode,
-    focusDuration: s.focusDuration / 60000,
-    setFocusDuration: (minutes: number) => s.setFocusDuration(minutes),
-    breakDuration: s.breakDuration / 60000,
-    setBreakDuration: (minutes: number) => s.setBreakDuration(minutes),
-    start: s.start,
-  }));
+  return useTimerStore(
+    useShallow(
+      (s) => ({
+        mode: s.mode,
+        isRunning: s.isRunning,
+
+        focusDuration: s.focusDuration / 60000,
+        breakDuration: s.breakDuration / 60000,
+        setFocusDuration: s.setFocusDuration,
+        setBreakDuration: s.setBreakDuration,
+      }),
+    ));
 }
 
 export function useTimerDisplay() {
-  const endsAt = useTimerStore((s) => s.endsAt);
-  const remainingTime = useTimerStore((s) => s.remainingTime);
-  const mode = useTimerStore((s) => s.mode);
-  const isRunning = useTimerStore((s) => s.isRunning);
+  const { endsAt, remainingTime, mode, isRunning } = useTimerStore(
+    useShallow((s) => ({
+      endsAt: s.endsAt,
+      remainingTime: s.remainingTime,
+      mode: s.mode,
+      isRunning: s.isRunning,
+    })),
+  );
 
   const [, forceTick] = useState(0);
 
