@@ -18,14 +18,13 @@ import SubProcessors from "./pages/SubProcessors";
 import AboutPomodoro from "./pages/AboutPomodoro";
 import { useSettingsTimerBridge } from "@/hooks/useSettingsTimerBridge";
 import { useTimerFinishedAlarm } from "@/hooks/useTimerFinishedAlarm";
-import { useTimerFinishedWithSettings } from "./hooks/useTimerFinishedWithSettings";
-
-import { useTimerEngine, useTimerRealtime } from "@focusdive/timer";
+import { useOnTimerFinished } from "@/hooks/useOnTimerFinished";
+import { useTimerElapsedDetector, useTimerRealtime } from "@focusdive/timer";
 
 function TimerEffects() {
   useTimerRealtime();
-  useTimerEngine();
-  useTimerFinishedWithSettings();
+  useTimerElapsedDetector();
+  useOnTimerFinished();
   useSettingsTimerBridge();
   useTimerFinishedAlarm();
   return null;

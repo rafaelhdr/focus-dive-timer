@@ -56,7 +56,7 @@ export function useTimerDisplay() {
   return { mode, isRunning, formattedTime };
 }
 
-export function useTimerEngine() {
+export function useTimerElapsedDetector() {
   const endsAt = useTimerStore((s) => s.endsAt);
   const isRunning = useTimerStore((s) => s.isRunning);
   const finish = useTimerStore((s) => s.finish);

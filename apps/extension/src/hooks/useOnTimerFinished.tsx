@@ -1,7 +1,7 @@
 import { useTimerFinished } from "@focusdive/timer";
 import { useSettingsQuery } from "@focusdive/settings";
 
-export function useTimerFinishedWithSettings() {
+export function useOnTimerFinished() {
   const { data: settings } = useSettingsQuery();
 
   const autostartBreak = settings?.autostartBreak ?? false;

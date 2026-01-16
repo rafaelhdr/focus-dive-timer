@@ -41,9 +41,15 @@ importers:
 
   apps/extension:
     dependencies:
+      '@focusdive/alarm':
+        specifier: workspace:*
+        version: link:../../packages/alarm
       '@focusdive/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@focusdive/settings':
+        specifier: workspace:*
+        version: link:../../packages/settings
       '@focusdive/timer':
         specifier: workspace:*
         version: link:../../packages/timer

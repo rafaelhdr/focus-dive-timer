@@ -12,7 +12,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@focusdive/alarm": "workspace:*",
     "@focusdive/auth": "workspace:*",
+    "@focusdive/settings": "workspace:*",
     "@focusdive/timer": "workspace:*",
     "@focusdive/ui": "workspace:*",
     "@focusdive/utils": "workspace:*",

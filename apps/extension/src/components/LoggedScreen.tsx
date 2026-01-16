@@ -1,0 +1,21 @@
+import { Dashboard } from "./Dashboard";
+import { useTimerElapsedDetector, useTimerRealtime } from "@focusdive/timer";
+import { useOnTimerFinished } from "@/hooks/useOnTimerFinished";
+import { useTimerFinishedAlarm } from "@/hooks/useTimerFinishedAlarm";
+
+function TimerEffects() {
+  useTimerRealtime();
+  useTimerElapsedDetector();
+  useOnTimerFinished();
+  useTimerFinishedAlarm();
+  return null;
+}
+
+export const LoggedScreen = () => {
+  return (
+    <>
+      <TimerEffects />
+      <Dashboard />
+    </>
+  );
+}

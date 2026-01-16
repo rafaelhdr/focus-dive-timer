@@ -1,5 +1,5 @@
 import { LoginScreen } from "@/components/LoginScreen";
-import { Dashboard } from "@/components/Dashboard";
+import { LoggedScreen } from "@/components/LoggedScreen";
 import { useMe } from '@focusdive/auth';
 
 const Index = () => {
@@ -18,7 +18,7 @@ const Index = () => {
   return (
     <div className="bg-background">
       {!!user ? (
-        <Dashboard />
+        <LoggedScreen />
       ) : (
         <LoginScreen />
       )}

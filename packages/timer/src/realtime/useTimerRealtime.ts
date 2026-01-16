@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { getTimerSocket } from "./socketClient";
 import { attachTimerChannel } from "./channel";
-import { useTimerStore } from "../store/timerStore"; // ajuste o path se necessário
-import type { TimerData } from "../types"; // ajuste o path se necessário
+import { useTimerStore } from "../store/timerStore";
+import type { TimerData } from "../types";
 
 export function useTimerRealtime() {
   const setFromServer = useTimerStore((s) => s.setFromServer);
