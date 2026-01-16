@@ -57,6 +57,7 @@ export function useTimerDisplay() {
 }
 
 export function useTimerElapsedDetector() {
+  const expectedMode = useTimerStore((s) => s.mode);
   const endsAt = useTimerStore((s) => s.endsAt);
   const isRunning = useTimerStore((s) => s.isRunning);
   const finish = useTimerStore((s) => s.finish);
@@ -65,7 +66,7 @@ export function useTimerElapsedDetector() {
     if (!isRunning || !endsAt) return;
 
     const delay = Math.max(0, endsAt - Date.now());
-    const id = window.setTimeout(() => finish(), delay);
+    const id = window.setTimeout(() => finish({expectedMode}), delay);
 
     return () => window.clearTimeout(id);
   }, [isRunning, endsAt, finish]);

@@ -33,7 +33,7 @@ export interface TimerState {
   pause: () => void;
   reset: () => void;
   setMode: (mode: TimerMode) => void;
-  finish: () => void;
+  finish: ({expectedMode}: {expectedMode: TimerMode}) => void;
 
   setFromServer: (data: Partial<Pick<TimerState, "mode" | "endsAt" | "remainingTime" | "isRunning">>) => void;
 }
@@ -123,10 +123,12 @@ export const useTimerStore = create<TimerState>((set, get) => ({
 
   setFromServer: (data) => set(data),
 
-  finish: () => {
+  finish: ({ expectedMode }) => {
     const s = get();
-    if (!s.isRunning || !s.endsAt) return;
+    const mode = s.mode;
 
+    if (mode !== expectedMode) return;
+    if (!s.isRunning || !s.endsAt) return;
     if (s.finishedAt && s.finishedAt >= s.endsAt) return;
 
     set({
