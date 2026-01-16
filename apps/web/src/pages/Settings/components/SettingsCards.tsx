@@ -111,38 +111,6 @@ const SettingsCards = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="default-focus-duration">Default Focus Duration</Label>
-              <span className="font-medium">{draft.defaultFocusDuration} minutes</span>
-            </div>
-            <Slider
-              id="default-focus-duration"
-              min={5}
-              max={60}
-              step={5}
-              value={[draft.defaultFocusDuration]}
-              onValueChange={(values) => patchDraft({ defaultFocusDuration: values[0] })}
-              className="py-4"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="default-break-duration">Default Break Duration</Label>
-              <span className="font-medium">{draft.defaultBreakDuration} minutes</span>
-            </div>
-            <Slider
-              id="default-break-duration"
-              min={1}
-              max={30}
-              step={1}
-              value={[draft.defaultBreakDuration]}
-              onValueChange={(values) => patchDraft({ defaultBreakDuration: values[0] })}
-              className="py-4"
-            />
-          </div>
-
           <div className="flex items-center space-x-2">
             <Checkbox
               id="autostart-break"

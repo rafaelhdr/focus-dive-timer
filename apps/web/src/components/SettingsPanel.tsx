@@ -2,28 +2,10 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
-import { analytics } from '@/utils/analytics';
-import { useTimer } from '@focusdive/timer';
+import { useAutoSaveSettings } from '@/hooks/useAutoSaveSettings';
 
 const SettingsPanel: React.FC = () => {
-  const {
-    focusDuration,
-    breakDuration,
-    setFocusDuration,
-    setBreakDuration,
-  } = useTimer();
-
-  const handleFocusDurationChange = (values: number[]) => {
-    const newValue = values[0];
-    analytics.settingsChanged('focus_duration', newValue);
-    setFocusDuration(newValue);
-  };
-
-  const handleBreakDurationChange = (values: number[]) => {
-    const newValue = values[0];
-    analytics.settingsChanged('break_duration', newValue);
-    setBreakDuration(newValue);
-  };
+  const { draft, patchDraft } = useAutoSaveSettings();
 
   return (
     <Card className="mt-6">
@@ -34,15 +16,15 @@ const SettingsPanel: React.FC = () => {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="focus-duration">Focus Duration</Label>
-            <span className="font-medium">{focusDuration} minutes</span>
+            <span className="font-medium">{draft?.defaultFocusDuration} minutes</span>
           </div>
           <Slider
-            id="focus-duration"
+            id="default-focus-duration"
             min={5}
             max={60}
             step={5}
-            value={[focusDuration]}
-            onValueChange={handleFocusDurationChange}
+            value={[draft?.defaultFocusDuration]}
+            onValueChange={(values) => patchDraft({ defaultFocusDuration: values[0] })}
             className="py-4"
           />
         </div>
@@ -50,15 +32,15 @@ const SettingsPanel: React.FC = () => {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="break-duration">Break Duration</Label>
-            <span className="font-medium">{breakDuration} minutes</span>
+            <span className="font-medium">{draft?.defaultBreakDuration} minutes</span>
           </div>
           <Slider
-            id="break-duration"
+            id="default-break-duration"
             min={1}
             max={30}
             step={1}
-            value={[breakDuration]}
-            onValueChange={handleBreakDurationChange}
+            value={[draft?.defaultBreakDuration]}
+            onValueChange={(values) => patchDraft({ defaultBreakDuration: values[0] })}
             className="py-4"
           />
         </div>
