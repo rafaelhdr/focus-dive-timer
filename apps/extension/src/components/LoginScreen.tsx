@@ -8,6 +8,7 @@ import { Loader2, Mail, ShieldCheck } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useRequestLoginToken, useVerifyLoginToken } from "@focusdive/auth";
 import {
+  setLoginEmail,
   getLoginEmail,
   getLoginStep,
   setLoginStep,
@@ -43,6 +44,7 @@ export const LoginScreen = ({}: LoginScreenProps) => {
       await requestLoginToken.mutateAsync(email);
       setStep("token");
       setLoginStep("token");
+      setLoginEmail(email);
     } catch (error) {
       toast({
         title: "Error",
