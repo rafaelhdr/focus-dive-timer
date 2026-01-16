@@ -4,7 +4,7 @@ import { Play, Pause, RotateCcw, Coffee, Brain } from 'lucide-react';
 import { useTimer } from '@focusdive/timer';
 import { startTimer, pauseTimer, resetTimer, setTimerMode } from '@focusdive/timer';
 
-const TimerControls: React.FC = () => {
+export const TimerControls: React.FC = () => {
   const { mode, isRunning } = useTimer()
   const onToggleTimer = () => {
     if (!isRunning) {
@@ -18,7 +18,7 @@ const TimerControls: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col md:flex-row gap-4 w-full justify-center mt-6">
+    <>
       <Button 
         onClick={onToggleTimer}
         size="lg" 
@@ -61,8 +61,6 @@ const TimerControls: React.FC = () => {
           </>
         )}
       </Button>
-    </div>
+    </>
   );
 };
-
-export default TimerControls;

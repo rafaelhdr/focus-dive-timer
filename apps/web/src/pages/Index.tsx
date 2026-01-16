@@ -1,7 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { Timer } from '@focusdive/timer';
-import TimerControls from '@/components/TimerControls';
+import { Timer, TimerControls } from '@focusdive/timer';
 import SettingsPanel from '@/components/SettingsPanel';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
@@ -17,7 +16,7 @@ const Index = () => {
   const { data: user } = useMe();
 
   const navigate = useNavigate();
-  
+
   const [slackEnabled, setSlackEnabled] = useState(false);
   const [showPomodoroButton, setShowPomodoroButton] = useState(true);
 
@@ -60,7 +59,7 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background transition-colors duration-300">
       <Navigation />
-      
+
       <div className="pt-16 flex flex-col items-center justify-center flex-1 w-full max-w-md mx-auto p-4">
         <header className="mb-8 text-center w-full">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Focus Dive</h1>
@@ -70,13 +69,13 @@ const Index = () => {
             </p>
             <IntegrationsInfoDialog />
           </div>
-          
+
           {/* Pomodoro Technique Button */}
           {showPomodoroButton && (
             <div className="mb-4">
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handlePomodoroButtonClick}
                 className="text-sm"
               >
@@ -84,7 +83,7 @@ const Index = () => {
               </Button>
             </div>
           )}
-          
+
           {/* Integration Icons */}
           <div className="flex items-center justify-center gap-4">
             <button
@@ -92,12 +91,11 @@ const Index = () => {
               className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
               title="Slack Integration"
             >
-              <SiSlack 
-                className={`h-5 w-5 transition-colors ${
-                  slackEnabled 
-                    ? "text-[#4A154B] hover:text-[#4A154B]/80" 
+              <SiSlack
+                className={`h-5 w-5 transition-colors ${slackEnabled
+                    ? "text-[#4A154B] hover:text-[#4A154B]/80"
                     : "text-muted-foreground hover:text-foreground"
-                }`} 
+                  }`}
               />
             </button>
           </div>
@@ -106,12 +104,14 @@ const Index = () => {
         <div className="w-full max-w-md">
           <Timer />
 
-          <TimerControls />
+          <div className="flex flex-col md:flex-row gap-4 w-full justify-center mt-6">
+            <TimerControls />
+          </div>
 
           <SettingsPanel />
         </div>
       </div>
-      
+
       <Footer />
     </div>
   );
