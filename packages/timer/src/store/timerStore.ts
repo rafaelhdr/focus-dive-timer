@@ -1,8 +1,7 @@
+import { type TimerMode } from "../types";
 import { isDebug } from "@focusdive/config";
 import { create } from "zustand";
 import { timerEvents } from "../events/timerEvents";
-
-export type TimerMode = "focus" | "break";
 
 const getResetTime = (mode: TimerMode, focusDuration: number, breakDuration: number) => {
   const ms = mode === "focus" ? focusDuration : breakDuration;

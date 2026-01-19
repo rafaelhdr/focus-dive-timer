@@ -1,3 +1,4 @@
+import { TimerMode } from "../types";
 import { useTimerStore } from "../store/timerStore";
 import { pushTimerToServer } from "../realtime/sync";
 
@@ -22,7 +23,7 @@ export async function resetTimer() {
   await pushTimerToServer({ endsAt, remainingTime, mode, isRunning });
 }
 
-export async function setTimerMode(mode: 'focus' | 'break') {
+export async function setTimerMode(mode: TimerMode) {
   useTimerStore.getState().setMode(mode);
 
   const { endsAt, remainingTime, isRunning } = useTimerStore.getState();

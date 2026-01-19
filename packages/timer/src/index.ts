@@ -1,3 +1,4 @@
+export { type TimerMode } from "./types";
 export { Timer } from "./components/Timer";
 export { TimerControls } from "./components/TimerControls";
 export { timerEvents } from "./events/timerEvents";

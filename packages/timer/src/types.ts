@@ -1,5 +1,7 @@
+export type TimerMode = "focus" | "break";
+
 export interface TimerData {
-  mode: "focus" | "break";
+  mode: TimerMode;
   endsAt: number | null;
   remainingTime: number;
   isRunning: boolean;

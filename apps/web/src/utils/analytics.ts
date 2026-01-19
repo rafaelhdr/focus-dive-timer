@@ -1,3 +1,4 @@
+import { TimerMode } from '@focusdive/timer';
 
 // Umami analytics utility
 declare global {
@@ -16,23 +17,23 @@ export const trackEvent = (eventName: string, eventData?: Record<string, any>) =
 
 // Timer-specific tracking functions
 export const analytics = {
-  timerStarted: (mode: 'focus' | 'break', duration: number) => {
+  timerStarted: (mode: TimerMode, duration: number) => {
     trackEvent('timer_started', { mode, duration });
   },
   
-  timerPaused: (mode: 'focus' | 'break', timeRemaining: number) => {
+  timerPaused: (mode: TimerMode, timeRemaining: number) => {
     trackEvent('timer_paused', { mode, timeRemaining });
   },
   
-  timerCompleted: (mode: 'focus' | 'break', duration: number) => {
+  timerCompleted: (mode: TimerMode, duration: number) => {
     trackEvent('timer_completed', { mode, duration });
   },
   
-  timerReset: (mode: 'focus' | 'break') => {
+  timerReset: (mode: TimerMode) => {
     trackEvent('timer_reset', { mode });
   },
   
-  modeToggled: (fromMode: 'focus' | 'break', toMode: 'focus' | 'break') => {
+  modeToggled: (fromMode: TimerMode, toMode: TimerMode) => {
     trackEvent('mode_toggled', { fromMode, toMode });
   },
   

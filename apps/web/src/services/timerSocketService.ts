@@ -1,4 +1,4 @@
-
+import { TimerMode } from "@focusdive/timer";
 import { io, Socket } from "socket.io-client";
 import { apiUrl } from "@focusdive/config";
 import { TimerData } from "@/hooks/types";
@@ -78,7 +78,7 @@ class TimerSocketService {
     });
   }
 
-  updateTimer(timerEndsAt: number | null, mode: "focus" | "break", isRunning: boolean): void {
+  updateTimer(timerEndsAt: number | null, mode: TimerMode, isRunning: boolean): void {
     if (!this.socket) {
       console.warn("Cannot update timer: WebSocket not connected");
       return;

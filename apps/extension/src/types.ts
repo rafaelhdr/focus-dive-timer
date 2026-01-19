@@ -1,9 +1,9 @@
-export type Mode = "focus" | "break";
+import { TimerMode } from "@focusdive/timer";
 
 export type TimerSetEndsAtMessage = {
   type: "TIMER/SET_ENDS_AT";
   endsAt: number | null;
-  mode?: Mode;
+  mode?: TimerMode;
 };
 
 export type ExtensionMessage = TimerSetEndsAtMessage;
