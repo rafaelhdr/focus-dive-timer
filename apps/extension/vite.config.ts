@@ -27,10 +27,12 @@ export default defineConfig(({ mode }) => {
       outDir: 'dist',
       rollupOptions: {
         input: {
-          main: path.resolve(__dirname, 'index.html')
+          main: path.resolve(__dirname, 'index.html'),
+          background: path.resolve(__dirname, "src/background/index.ts"),
         },
         output: {
-          entryFileNames: 'assets/[name].js',
+          entryFileNames: (chunk) =>
+            chunk.name === "background" ? "background.js" : "assets/[name].js",
           chunkFileNames: 'assets/[name].js',
           assetFileNames: 'assets/[name].[ext]',
           // Disable code splitting for extensions

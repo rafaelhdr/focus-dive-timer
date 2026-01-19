@@ -1,0 +1,44 @@
+{
+  "manifest_version": 2,
+  "name": "FocusDive Extension",
+  "version": "1.0.0",
+  "description": "Block distractions and enable deep work with FocusDive",
+
+  "permissions": [
+    "alarms",
+    "activeTab",
+    "storage",
+    "https://api.focusdive.app/*",
+    "http://localhost:5000/*"
+  ],
+
+
+
+
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false,
+    "type": "module"
+  },
+
+  "browser_action": {
+    "default_popup": "index.html",
+    "default_title": "FocusDive",
+    "default_icon": {
+      "16": "favicon-16x16.png",
+      "32": "favicon-32x32.png",
+      "48": "android-icon-48x48.png",
+      "128": "android-icon-144x144.png"
+    }
+  },
+
+  "icons": {
+    "16": "favicon-16x16.png",
+    "32": "favicon-32x32.png",
+    "48": "android-icon-48x48.png",
+    "128": "android-icon-144x144.png"
+  },
+
+  "content_security_policy": "script-src 'self'; object-src 'self'"
+}
+

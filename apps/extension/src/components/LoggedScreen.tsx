@@ -3,6 +3,7 @@ import { useTimerElapsedDetector, useTimerRealtime } from "@focusdive/timer";
 import { useOnTimerFinished } from "@/hooks/useOnTimerFinished";
 import { useTimerFinishedAlarm } from "@/hooks/useTimerFinishedAlarm";
 import { useSettingsTimerBridge } from "@/hooks/useSettingsTimerBridge";
+import { useTimerWorkerBridge } from "@/hooks/useTimerWorkerBridge";
 
 function TimerEffects() {
   useTimerRealtime();
@@ -10,6 +11,7 @@ function TimerEffects() {
   useOnTimerFinished();
   useSettingsTimerBridge();
   useTimerFinishedAlarm();
+  useTimerWorkerBridge();
   return null;
 }
 
