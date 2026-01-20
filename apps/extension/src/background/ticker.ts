@@ -12,6 +12,7 @@ function stop() {
     intervalId = null;
   }
   currentTickMs = null;
+  updateBadgeFromState(getState());
 }
 
 async function tickOnce() {
@@ -57,8 +58,4 @@ export async function ensureTicking(state?: TimerState) {
   const ms = Math.max(0, s.endsAt - Date.now());
   const tickMs = desiredTickMs(ms);
   startOrReschedule(tickMs);
-}
-
-export function stopTicking() {
-  stop();
 }

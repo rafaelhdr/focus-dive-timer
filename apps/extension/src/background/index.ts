@@ -1,7 +1,7 @@
 import browser from "webextension-polyfill";
 import type { TimerSetEndsAtMessage } from "../types";
 import { restoreState, setState } from "./state";
-import { ensureTicking, stopTicking } from "./ticker";
+import { ensureTicking } from "./ticker";
 import { updateBadgeFromState } from "./badge";
 
 async function init() {
@@ -18,14 +18,6 @@ browser.runtime.onMessage.addListener(async (message: unknown) => {
     endsAt: msg.endsAt ?? null,
     mode: msg.mode ?? "focus",
   });
-
-  if (!msg.endsAt) {
-    stopTicking();
-    // badge will be cleared by updateBadgeFromState on next ensureTicking tick,
-    // but we can also force now:
-    await ensureTicking();
-    return;
-  }
 
   await ensureTicking();
 });

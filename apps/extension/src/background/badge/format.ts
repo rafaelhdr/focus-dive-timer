@@ -8,10 +8,10 @@ export function formatBadgeText(ms: number): string | null {
   if (totalSeconds <= 0) return null;
 
   // >= 60s → minutes
-  if (totalSeconds >= 60) return String(Math.ceil(totalSeconds / 60));
+  if (totalSeconds >= 60) return String(Math.ceil(totalSeconds / 60) - 1);
 
   // < 60s → seconds
-  return String(totalSeconds);
+  return String(totalSeconds - 1);
 }
 
 export function desiredTickMs(ms: number) {
