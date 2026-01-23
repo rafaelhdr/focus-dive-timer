@@ -1,3 +1,4 @@
+import { TimerMode } from "@focusdive/timer";
 import { setState } from "./state";
 import { type TimerSyncPayload } from "../types";
 
@@ -19,4 +20,16 @@ export async function applyTimerSync(synced: TimerSyncPayload) {
 
 export async function markTimerFinished(endsAt: number) {
   await setState({ lastFinishedEndsAt: endsAt });
+}
+
+export async function restartTimerStore(nextMode: TimerMode, durationMinutes: number) {
+  const now = Date.now();
+  const endsAt = now + durationMinutes * 60_000;
+
+  await setState({
+    mode: nextMode,
+    endsAt,
+    remainingTime: null,
+    isRunning: true,
+  });
 }
