@@ -8,11 +8,40 @@ type TimerFinishedOptions = {
   autostartFocus: boolean;
 };
 
-function durationToMMSS(ms: number) {
-  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+export type TimerFormat = "clock" | "badge";
+
+type FormatArgs = {
+  isRunning: boolean;
+  endsAt: number | null;
+  remainingTime: number;
+  format: TimerFormat;
+};
+
+export function formatRemainingTime({
+  isRunning,
+  endsAt,
+  remainingTime,
+  format,
+}: FormatArgs): string | null {
+  const ms = isRunning && endsAt
+    ? Math.max(0, endsAt - Date.now())
+    : Math.max(0, remainingTime);
+
+  if (ms <= 0) return null;
+
+  if (format === "clock") {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  }
+
+  // format === "badge"
+  if (ms >= 60_000) {
+    return String(Math.ceil(ms / 60_000));
+  }
+  return String(Math.floor(ms / 1000));
 }
 
 export function useTimer() {
@@ -48,10 +77,12 @@ export function useTimerDisplay() {
     return () => window.clearInterval(id);
   }, [endsAt, isRunning]);
 
-  const ms =
-    isRunning && endsAt ? Math.max(0, endsAt - Date.now()) : Math.max(0, remainingTime);
-
-  const formattedTime = durationToMMSS(ms);
+  const formattedTime = formatRemainingTime({
+    isRunning,
+    endsAt,
+    remainingTime,
+    format: "clock",
+  });
 
   return { mode, isRunning, formattedTime };
 }

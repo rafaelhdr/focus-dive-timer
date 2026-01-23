@@ -1,14 +1,19 @@
 import browser from "webextension-polyfill";
-import type { Mode } from "../types";
+import type { TimerMode } from "@focusdive/timer";
 
 export type TimerState = {
   endsAt: number | null;
-  mode: Mode;
+  mode: TimerMode;
+  remainingTime: number | null;
 };
 
 const STORAGE_KEY = "timer_state_v1";
 
-let state: TimerState = { endsAt: null, mode: "focus" };
+let state: TimerState = {
+  endsAt: null,
+  mode: "focus",
+  remainingTime: null,
+};
 
 export function getState(): TimerState {
   return state;
@@ -28,6 +33,6 @@ export async function restoreState() {
 }
 
 export async function clearState() {
-  state = { endsAt: null, mode: "focus" };
+  state = { endsAt: null, mode: "focus", remainingTime: null };
   await browser.storage.local.remove(STORAGE_KEY);
 }

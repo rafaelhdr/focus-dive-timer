@@ -1,9 +1,10 @@
 import { TimerMode } from "@focusdive/timer";
 
-export type TimerSetEndsAtMessage = {
-  type: "TIMER/SET_ENDS_AT";
-  endsAt: number | null;
-  mode?: TimerMode;
+export type TimerSyncMessage = {
+  type: "TIMER/SYNC_BACKGROUND";
+  endsAt: number;
+  mode: TimerMode;
+  remainingTime: number;
 };
 
-export type ExtensionMessage = TimerSetEndsAtMessage;
+export type ExtensionMessage = TimerSyncMessage;

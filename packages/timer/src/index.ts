@@ -2,7 +2,7 @@ export { type TimerMode } from "./types";
 export { Timer } from "./components/Timer";
 export { TimerControls } from "./components/TimerControls";
 export { timerEvents } from "./events/timerEvents";
-export { useTimer, useTimerDisplay, useTimerElapsedDetector, useTimerFinished } from "./hooks/useTimer";
+export { formatRemainingTime, useTimer, useTimerDisplay, useTimerElapsedDetector, useTimerFinished } from "./hooks/useTimer";
 export { useTimerRealtime } from "./realtime/useTimerRealtime";
 export { startTimer, pauseTimer, resetTimer, setTimerMode } from "./commands";
 export { useTimerStore } from "./store/timerStore";
