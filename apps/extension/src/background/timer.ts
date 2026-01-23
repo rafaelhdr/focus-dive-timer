@@ -5,7 +5,7 @@ import { getState } from "./state";
 import { startCountdown, stopCountdown } from "./service_worker";
 
 export type SyncBackgroundArgs =
-  | { source: "message"; message: Partial<TimerSyncMessage> }
+  | { source: "message"; message: TimerSyncMessage }
   | { source: "boot" };
 
 export type TimerSynced = {
@@ -14,7 +14,7 @@ export type TimerSynced = {
   remainingTime: number | null;
 };
 
-export async function syncBackground(args: SyncBackgroundArgs): Promise<TimerSynced> {
+export async function syncBackground(args: SyncBackgroundArgs): Promise<void> {
   const current = getState();
 
   let endsAt = current.endsAt;
@@ -34,7 +34,4 @@ export async function syncBackground(args: SyncBackgroundArgs): Promise<TimerSyn
   } else {
     stopCountdown();
   }
-
-  return { endsAt, mode, remainingTime };
 }
-

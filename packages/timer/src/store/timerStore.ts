@@ -137,6 +137,6 @@ export const useTimerStore = create<TimerState>((set, get) => ({
       finishedAt: Date.now(),
     });
 
-    timerEvents.emit("timer_finished", { mode: s.mode });
+    timerEvents.emit("timer_finished", { mode: s.mode, endsAt: s.endsAt });
   },
 }));

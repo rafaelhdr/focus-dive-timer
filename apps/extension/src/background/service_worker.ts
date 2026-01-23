@@ -1,5 +1,6 @@
 import { formatRemainingTime, type TimerMode } from "@focusdive/timer";
 import { clearBadge, setBadge } from "../libs/badge";
+import { timerEvents } from "@focusdive/timer";
 
 let intervalId: number | null = null;
 let endsAt: number | null = null;
@@ -21,6 +22,7 @@ async function tick() {
 
   if (!text) {
     await clearBadge();
+    timerEvents.emit("timer_finished", { mode, endsAt });
     stopCountdown();
     return;
   }
