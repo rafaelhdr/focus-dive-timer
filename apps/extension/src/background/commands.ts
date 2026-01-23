@@ -1,21 +1,7 @@
-import type { TimerMode } from "@focusdive/timer";
 import { setState } from "./state";
+import { type TimerSyncPayload } from "../types";
 
-export type TimerSynced = {
-  endsAt: number | null;
-  mode: TimerMode;
-  remainingTime: number | null;
-  isRunning: boolean;
-  focusBeepEnabled: boolean;
-  focusBeepVolume: number;
-  alarmSound: string;
-  autostartFocus: boolean;
-  autostartBreak: boolean;
-  defaultFocusDuration: number;
-  defaultBreakDuration: number;
-};
-
-export async function applyTimerSync(synced: TimerSynced) {
+export async function applyTimerSync(synced: TimerSyncPayload) {
   await setState({
     endsAt: synced.endsAt ?? null,
     mode: synced.mode ?? "focus",

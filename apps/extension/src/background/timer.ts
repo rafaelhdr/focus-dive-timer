@@ -8,12 +8,6 @@ export type SyncBackgroundArgs =
   | { source: "message"; message: TimerSyncMessage }
   | { source: "boot" };
 
-export type TimerSynced = {
-  endsAt: number | null;
-  mode: TimerMode;
-  remainingTime: number | null;
-};
-
 export async function syncBackground(args: SyncBackgroundArgs): Promise<void> {
   const current = getState();
 
