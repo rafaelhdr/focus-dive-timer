@@ -1,7 +1,7 @@
 import browser from "webextension-polyfill";
 
 import type { TimerSyncMessage } from "../types";
-import { syncBackground, type SyncBackgroundArgs } from "./timer";
+import { syncBackgroundFromState } from "./timer";
 import { applyTimerSync } from "./commands";
 import { registerTimerFinishedListener } from "./listeners/timerFinished";
 
@@ -15,8 +15,8 @@ function isTimerSyncMessage(message: unknown): message is TimerSyncMessage {
 browser.runtime.onMessage.addListener(async (message: unknown) => {
   if (!isTimerSyncMessage(message)) return;
 
-  await syncBackground({ source: "message", message } as SyncBackgroundArgs);
   await applyTimerSync(message);
+  syncBackgroundFromState();
 });
 
 registerTimerFinishedListener();
