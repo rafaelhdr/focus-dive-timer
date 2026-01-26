@@ -17,7 +17,7 @@ const Index = () => {
 
   return (
     <div className="bg-background">
-      {!!user ? (
+      {user ? (
         <LoggedScreen />
       ) : (
         <LoginScreen />
