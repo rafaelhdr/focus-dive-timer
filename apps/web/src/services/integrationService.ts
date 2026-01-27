@@ -7,7 +7,7 @@ interface SlackIntegrationSettings {
   slack_dnd_text?: string;
 }
 
-interface IntegrationSettings extends SlackIntegrationSettings {}
+type IntegrationSettings = SlackIntegrationSettings
 
 export const getIntegrationSettings = async (): Promise<IntegrationSettings> => {
   try {
