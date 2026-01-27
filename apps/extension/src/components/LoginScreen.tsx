@@ -14,9 +14,7 @@ import {
   setLoginStep,
 } from "@/storage/authFlowStorage";
 
-interface LoginScreenProps {}
-
-export const LoginScreen = ({}: LoginScreenProps) => {
+export const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [token, setToken] = useState("");
   const [step, setStep] = useState<"email" | "token">("email");
@@ -45,7 +43,7 @@ export const LoginScreen = ({}: LoginScreenProps) => {
       setStep("token");
       setLoginStep("token");
       setLoginEmail(email);
-    } catch (error) {
+    } catch (_) {
       toast({
         title: "Error",
         description: "Failed to send verification token. Please try again.",
@@ -64,7 +62,7 @@ export const LoginScreen = ({}: LoginScreenProps) => {
       await verifyLoginToken.mutateAsync({ email, token });
       setStep(null);
       setLoginStep("email");
-    } catch (error) {
+    } catch (_) {
       toast({
         title: "Error",
         description: "Invalid token. Please try again.",

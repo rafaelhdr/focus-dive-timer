@@ -36,8 +36,6 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
 
-      "no-empty-pattern": "off",
-
       "react-refresh/only-export-components": "off",
 
       "react-hooks/static-components": "off",

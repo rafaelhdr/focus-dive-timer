@@ -7,8 +7,8 @@
     "packages/*"
   ],
   "scripts": {
-    "lint": "pnpm -r lint",
-    "lint:fix": "pnpm -r lint --fix",
+    "lint": "pnpm -r --no-bail lint",
+    "lint:fix": "pnpm -r --no-bail lint --fix",
     "web:dev": "dotenv -e .env -- pnpm --filter @focusdive/webapp dev",
     "web:build": "dotenv -e .env -- pnpm --filter @focusdive/webapp build",
     "web:start": "pnpm --filter @focusdive/webapp start",
