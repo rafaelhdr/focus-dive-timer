@@ -3,6 +3,7 @@ import { Timer, TimerControls } from "@focusdive/timer";
 import { useToast } from "@/hooks/use-toast";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useLogout } from "@focusdive/auth";
+import SettingsPanel from '@/components/SettingsPanel';
 import { LogOut } from "lucide-react";
 
 export const Dashboard = () => {
@@ -31,6 +32,8 @@ export const Dashboard = () => {
       <div className="flex flex-col md:flex-row gap-4 w-full justify-center mt-6">
         <TimerControls />
       </div>
+
+      <SettingsPanel />
 
       <div className="pt-3">
         <Button 
