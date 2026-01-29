@@ -76,16 +76,17 @@ export const useTimerStore = create<TimerState>((set, get) => ({
   finishedAt: null,
 
   start: () => {
-    const mode = get().mode;
-    const { remainingTime, focusDuration, breakDuration } = get();
+    const { mode, remainingTime, focusDuration, breakDuration } = get();
     const defaultMs = mode === "focus" ? focusDuration : breakDuration;
-
     const ms = remainingTime > 0 ? remainingTime : defaultMs;
+    
+    const now = Date.now();
+    const nextSecond = now + (1000 - (now % 1000));
 
     set({
       mode,
       isRunning: true,
-      endsAt: Date.now() + ms + 1000,
+      endsAt: nextSecond + ms,
       remainingTime: 0,
     });
   },
