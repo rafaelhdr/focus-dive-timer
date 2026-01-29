@@ -13,7 +13,7 @@ export type TimerFormat = "clock" | "badge";
 type FormatArgs = {
   isRunning: boolean;
   endsAt: number | null;
-  remainingTime: number;
+  remainingTime: number | null;
   format: TimerFormat;
 };
 
@@ -25,7 +25,7 @@ export function formatRemainingTime({
 }: FormatArgs): string | null {
   const ms = isRunning && endsAt
     ? Math.max(0, endsAt - Date.now())
-    : Math.max(0, remainingTime);
+    : Math.max(0, remainingTime ?? 0);
 
   if (ms <= 0) return null;
 

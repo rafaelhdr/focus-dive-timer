@@ -24,6 +24,9 @@ export default defineConfig(({ mode }) => ({
       project: "javascript-react",
     }),
   ].filter(Boolean),
+  test: {
+    environment: "node",
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
