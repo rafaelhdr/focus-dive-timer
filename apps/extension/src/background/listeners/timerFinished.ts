@@ -1,4 +1,4 @@
-import { timerEvents, type TimerMode } from "@focusdive/timer";
+import { timerEvents, type TimerMode, updateTimer } from "@focusdive/timer";
 import { getState } from "../state";
 import { markTimerFinished, restartTimerStore } from "../commands";
 import { playAlarm, AlarmSoundId } from "@focusdive/alarm";
@@ -9,16 +9,18 @@ const restartTimer = async (settings: TimerSyncPayload, mode: TimerMode) => {
   if (mode === "focus") {
     if (!settings.autostartBreak) return;
 
-    await restartTimerStore("break", settings.defaultBreakDuration);
+    const { endsAt } = await restartTimerStore("break", settings.defaultBreakDuration);
     syncBackgroundFromState();
+    updateTimer({ endsAt, mode: "break", isRunning: true, remainingTime: null });
     return;
   }
 
   if (mode === "break") {
     if (!settings.autostartFocus) return;
 
-    await restartTimerStore("focus", settings.defaultFocusDuration);
+    const { endsAt } = await restartTimerStore("focus", settings.defaultFocusDuration);
     syncBackgroundFromState();
+    updateTimer({ endsAt, mode: "focus", isRunning: true, remainingTime: null });
     return;
   }
 }

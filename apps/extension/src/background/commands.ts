@@ -32,4 +32,8 @@ export async function restartTimerStore(nextMode: TimerMode, durationMinutes: nu
     remainingTime: null,
     isRunning: true,
   });
+
+  return {
+    endsAt,
+  }
 }

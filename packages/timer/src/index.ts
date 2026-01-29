@@ -5,4 +5,5 @@ export { timerEvents } from "./events/timerEvents";
 export { formatRemainingTime, useTimer, useTimerDisplay, useTimerElapsedDetector, useTimerFinished } from "./hooks/useTimer";
 export { useTimerRealtime } from "./realtime/useTimerRealtime";
 export { startTimer, pauseTimer, resetTimer, setTimerMode } from "./commands";
+export { updateTimer } from "./services/timerService";
 export { useTimerStore } from "./store/timerStore";
