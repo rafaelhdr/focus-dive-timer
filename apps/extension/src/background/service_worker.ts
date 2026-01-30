@@ -45,6 +45,7 @@ export function startCountdown(nextEndsAt: number, nextMode: TimerMode) {
 
 export function stopCountdown() {
   if (intervalId !== null) {
+    clearBadge();
     clearInterval(intervalId);
     intervalId = null;
   }
