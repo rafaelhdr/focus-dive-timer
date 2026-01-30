@@ -1,8 +1,25 @@
-node_modules
-dist
-.dockerignore
-Dockerfile
-.vscode
+# Git / editor
 .git
-.gitignore 
+.gitignore
+
+# Dependencies
+node_modules
+**/node_modules
+
+# Builds
+dist
+**/dist
+**/.vite
+
+# Extension not used in Docker context
+apps/extension
+
+# Env / logs
+.env*
+!.env.production
 *.log
+
+# Docker noise
+Dockerfile
+**/Dockerfile
+.dockerignore

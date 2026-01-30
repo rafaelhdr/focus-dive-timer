@@ -15,6 +15,7 @@
     "@focusdive/auth": "workspace:*",
     "@focusdive/config": "workspace:*",
     "@focusdive/settings": "workspace:*",
+    "@focusdive/timer": "workspace:*",
     "@focusdive/ui": "workspace:*",
     "@focusdive/utils": "workspace:*",
     "@hookform/resolvers": "^3.9.0",
