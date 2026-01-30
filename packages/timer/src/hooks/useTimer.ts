@@ -39,7 +39,7 @@ export function formatRemainingTime({
 
   // format === "badge"
   if (ms >= 60_000) {
-    return String(Math.ceil(ms / 60_000));
+    return String(Math.floor(ms / 60_000));
   }
   return String(Math.floor(ms / 1000));
 }

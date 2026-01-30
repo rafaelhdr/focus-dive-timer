@@ -59,4 +59,23 @@ describe("formatRemainingTime", () => {
       }),
     ).toBe("10");
   });
+
+  it("badge rounds down", () => {
+    expect(
+      formatRemainingTime({
+        isRunning: true,
+        endsAt: 10 * 60_000 + 1000,
+        remainingTime: null,
+        format: "badge",
+      }),
+    ).toBe("10");
+    expect(
+      formatRemainingTime({
+        isRunning: true,
+        endsAt: 10 * 60_000 - 1000,
+        remainingTime: null,
+        format: "badge",
+      }),
+    ).toBe("9");
+  });
 });
