@@ -19,6 +19,7 @@ import AboutPomodoro from "./pages/AboutPomodoro";
 import { useSettingsTimerBridge } from "@/hooks/useSettingsTimerBridge";
 import { useTimerFinishedAlarm } from "@/hooks/useTimerFinishedAlarm";
 import { useOnTimerFinished } from "@/hooks/useOnTimerFinished";
+import { useDocumentTitleTimer } from "@/hooks/useDocumentTitleTimer";
 import { useTimerElapsedDetector, useTimerRealtime } from "@focusdive/timer";
 
 function TimerEffects() {
@@ -27,6 +28,7 @@ function TimerEffects() {
   useOnTimerFinished();
   useSettingsTimerBridge();
   useTimerFinishedAlarm();
+  useDocumentTitleTimer();
   return null;
 }
 
