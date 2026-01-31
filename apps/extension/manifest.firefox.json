@@ -39,6 +39,16 @@
     "128": "android-icon-144x144.png"
   },
 
-  "content_security_policy": "script-src 'self'; object-src 'self'"
-}
+  "content_security_policy": "script-src 'self'; object-src 'self'",
 
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "focusdive-extension@focusdive.app",
+      "data_collection_permissions": {
+        "required": ["personallyIdentifyingInfo"],
+        "optional": ["technicalAndInteraction"]
+      }
+    }
+  }
+
+}
