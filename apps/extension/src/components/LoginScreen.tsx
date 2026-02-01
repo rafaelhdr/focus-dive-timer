@@ -8,6 +8,7 @@ import { Loader2, Mail, ShieldCheck } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useRequestLoginToken, useVerifyLoginToken } from "@focusdive/auth";
 import {
+  clearLoginFlow,
   setLoginEmail,
   getLoginEmail,
   getLoginStep,
@@ -27,11 +28,15 @@ export const LoginScreen = () => {
   const verifyLoginToken = useVerifyLoginToken();
 
   useEffect(() => {
-    const savedStep = getLoginStep();
-    const savedEmail = getLoginEmail();
+    (async () => {
+      const [savedStep, savedEmail] = await Promise.all([
+        getLoginStep(),
+        getLoginEmail(),
+      ]);
 
-    setStep(savedStep);
-    if (savedEmail) setEmail(savedEmail);
+      setStep(savedStep);
+      if (savedEmail) setEmail(savedEmail);
+    })();
   }, []);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
@@ -41,8 +46,10 @@ export const LoginScreen = () => {
     try {
       await requestLoginToken.mutateAsync(email);
       setStep("token");
-      setLoginStep("token");
-      setLoginEmail(email);
+      await Promise.all([
+        setLoginStep("token"),
+        setLoginEmail(email),
+      ]);
     } catch (_) {
       toast({
         title: "Error",
@@ -61,7 +68,7 @@ export const LoginScreen = () => {
     try {
       await verifyLoginToken.mutateAsync({ email, token });
       setStep(null);
-      setLoginStep("email");
+      await setLoginStep("email");
     } catch (_) {
       toast({
         title: "Error",
@@ -74,9 +81,7 @@ export const LoginScreen = () => {
   };
 
   const handleBackToEmail = () => {
-    // Clear temporary login state when going back
-    localStorage.removeItem("focusdive_login_email");
-    localStorage.removeItem("focusdive_login_step");
+    void clearLoginFlow();
     setStep("email");
     setToken("");
   };

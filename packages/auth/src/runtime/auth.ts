@@ -13,7 +13,7 @@ function isExpired(token: string): boolean {
 }
 
 export async function getAccessToken(): Promise<string | null> {
-  const { accessToken, refreshToken } = getTokens();
+  const { accessToken, refreshToken } = await getTokens();
 
   if (!refreshToken) return null;
 
@@ -23,8 +23,8 @@ export async function getAccessToken(): Promise<string | null> {
 
   if (!refreshPromise) {
     refreshPromise = refreshAccessToken(refreshToken)
-      .then(({ access_token: newAccess, refresh_token: newRefresh }) => {
-        setTokens(newAccess, newRefresh);
+      .then(async ({ access_token: newAccess, refresh_token: newRefresh }) => {
+        await setTokens(newAccess, newRefresh);
         return newAccess;
       })
       .finally(() => {

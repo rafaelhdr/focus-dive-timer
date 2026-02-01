@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import browser from "webextension-polyfill";
+import { sendMessage } from "../browser";
 import { useTimerStore } from "@focusdive/timer";
 import { useSettingsQuery } from "@focusdive/settings";
 import { useShallow } from 'zustand/react/shallow'
@@ -35,6 +35,6 @@ export function useTimerWorkerBridge() {
       defaultFocusDuration: settings.defaultFocusDuration,
       defaultBreakDuration: settings.defaultBreakDuration,
     }
-    browser.runtime.sendMessage(message);
+    sendMessage(message);
   }, [endsAt, mode, isRunning, remainingTime, settings]);
 }

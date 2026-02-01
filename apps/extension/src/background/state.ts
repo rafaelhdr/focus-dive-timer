@@ -1,5 +1,5 @@
-import browser from "webextension-polyfill";
 import type { TimerMode } from "@focusdive/timer";
+import { getJSON, setJSON, remove } from "@focusdive/storage";
 
 export type TimerState = {
   endsAt: number | null;
@@ -41,18 +41,16 @@ export function getState(): TimerState {
 
 export async function setState(next: Partial<TimerState>) {
   state = { ...state, ...next };
-  await browser.storage.local.set({ [STORAGE_KEY]: state });
+  await setJSON(STORAGE_KEY, state);
 }
 
 export async function restoreState() {
-  const stored = await browser.storage.local.get(STORAGE_KEY);
-  if (stored?.[STORAGE_KEY]) {
-    state = stored[STORAGE_KEY] as TimerState;
-  }
+  const stored = await getJSON<TimerState>(STORAGE_KEY);
+  if (stored) state = stored;
   return state;
 }
 
 export async function clearState() {
   state = INITIAL_STATE;
-  await browser.storage.local.remove(STORAGE_KEY);
+  await remove(STORAGE_KEY);
 }

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +22,14 @@ import { useTimerFinishedAlarm } from "@/hooks/useTimerFinishedAlarm";
 import { useOnTimerFinished } from "@/hooks/useOnTimerFinished";
 import { useDocumentTitleTimer } from "@/hooks/useDocumentTitleTimer";
 import { useTimerElapsedDetector, useTimerRealtime } from "@focusdive/timer";
+import { initAuth } from "@focusdive/auth";
+
+function AuthEffects() {
+  useEffect(() => {
+    void initAuth();
+  }, []);
+  return null;
+}
 
 function TimerEffects() {
   useTimerRealtime();
@@ -39,6 +48,7 @@ const App = () => (
     <ThemeProvider defaultTheme="system" storageKey="focus-dive-theme">
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
+          <AuthEffects />
           <TimerEffects />
           <Toaster />
           <Sonner />

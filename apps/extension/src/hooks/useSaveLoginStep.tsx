@@ -11,11 +11,11 @@ export function useSaveLoginStep(options: Options = {}) {
 
   useEffect(() => {
     const off = authEvents.on("login_email_sent", () => {
-      setLoginStep("token");
-
-      if (email) setLoginEmail(email);
+      void setLoginStep("token");
+      if (email) void setLoginEmail(email);
     });
 
     return off;
   }, [email]);
 }
+

@@ -1,16 +1,31 @@
-export const getTokens = () => {
+import { get, set, remove } from "@focusdive/storage";
+
+export async function getTokens() {
+  const [accessToken, refreshToken] = await Promise.all([
+    get("focus_dive_access_token"),
+    get("focus_dive_refresh_token"),
+  ]);
+
   return {
-    accessToken: localStorage.getItem('focus_dive_access_token'),
-    refreshToken: localStorage.getItem('focus_dive_refresh_token'),
+    accessToken,
+    refreshToken,
   };
 }
 
-export const setTokens = (accessToken: string, refreshToken: string) => {
-  localStorage.setItem('focus_dive_access_token', accessToken);
-  localStorage.setItem('focus_dive_refresh_token', refreshToken);
+export async function setTokens(
+  accessToken: string,
+  refreshToken: string
+) {
+  await Promise.all([
+    set("focus_dive_access_token", accessToken),
+    set("focus_dive_refresh_token", refreshToken),
+  ]);
 }
 
-export function clearTokens() {
-  localStorage.removeItem("focus_dive_access_token");
-  localStorage.removeItem("focus_dive_refresh_token");
+export async function clearTokens() {
+  await Promise.all([
+    remove("focus_dive_access_token"),
+    remove("focus_dive_refresh_token"),
+  ]);
 }
+

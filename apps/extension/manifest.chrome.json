@@ -6,8 +6,8 @@
 
   "permissions": [
     "alarms",
-    "storage",
-    "activeTab"
+    "activeTab",
+    "storage"
   ],
 
   "host_permissions": [

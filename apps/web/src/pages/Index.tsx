@@ -1,6 +1,6 @@
-
 import { useEffect, useState } from 'react';
 import { Timer, TimerControls } from '@focusdive/timer';
+import { get, set } from "@focusdive/storage";
 import SettingsPanel from '@/components/SettingsPanel';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
@@ -20,13 +20,13 @@ const Index = () => {
   const [slackEnabled, setSlackEnabled] = useState(false);
   const [showPomodoroButton, setShowPomodoroButton] = useState(true);
 
-  // Check if Pomodoro button should be shown
   useEffect(() => {
-    const pomodoroButtonClicked = localStorage.getItem('pomodoro_button_clicked') === 'true';
-    setShowPomodoroButton(!pomodoroButtonClicked);
+    (async () => {
+      const clicked = await get('pomodoro_button_clicked');
+      setShowPomodoroButton(clicked !== 'true');
+    })();
   }, []);
 
-  // Load integration settings to determine icon colors
   useEffect(() => {
     const loadIntegrationSettings = async () => {
       if (!user) {
@@ -51,7 +51,7 @@ const Index = () => {
   };
 
   const handlePomodoroButtonClick = () => {
-    localStorage.setItem('pomodoro_button_clicked', 'true');
+    void set('pomodoro_button_clicked', 'true');
     setShowPomodoroButton(false);
     navigate('/about-pomodoro');
   };

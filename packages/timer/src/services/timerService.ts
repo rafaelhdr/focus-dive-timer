@@ -28,7 +28,7 @@ export const updateTimer = async (data: UpdateTimerPayload): Promise<boolean> =>
     });
 
     if (!response.ok) {
-      console.error("Failed to update timer:", response.statusText);
+      console.error("Failed to update timer:", response.status);
       return false;
     }
 

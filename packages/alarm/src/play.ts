@@ -34,4 +34,5 @@ export async function play(
   el.volume = clamp01(opts.volume ?? 1);
   el.currentTime = 0;
   await el.play();
+  return true;
 }

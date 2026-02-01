@@ -27,6 +27,7 @@ import {
 
 const Navigation: React.FC = () => {
   const { data: user } = useMe()
+  console.log('user', user)
   const location = useLocation();
   const { isRunning } = useTimer();
   const logout = useLogout();
@@ -113,7 +114,7 @@ const Navigation: React.FC = () => {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem disabled className="flex justify-between">
                       <span className="text-muted-foreground text-xs">
-                        {localStorage.getItem('focus_dive_user_email') || 'User'}
+                        {user?.email || 'User'}
                       </span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -175,7 +176,7 @@ const Navigation: React.FC = () => {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem disabled className="flex justify-between">
                       <span className="text-muted-foreground text-xs">
-                        {localStorage.getItem('focus_dive_user_email') || 'User'}
+                        {user?.email || 'User'}
                       </span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />

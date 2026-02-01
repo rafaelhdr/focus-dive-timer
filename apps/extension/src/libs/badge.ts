@@ -1,7 +1,5 @@
 import { type TimerMode } from "@focusdive/timer";
-import browser from "webextension-polyfill";
-
-const actionApi = browser.action ?? browser.browserAction;
+import { setBadgeBackgroundColor, setBadgeText } from "../browser/action";
 
 type BadgeColor = [number, number, number, number];
 
@@ -12,10 +10,12 @@ const BADGE_COLORS: Record<TimerMode, BadgeColor> = {
 
 export async function setBadge(text: string, mode: TimerMode = "focus") {
   const color = BADGE_COLORS[mode];
-  await actionApi.setBadgeBackgroundColor({ color });
-  await actionApi.setBadgeText({ text });
+  await Promise.all([
+    setBadgeBackgroundColor({ color }),
+    setBadgeText({ text }),
+  ]);
 }
 
 export async function clearBadge() {
-  await actionApi.setBadgeText({ text: "" });
+  await setBadgeText({ text: "" });
 }

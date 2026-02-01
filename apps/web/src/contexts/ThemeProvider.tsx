@@ -1,4 +1,4 @@
-
+import { get, set } from "@focusdive/storage";
 import { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "dark" | "light" | "system";
@@ -19,6 +19,10 @@ const initialState: ThemeProviderState = {
   setTheme: () => null,
 };
 
+function isTheme(value: unknown): value is Theme {
+  return value === "dark" || value === "light" || value === "system";
+}
+
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
@@ -27,9 +31,26 @@ export function ThemeProvider({
   storageKey = "focus-dive-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
-  );
+  const [theme, setThemeState] = useState<Theme>(defaultTheme);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      const saved = await get(storageKey);
+      if (cancelled) return;
+
+      if (isTheme(saved)) {
+        setThemeState(saved);
+      } else {
+        setThemeState(defaultTheme);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [storageKey, defaultTheme]);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -51,8 +72,8 @@ export function ThemeProvider({
   const value = {
     theme,
     setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
-      setTheme(theme);
+      set(storageKey, theme);
+      setThemeState(theme);
     },
   };
 

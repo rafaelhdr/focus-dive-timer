@@ -35,7 +35,7 @@ export function useVerifyLoginToken() {
       verifyToken(email, token),
     onSuccess: async (res) => {
       if (res?.success && res.access_token && res.refresh_token) {
-        setTokens(res.access_token, res.refresh_token);
+        await setTokens(res.access_token, res.refresh_token);
         setAuthenticated(true);
         await queryClient.invalidateQueries({ queryKey: authKeys.me() });
       }
@@ -48,9 +48,13 @@ export function useLogout() {
   const setAuthenticated = useAuthStore((s) => s.setAuthenticated);
 
   return () => {
-    clearTokens();
+    void clearTokens();
     setAuthenticated(false);
 
-    queryClient.removeQueries({ queryKey: authKeys.me(), exact: true });
+    queryClient.clear();
   };
+}
+
+export async function initAuth() {
+  await useAuthStore.getState().hydrate();
 }

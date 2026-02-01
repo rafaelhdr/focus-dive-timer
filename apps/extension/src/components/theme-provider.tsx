@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react"
+import { get, set } from "@focusdive/storage";
 
 type Theme = "dark" | "light" | "system"
 
@@ -26,9 +27,26 @@ export function ThemeProvider({
   storageKey = "focusdive-ui-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
-  )
+  const [theme, setThemeState] = useState<Theme>(defaultTheme);
+
+  function isTheme(value: unknown): value is Theme {
+    return value === "dark" || value === "light" || value === "system";
+  }
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      const saved = await get(storageKey);
+      if (cancelled) return;
+
+      setThemeState(isTheme(saved) ? saved : defaultTheme);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [storageKey, defaultTheme]);
 
   useEffect(() => {
     const root = window.document.documentElement
@@ -51,8 +69,8 @@ export function ThemeProvider({
   const value = {
     theme,
     setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme)
-      setTheme(theme)
+      void set(storageKey, theme);
+      setThemeState(theme);
     },
   }
 

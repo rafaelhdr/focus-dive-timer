@@ -1,35 +1,40 @@
+import { get, set, remove } from "@focusdive/storage";
+
 export type LoginStep = "email" | "token";
 
 const STEP_KEY = "focusdive.login.step";
 const EMAIL_KEY = "focusdive.login.email";
 
-export function getLoginStep(): LoginStep {
-  const v = localStorage.getItem(STEP_KEY);
-  return v === "token" ? "token" : "email";
+function isLoginStep(v: unknown): v is LoginStep {
+  return v === "email" || v === "token";
 }
 
-export function setLoginStep(step: LoginStep) {
-  localStorage.setItem(STEP_KEY, step);
+export async function getLoginStep(): Promise<LoginStep> {
+  const v = await get(STEP_KEY);
+  return isLoginStep(v) ? v : "email";
 }
 
-export function clearLoginStep() {
-  localStorage.removeItem(STEP_KEY);
+export async function setLoginStep(step: LoginStep): Promise<void> {
+  await set(STEP_KEY, step);
 }
 
-export function getLoginEmail(): string {
-  return localStorage.getItem(EMAIL_KEY) ?? "";
+export async function clearLoginStep(): Promise<void> {
+  await remove(STEP_KEY);
 }
 
-export function setLoginEmail(email: string) {
-  localStorage.setItem(EMAIL_KEY, email);
+export async function getLoginEmail(): Promise<string> {
+  return (await get(EMAIL_KEY)) ?? "";
 }
 
-export function clearLoginEmail() {
-  localStorage.removeItem(EMAIL_KEY);
+export async function setLoginEmail(email: string): Promise<void> {
+  await set(EMAIL_KEY, email);
 }
 
-export function clearLoginFlow() {
-  clearLoginStep();
-  clearLoginEmail();
+export async function clearLoginEmail(): Promise<void> {
+  await remove(EMAIL_KEY);
+}
+
+export async function clearLoginFlow(): Promise<void> {
+  await Promise.all([clearLoginStep(), clearLoginEmail()]);
 }
 
