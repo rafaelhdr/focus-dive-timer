@@ -8,7 +8,8 @@
     "alarms",
     "activeTab",
     "storage",
-    "https://api.focusdive.app/*"
+    "https://api.focusdive.app/*",
+    "http://localhost:5000/*"
   ],
 
 

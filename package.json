@@ -15,6 +15,7 @@
     "web:start": "pnpm --filter @focusdive/webapp start",
     "web:typecheck": "pnpm --filter @focusdive/webapp typecheck",
     "extension:dev": "dotenv -e .env -- pnpm --filter @focusdive/extension dev",
+    "extension:build:firefox-dev": "BUILD_TARGET=extension dotenv -e .env -- pnpm --filter @focusdive/extension build && cp apps/extension/manifest.firefox-dev.json apps/extension/dist/manifest.json",
     "extension:build:firefox": "BUILD_TARGET=extension dotenv -e .env -- pnpm --filter @focusdive/extension build && cp apps/extension/manifest.firefox.json apps/extension/dist/manifest.json",
     "extension:build:chrome": "BUILD_TARGET=extension dotenv -e .env -- pnpm --filter @focusdive/extension build && cp apps/extension/manifest.chrome.json apps/extension/dist/manifest.json",
     "extension:build:dev": "pnpm --filter @focusdive/extension build:dev",
