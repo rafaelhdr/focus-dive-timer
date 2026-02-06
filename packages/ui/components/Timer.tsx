@@ -3,13 +3,14 @@ import { Button } from "@focusdive/ui";
 import { cn } from '@focusdive/utils';
 
 interface TimerProps {
-  time: string;
+  time: string | null;
   mode: 'focus' | 'break';
   isActive: boolean;
   onAddFocusMinutes: (minutes: number) => void;
+  showAddFocusMinutesButton: boolean;
 }
 
-const Timer: React.FC<TimerProps> = ({ time, mode, isActive, onAddFocusMinutes }) => {
+const Timer: React.FC<TimerProps> = ({ time, mode, isActive, onAddFocusMinutes, showAddFocusMinutesButton }) => {
   return (
     <div 
       className={cn(
@@ -29,15 +30,14 @@ const Timer: React.FC<TimerProps> = ({ time, mode, isActive, onAddFocusMinutes }
         </div>
       </div>
       
-      {/* +5 Focus Minutes Button - Bottom Right */}
-      <Button
+      {showAddFocusMinutesButton && <Button
         onClick={() => onAddFocusMinutes(5)}
         size="sm"
         variant="secondary"
         className="absolute bottom-4 right-4 bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"
       >
         +5 Focus
-      </Button>
+      </Button>}
     </div>
   );
 };

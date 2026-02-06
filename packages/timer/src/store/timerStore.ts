@@ -31,6 +31,7 @@ export interface TimerState {
   start: () => void;
   pause: () => void;
   reset: () => void;
+  addFocusMinutes: (minutes: number) => void;
   setMode: (mode: TimerMode) => void;
   finish: ({expectedMode}: {expectedMode: TimerMode}) => void;
 
@@ -119,6 +120,37 @@ export const useTimerStore = create<TimerState>((set, get) => ({
   setMode: (mode) => {
     set({ mode });
     get().reset();
+  },
+
+  addFocusMinutes: (minutes) => {
+    const s = get();
+    const addMs = minutes * 60 * 1000;
+    const now = Date.now();
+    const nextSecond = now + (1000 - (now % 1000));
+
+    if (s.mode === "focus") {
+      const baseEndsAt =
+        s.isRunning && s.endsAt
+          ? s.endsAt
+          : nextSecond + Math.max(0, s.remainingTime);
+
+          set({
+            isRunning: true,
+            endsAt: baseEndsAt + addMs,
+            remainingTime: 0,
+            finishedAt: null,
+          });
+
+          return;
+    }
+
+    set({
+      mode: "focus",
+      isRunning: true,
+      endsAt: nextSecond + addMs,
+      remainingTime: 0,
+      finishedAt: null,
+    });
   },
 
   setFromServer: (data) => set(data),

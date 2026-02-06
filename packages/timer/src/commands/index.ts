@@ -23,6 +23,13 @@ export async function resetTimer() {
   await pushTimerToServer({ endsAt, remainingTime, mode, isRunning });
 }
 
+export async function addFocusMinutes(minutes: number) {
+  useTimerStore.getState().addFocusMinutes(minutes);
+
+  const { endsAt, remainingTime, mode, isRunning } = useTimerStore.getState();
+  await pushTimerToServer({ endsAt, remainingTime, mode, isRunning });
+}
+
 export async function setTimerMode(mode: TimerMode) {
   useTimerStore.getState().setMode(mode);
 
