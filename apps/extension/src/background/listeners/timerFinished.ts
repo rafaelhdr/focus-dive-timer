@@ -1,7 +1,7 @@
 import { timerEvents, type TimerMode, updateTimer } from "@focusdive/timer";
 import { getState } from "../state";
 import { markTimerFinished, restartTimerStore } from "../commands";
-import { playAlarm, AlarmSoundId } from "@focusdive/alarm";
+import { playAlarm } from "../../browser";
 import { syncBackgroundFromState } from "../timer";
 import { type TimerSyncPayload } from "../../types";
 
@@ -33,7 +33,7 @@ export function registerTimerFinishedListener() {
     if (s.lastFinishedEndsAt === endsAt) return;
     await markTimerFinished(endsAt);
 
-    playAlarm(s.alarmSound as AlarmSoundId, { volume: s.focusBeepVolume });
+    await playAlarm(s.alarmSound, { volume: s.focusBeepVolume });
     restartTimer(s, mode);
   });
 }

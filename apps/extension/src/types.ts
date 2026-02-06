@@ -20,4 +20,13 @@ export type TimerSyncMessage = {
   type: "TIMER/SYNC_BACKGROUND";
 } & TimerSyncPayload;
 
-export type ExtensionMessage = TimerSyncMessage;
+type PlayAlarmMessagePayload = {
+  soundId: string;
+  volume: number;
+};
+
+export type PlayAlarmMessage = {
+  type: "TIMER/PLAY_ALARM";
+} & PlayAlarmMessagePayload;
+
+export type ExtensionMessage = TimerSyncMessage | PlayAlarmMessage;

@@ -1,2 +1,3 @@
 export { setBadgeText, setBadgeBackgroundColor } from "./action";
-export { sendMessage, onMessage } from "./runtime";
+export { chromeApi, sendMessage, onMessage } from "./runtime";
+export { playAlarm } from "./alarm";

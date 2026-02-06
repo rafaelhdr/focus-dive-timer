@@ -12,8 +12,14 @@ function firefoxRuntime() {
   return b.runtime;
 }
 
-function chromeRuntime() {
+export function chromeApi() {
   const c = (globalThis as any).chrome;
+  if (!c) throw new Error("chrome not available");
+  return c;
+}
+
+function chromeRuntime() {
+  const c = chromeApi();
   if (!c?.runtime) throw new Error("chrome.runtime not available");
   return c.runtime;
 }

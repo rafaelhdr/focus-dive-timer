@@ -1,12 +1,13 @@
 {
   "manifest_version": 3,
-  "name": "FocusDive Extension",
-  "version": "1.0.0",
+  "name": "FocusDive Chrome Extension",
+  "version": "1.0.1",
   "description": "Block distractions and enable deep work with FocusDive",
 
   "permissions": [
-    "alarms",
     "activeTab",
+    "alarms",
+    "offscreen",
     "storage"
   ],
 
