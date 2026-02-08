@@ -5,8 +5,6 @@
   "description": "Block distractions and enable deep work with FocusDive",
 
   "permissions": [
-    "alarms",
-    "activeTab",
     "storage",
     "https://api.focusdive.app/*"
   ],
