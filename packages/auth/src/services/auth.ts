@@ -1,5 +1,5 @@
 import { getAccessToken } from '../runtime/auth';
-import { apiUrl } from '@focusdive/config';
+import { apiNewUrl, apiUrl } from '@focusdive/config';
 
 interface UserData {
   email: string;
@@ -20,7 +20,7 @@ export interface AuthLoginResponse {
 export const me = async (): Promise<UserData | null> => {
   try {
     const accessToken = await getAccessToken();
-    const response = await fetch(`${apiUrl}/auth/me`, {
+    const response = await fetch(`${apiNewUrl}/v1/users/me`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${accessToken}`,
