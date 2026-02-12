@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "FocusDive Firefox Extension",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Block distractions and enable deep work with FocusDive",
 
   "permissions": [

@@ -45,11 +45,11 @@ export const LoginScreen = () => {
     setIsLoading(true);
     try {
       await requestLoginToken.mutateAsync(email);
-      setStep("token");
       await Promise.all([
         setLoginStep("token"),
         setLoginEmail(email),
       ]);
+      setStep("token");
     } catch (_) {
       toast({
         title: "Error",
@@ -67,8 +67,8 @@ export const LoginScreen = () => {
     setIsLoading(true);
     try {
       await verifyLoginToken.mutateAsync({ email, token });
-      setStep(null);
       await setLoginStep("email");
+      setStep(null);
     } catch (_) {
       toast({
         title: "Error",
