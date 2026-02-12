@@ -19,9 +19,8 @@
     "extension:build:firefox": "BUILD_TARGET=extension dotenv -e .env -- pnpm --filter @focusdive/extension build && cp apps/extension/manifest.firefox.json apps/extension/dist/manifest.json",
     "extension:build:chrome": "BUILD_TARGET=extension dotenv -e .env -- pnpm --filter @focusdive/extension build && cp apps/extension/manifest.chrome.json apps/extension/dist/manifest.json",
     "extension:build:dev": "pnpm --filter @focusdive/extension build:dev",
-    "dev": "pnpm run web:dev",
-    "build": "pnpm run web:build",
-    "start": "pnpm run web:start"
+    "openapi:generate": "cd apps/api && ./.venv/bin/python ./src/focusdive_api/extract-openapi.py --app-dir src --out ../../packages/api-client/openapi.json main:app",
+    "openapi:convert": "pnpm --filter @focusdive/api-client run openapi:convert"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",

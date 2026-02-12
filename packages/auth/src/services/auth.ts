@@ -1,5 +1,6 @@
+import { client } from '@focusdive/api-client';
 import { getAccessToken } from '../runtime/auth';
-import { apiNewUrl, apiUrl } from '@focusdive/config';
+import { apiUrl } from '@focusdive/config';
 
 interface UserData {
   email: string;
@@ -18,26 +19,20 @@ export interface AuthLoginResponse {
 }
 
 export const me = async (): Promise<UserData | null> => {
-  try {
-    const accessToken = await getAccessToken();
-    const response = await fetch(`${apiNewUrl}/v1/users/me`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      credentials: 'include',
-    });
-    
-    if (!response.ok) {
-      console.error('Failed to fetch user subscription data:', response.status);
-      return null;
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching user subscription data:', error);
+  const accessToken = await getAccessToken();
+  const { data, error, response } = await client.GET(`/v1/users/me`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    console.error("Failed to fetch user subscription data:", response.status, error);
     return null;
   }
+
+  return data ?? null;
 };
 
 export const loginWithEmail = async (email: string): Promise<AuthLoginResponse> => {
@@ -51,13 +46,13 @@ export const loginWithEmail = async (email: string): Promise<AuthLoginResponse> 
       body: JSON.stringify({ email }),
       credentials: 'include',
     });
-    
+
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.message || 'Failed to request login token');
     }
-    
+
     console.log('Login request successful:', data);
     return {
       success: true,
@@ -82,13 +77,13 @@ export const verifyToken = async (email: string, token: string): Promise<AuthVer
       body: JSON.stringify({ email, token }),
       credentials: 'include',
     });
-    
+
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.message || 'Failed to verify token');
     }
-    
+
     return {
       success: true,
       access_token: data.access_token,
@@ -111,12 +106,12 @@ export const refreshAccessToken = async (refreshToken: string): Promise<AuthVeri
       body: JSON.stringify({ refresh_token: refreshToken }),
       credentials: 'include',
     });
-    
+
     if (!response.ok) {
       const data = await response.json();
       throw new Error(data.message || `Failed to refresh token (status: ${response.status})`);
     }
-    
+
     const data = await response.json();
     console.log('Token refresh successful');
     return {

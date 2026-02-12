@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@focusdive/config": "workspace:*",
+    "@focusdive/api-client": "workspace:*",
     "@focusdive/storage": "workspace:*",
     "@tanstack/react-query": "catalog:",
     "mitt": "catalog:",
