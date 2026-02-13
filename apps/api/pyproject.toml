@@ -9,6 +9,7 @@ dependencies = [
     "fastapi[standard]>=0.128.5",
     "mongoengine==0.29.1",
     "python-jose[cryptography]>=3.5.0",
+    "redis>=7.1.1",
 ]
 
 [dependency-groups]

@@ -20,5 +20,8 @@ class Settings(BaseSettings):
     smtp_tls: bool = False
     smtp_ssl: bool = False
 
+    redis_url: str = "redis://redis:6379/0"
+    login_code_ttl_seconds: int = 300
+
 
 settings = Settings()  # type: ignore[call-arg]

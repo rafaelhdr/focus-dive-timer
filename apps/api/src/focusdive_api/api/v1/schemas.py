@@ -6,3 +6,11 @@ class MeOut(BaseModel):
     id: str
     email: EmailStr
     is_beta_user: bool
+
+
+class LoginIn(BaseModel):
+    email: EmailStr
+
+
+class LoginOut(BaseModel):
+    message: str
