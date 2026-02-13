@@ -12,5 +12,13 @@ class Settings(BaseSettings):
     mongo_uri: str
     mongo_db: str
 
+    smtp_user: str | None = None
+    smtp_pass: SecretStr | None = None
+    smtp_from: str | None = None
+    smtp_host: str | None = None
+    smtp_port: int | None = None
+    smtp_tls: bool = False
+    smtp_ssl: bool = False
+
 
 settings = Settings()  # type: ignore[call-arg]

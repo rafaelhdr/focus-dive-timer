@@ -4,7 +4,6 @@ from focusdive_api.core.jwt import create_access_token
 from focusdive_api.main import app
 from focusdive_api.users.repo import User, UserRepo, get_user_repo
 
-
 EMAIL = "test@focusdive.app"
 
 
