@@ -7,7 +7,8 @@
     "packages/*"
   ],
   "scripts": {
-    "typecheck": "pnpm -r --no-bail exec tsc --noEmit",
+    "build": "tsc -b",
+    "typecheck": "tsc -b --noEmit",
     "test": "pnpm -r --no-bail test",
     "lint": "pnpm -r --no-bail lint",
     "lint:fix": "pnpm -r --no-bail lint --fix",

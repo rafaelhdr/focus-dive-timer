@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "exports": {
-    ".": "./index.ts",
-    "./styles.css": "./styles.css"
+    ".": "./src/index.ts",
+    "./styles.css": "./src/styles.css"
   },
   "keywords": [],
   "author": "",
