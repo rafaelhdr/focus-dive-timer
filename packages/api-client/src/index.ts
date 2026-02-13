@@ -1,17 +1,31 @@
 import { apiNewUrl } from "@focusdive/config";
-import createClient from "openapi-fetch";
-import type { paths, components } from "./__generated__/openapi";
+import createFetchClient from "openapi-fetch";
+import createClient from "openapi-react-query";
+import type { paths } from "./__generated__/openapi";
+import { getAccessToken } from "@focusdive/auth-token";
 
-export const client = createClient<paths>({ baseUrl: apiNewUrl });
+type CustomFetch = (request: Request) => Promise<Response>;
 
-// Schema Obj
-type MyType = components["schemas"]["MyType"];
+const authFetch: CustomFetch = async (request) => {
+  const token: string | null = await getAccessToken();
 
-// Path params
-type EndpointParams = paths["/my/endpoint"]["parameters"];
+  const headers = new Headers(request.headers);
+  if (token) headers.set("Authorization", `Bearer ${token}`);
 
-// Response obj
-type SuccessResponse =
-  paths["/my/endpoint"]["get"]["responses"][200]["content"]["application/json"]["schema"];
-type ErrorResponse =
-  paths["/my/endpoint"]["get"]["responses"][500]["content"]["application/json"]["schema"];
+  const nextRequest = new Request(request, {
+    headers,
+    credentials: "include",
+  });
+
+  return fetch(nextRequest);
+};
+
+export const fdFetch = createFetchClient<paths>({
+  baseUrl: apiNewUrl,
+  fetch: authFetch,
+});
+export const fdApi = createClient(fdFetch);
+
+export const fdKeys = {
+  me: () => fdApi.queryOptions("get", "/v1/users/me").queryKey,
+};

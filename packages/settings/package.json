@@ -11,6 +11,9 @@
     "@focusdive/config": "workspace:*",
     "@focusdive/auth": "workspace:*"
   },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

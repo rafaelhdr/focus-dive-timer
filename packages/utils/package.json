@@ -6,6 +6,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
   "packageManager": "pnpm@10.15.1",
   "dependencies": {
     "clsx": "^2.1.1",

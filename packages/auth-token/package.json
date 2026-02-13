@@ -1,10 +1,11 @@
 {
-  "name": "@focusdive/auth",
+  "name": "@focusdive/auth-token",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "keywords": [],
   "author": "",
+  "license": "ISC",
   "exports": {
     ".": "./src/index.ts"
   },
@@ -12,14 +13,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@focusdive/config": "workspace:*",
-    "@focusdive/api-client": "workspace:*",
-    "@focusdive/auth-token": "workspace:*",
     "@focusdive/storage": "workspace:*",
-    "@tanstack/react-query": "catalog:",
-    "mitt": "catalog:",
-    "zustand": "catalog:"
+    "@focusdive/config": "workspace:*"
   },
-  "license": "ISC",
   "packageManager": "pnpm@10.15.1"
 }

@@ -27,7 +27,6 @@ import {
 
 const Navigation: React.FC = () => {
   const { data: user } = useMe()
-  console.log('user', user)
   const location = useLocation();
   const { isRunning } = useTimer();
   const logout = useLogout();

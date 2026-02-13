@@ -11,6 +11,7 @@
   },
   "packageManager": "pnpm@10.15.1",
   "scripts": {
+    "typecheck": "tsc --noEmit",
     "openapi:convert": "openapi-typescript --output src/__generated__/openapi.ts openapi.json"
   },
   "devDependencies": {
@@ -19,6 +20,8 @@
   },
   "dependencies": {
     "@focusdive/config": "workspace:*",
-    "openapi-fetch": "^0.16.0"
+    "@focusdive/auth-token": "workspace:*",
+    "openapi-fetch": "^0.16.0",
+    "openapi-react-query": "^0.5.4"
   }
 }

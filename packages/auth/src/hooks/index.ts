@@ -1,20 +1,22 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { fdApi, fdKeys } from "@focusdive/api-client";
 import { loginWithEmail, verifyToken } from "../services/auth";
 import { setTokens } from "../storage/auth";
-import { authKeys } from '../queryKeys';
-import { me } from '../services/auth';
 import { useAuthStore } from "../store/authStore";
 import { authEvents } from "../events/authEvents";
 import { clearTokens } from '../storage/auth';
 
 export function useMe() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  return useQuery({
-    queryKey: authKeys.me(),
-    queryFn: me,
-    enabled: isAuthenticated,
-    staleTime: 60_000,
-  });
+  return fdApi.useQuery(
+    "get",
+    "/v1/users/me",
+    {},
+    {
+      enabled: isAuthenticated,
+      staleTime: 60_000,
+    },
+  );
 }
 
 export function useRequestLoginToken() {
@@ -37,7 +39,7 @@ export function useVerifyLoginToken() {
       if (res?.success && res.access_token && res.refresh_token) {
         await setTokens(res.access_token, res.refresh_token);
         setAuthenticated(true);
-        await queryClient.invalidateQueries({ queryKey: authKeys.me() });
+        await queryClient.invalidateQueries({ queryKey: fdKeys.me() });
       }
     },
   });

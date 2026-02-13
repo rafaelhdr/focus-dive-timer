@@ -9,6 +9,7 @@
     "build:dev": "vite build --mode development",
     "build:extension": "node scripts/build-extension.js",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
     "preview": "vite preview"
   },
   "dependencies": {

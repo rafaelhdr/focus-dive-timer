@@ -12,6 +12,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
   "packageManager": "pnpm@10.15.1",
   "dependencies": {
     "@focusdive/auth": "workspace:*",

@@ -1,10 +1,4 @@
-import { client } from '@focusdive/api-client';
-import { getAccessToken } from '../runtime/auth';
 import { apiUrl } from '@focusdive/config';
-
-interface UserData {
-  email: string;
-}
 
 export interface AuthVerifyResponse {
   success: boolean;
@@ -17,23 +11,6 @@ export interface AuthLoginResponse {
   success: boolean;
   message: string;
 }
-
-export const me = async (): Promise<UserData | null> => {
-  const accessToken = await getAccessToken();
-  const { data, error, response } = await client.GET(`/v1/users/me`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-    credentials: 'include',
-  });
-
-  if (!response.ok) {
-    console.error("Failed to fetch user subscription data:", response.status, error);
-    return null;
-  }
-
-  return data ?? null;
-};
 
 export const loginWithEmail = async (email: string): Promise<AuthLoginResponse> => {
   try {
@@ -92,35 +69,5 @@ export const verifyToken = async (email: string, token: string): Promise<AuthVer
   } catch (error: any) {
     console.error('Token verification failed:', error);
     throw new Error(error.message || 'Failed to verify token');
-  }
-};
-
-export const refreshAccessToken = async (refreshToken: string): Promise<AuthVerifyResponse> => {
-  try {
-    console.log('Refreshing access token');
-    const response = await fetch(`${apiUrl}/auth/refresh-token`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${refreshToken}`,
-      },
-      body: JSON.stringify({ refresh_token: refreshToken }),
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.message || `Failed to refresh token (status: ${response.status})`);
-    }
-
-    const data = await response.json();
-    console.log('Token refresh successful');
-    return {
-      success: true,
-      access_token: data.access_token,
-      refresh_token: data.refresh_token || refreshToken, // Use new refresh token if provided
-    };
-  } catch (error: any) {
-    console.error('Token refresh failed:', error);
-    throw new Error('Failed to refresh access token');
   }
 };
