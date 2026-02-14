@@ -1,4 +1,4 @@
-import { apiUrl, apiNewUrl } from '@focusdive/config';
+import { apiNewUrl } from '@focusdive/config';
 
 export interface AuthVerifyResponse {
   success: boolean;
@@ -46,7 +46,7 @@ export const loginWithEmail = async (email: string): Promise<AuthLoginResponse> 
 
 export const verifyToken = async (email: string, token: string): Promise<AuthVerifyResponse> => {
   try {
-    const response = await fetch(`${apiUrl}/auth/verify`, {
+    const response = await fetch(`${apiNewUrl}/v1/users/verify`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

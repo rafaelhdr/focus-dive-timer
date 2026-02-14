@@ -7,7 +7,8 @@ class Settings(BaseSettings):
 
     jwt_secret: SecretStr
     jwt_algorithm: str = "HS256"
-    jwt_exp_minutes: int = 2
+    jwt_access_exp_minutes: int = 15
+    jwt_refresh_exp_days: int = 15
 
     mongo_uri: str
     mongo_db: str

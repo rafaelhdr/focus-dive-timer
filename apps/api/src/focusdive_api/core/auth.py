@@ -2,18 +2,19 @@ from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError
 
-from focusdive_api.core.jwt import decode_access_token
+from focusdive_api.core.jwt import TokenService, get_token_service
 
 bearer = HTTPBearer(auto_error=True)
 
 
 async def get_current_subject(
     creds: HTTPAuthorizationCredentials = Depends(bearer),
+    tokens: TokenService = Depends(get_token_service),
 ) -> str:
     token = creds.credentials
 
     try:
-        payload = decode_access_token(token)
+        payload = tokens.decode_access_token(token)
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 

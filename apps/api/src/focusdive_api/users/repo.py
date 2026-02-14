@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from typing import Protocol
 
 from .mongoengine import User as MongoUser
@@ -18,6 +19,8 @@ class UserRepo(Protocol):
         """
         ...
 
+    async def upsert_by_email(self, email: str) -> User: ...
+
 
 class MongoUserRepo:
     async def get_user(self, user_email: str) -> User | None:
@@ -25,6 +28,23 @@ class MongoUserRepo:
             doc = MongoUser.objects.get(email=user_email)
         except MongoUser.DoesNotExist:
             return None
+
+        return User(
+            id=str(doc.id),
+            email=doc.email,
+            is_beta_user=bool(getattr(doc, "is_beta_user", False)),
+        )
+
+    async def upsert_by_email(self, email: str) -> User:
+        now = datetime.now(timezone.utc)
+        doc = MongoUser.objects(email=email).modify(
+            new=True,
+            upsert=True,
+            set_on_insert__email=email,
+            set_on_insert__is_beta_user=False,
+            set_on_insert__created_at=now,
+            set__updated_at=now,
+        )
 
         return User(
             id=str(doc.id),
