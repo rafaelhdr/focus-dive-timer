@@ -42,8 +42,8 @@ class MongoUserRepo:
             upsert=True,
             set_on_insert__email=email,
             set_on_insert__is_beta_user=False,
-            set_on_insert__created_at=now,
-            set__updated_at=now,
+            set_on_insert__created=now,
+            set__updated=now,
         )
 
         return User(

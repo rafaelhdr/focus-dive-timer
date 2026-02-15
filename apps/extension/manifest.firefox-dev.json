@@ -7,7 +7,8 @@
   "permissions": [
     "storage",
     "https://api.focusdive.app/*",
-    "http://localhost:5000/*"
+    "http://localhost:5000/*",
+    "http://localhost:8000/*"
   ],
 
 

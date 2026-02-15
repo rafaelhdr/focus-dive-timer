@@ -1,6 +1,5 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { fdApi, fdKeys } from "@focusdive/api-client";
-import { loginWithEmail, verifyToken } from "../services/auth";
 import { setTokens } from "../storage/auth";
 import { useAuthStore } from "../store/authStore";
 import { authEvents } from "../events/authEvents";
@@ -20,29 +19,34 @@ export function useMe() {
 }
 
 export function useRequestLoginToken() {
-  return useMutation({
-    mutationFn: (email: string) => loginWithEmail(email),
-    onSuccess: (_, email) => {
-      authEvents.emit("login_email_sent", { email });
-    }
-  });
+  return fdApi.useMutation(
+    "post",
+    "/v1/users/login",
+    {
+      onSuccess: (_, { body: { email } }) => {
+        authEvents.emit("login_email_sent", { email });
+      },
+    },
+  );
 }
 
 export function useVerifyLoginToken() {
   const queryClient = useQueryClient();
   const setAuthenticated = useAuthStore((s) => s.setAuthenticated);
 
-  return useMutation({
-    mutationFn: ({ email, token }: { email: string; token: string }) =>
-      verifyToken(email, token),
-    onSuccess: async (res) => {
-      if (res?.success && res.access_token && res.refresh_token) {
-        await setTokens(res.access_token, res.refresh_token);
-        setAuthenticated(true);
-        await queryClient.invalidateQueries({ queryKey: fdKeys.me() });
-      }
+  return fdApi.useMutation(
+    "post",
+    "/v1/users/verify",
+    {
+      onSuccess: async (res) => {
+        if (res.access_token && res.refresh_token) {
+          await setTokens(res.access_token, res.refresh_token);
+          setAuthenticated(true);
+          await queryClient.invalidateQueries({ queryKey: fdKeys.me() });
+        }
+      },
     },
-  });
+  );
 }
 
 export function useLogout() {

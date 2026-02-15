@@ -28,6 +28,7 @@ def create_app() -> FastAPI:
     app.include_router(v1_router)
     app.add_middleware(
         CORSMiddleware,
+        allow_origin_regex=r"^(chrome-extension|moz-extension)://[a-z0-9-]+$",
         allow_origins=origins,
         allow_credentials=True,
         allow_methods=["*"],

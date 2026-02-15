@@ -19,13 +19,13 @@ export const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [token, setToken] = useState("");
   const [step, setStep] = useState<"email" | "token">("email");
-  const [isLoading, setIsLoading] = useState(false);
   const {
     toast
   } = useToast();
 
   const requestLoginToken = useRequestLoginToken();
   const verifyLoginToken = useVerifyLoginToken();
+  const isLoading = requestLoginToken.isPending || verifyLoginToken.isPending;
 
   useEffect(() => {
     (async () => {
@@ -42,9 +42,12 @@ export const LoginScreen = () => {
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    setIsLoading(true);
     try {
-      await requestLoginToken.mutateAsync(email);
+      await requestLoginToken.mutateAsync({
+        body: {
+          email,
+        }
+      });
       await Promise.all([
         setLoginStep("token"),
         setLoginEmail(email),
@@ -56,17 +59,19 @@ export const LoginScreen = () => {
         description: "Failed to send verification token. Please try again.",
         variant: "destructive"
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const handleTokenSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) return;
-    setIsLoading(true);
     try {
-      await verifyLoginToken.mutateAsync({ email, token });
+      await verifyLoginToken.mutateAsync({
+        body: {
+          email,
+          token,
+        }
+      });
       await setLoginStep("email");
       setStep(null);
     } catch (_) {
@@ -75,8 +80,6 @@ export const LoginScreen = () => {
         description: "Invalid token. Please try again.",
         variant: "destructive"
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 

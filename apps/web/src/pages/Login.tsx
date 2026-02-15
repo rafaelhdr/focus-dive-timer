@@ -46,13 +46,15 @@ const Login = () => {
 
   const onEmailSubmit = async (values: EmailFormValues) => {
     try {
-      const res = await requestLoginToken.mutateAsync(values.email);
+      const res = await requestLoginToken.mutateAsync({
+        body: {
+          email: values.email,
+        }
+      });
 
-      // Ajuste conforme o retorno real da sua API
-      if (res?.success) {
-        setEmail(values.email);
-        setCurrentStep('verification');
-      }
+      setEmail(values.email);
+      setCurrentStep('verification');
+      toast.success(res.message)
     } catch (e) {
       toast.error('Failed to request login code');
     }
@@ -60,16 +62,14 @@ const Login = () => {
 
   const onVerificationSubmit = async (values: VerificationFormValues) => {
     try {
-      const res = await verifyLoginToken.mutateAsync({
-        email,
-        token: values.token,
+      await verifyLoginToken.mutateAsync({
+        body: {
+          email,
+          token: values.token,
+        }
       });
 
-      if (res?.success) {
-        navigate('/');
-      } else {
-        toast.error(res?.message ?? 'Invalid verification code');
-      }
+      navigate('/');
     } catch (e) {
       toast.error('Failed to verify code');
     }
