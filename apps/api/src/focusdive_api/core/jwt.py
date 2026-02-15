@@ -17,14 +17,14 @@ class TokenService(Protocol):
     def create_access_token(self, *, user_id: str) -> str: ...
     def create_refresh_token(self, *, user_id: str) -> str: ...
     def issue_token_pair(self, *, user_id: str) -> TokenPair: ...
-    def decode_access_token(self, token: str) -> dict: ...
+    def decode_token(self, token: str) -> dict: ...
 
 
 class JwtTokenService:
     def create_access_token(self, *, user_id: str) -> str:
         now = datetime.now(timezone.utc)
         payload = {
-            "typ": "access",
+            "type": "access",
             "sub": user_id,
             "iat": int(now.timestamp()),
             "exp": int(
@@ -40,7 +40,7 @@ class JwtTokenService:
     def create_refresh_token(self, *, user_id: str) -> str:
         now = datetime.now(timezone.utc)
         payload = {
-            "typ": "refresh",
+            "type": "refresh",
             "sub": user_id,
             "iat": int(now.timestamp()),
             "exp": int(
@@ -59,7 +59,7 @@ class JwtTokenService:
             refresh_token=self.create_refresh_token(user_id=user_id),
         )
 
-    def decode_access_token(self, token: str) -> dict:
+    def decode_token(self, token: str) -> dict:
         return jwt.decode(
             token,
             settings.jwt_secret.get_secret_value(),

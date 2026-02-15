@@ -87,6 +87,32 @@
         }
       }
     },
+    "/v1/users/refresh-token": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Refresh Token",
+        "operationId": "refresh_token_v1_users_refresh_token_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/v1/users/me": {
       "get": {
         "tags": [
@@ -199,6 +225,24 @@
           "is_beta_user"
         ],
         "title": "MeOut"
+      },
+      "RefreshOut": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "refresh_token": {
+            "type": "string",
+            "title": "Refresh Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token",
+          "refresh_token"
+        ],
+        "title": "RefreshOut"
       },
       "ValidationError": {
         "properties": {

@@ -14,7 +14,7 @@ async def get_current_subject(
     token = creds.credentials
 
     try:
-        payload = tokens.decode_access_token(token)
+        payload = tokens.decode_token(token)
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 

@@ -24,3 +24,8 @@ class VerifyIn(BaseModel):
 class VerifyOut(BaseModel):
     access_token: str
     refresh_token: str
+
+
+class RefreshOut(BaseModel):
+    access_token: str
+    refresh_token: str

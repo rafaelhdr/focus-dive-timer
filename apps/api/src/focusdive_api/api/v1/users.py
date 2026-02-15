@@ -3,6 +3,7 @@ import secrets
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from redis.asyncio import Redis
+from fastapi.security import HTTPBearer
 
 from focusdive_api.core.auth import get_current_subject
 from focusdive_api.core.jwt import TokenService, get_token_service
@@ -11,9 +12,10 @@ from focusdive_api.core.settings import settings
 from focusdive_api.emails.deps import Mailer, get_mailer
 from focusdive_api.users.repo import UserRepo, get_user_repo
 
-from .schemas import LoginIn, LoginOut, MeOut, VerifyIn, VerifyOut
+from .schemas import LoginIn, LoginOut, MeOut, RefreshOut, VerifyIn, VerifyOut
 
 MAX_ATTEMPTS = 5
+bearer = HTTPBearer(auto_error=True)
 
 router = APIRouter(tags=["users"])
 
@@ -90,6 +92,19 @@ async def verify(
     )
 
     return VerifyOut(access_token=access, refresh_token=refresh)
+
+
+@router.post("/refresh-token")
+async def refresh_token(
+    subject: str = Depends(get_current_subject),
+    tokens: TokenService = Depends(get_token_service),
+) -> RefreshOut:
+    return RefreshOut(
+        access_token=tokens.create_access_token(
+            user_id=subject,
+        ),
+        refresh_token=tokens.create_refresh_token(user_id=subject),
+    )
 
 
 @router.get("/me", response_model=MeOut)

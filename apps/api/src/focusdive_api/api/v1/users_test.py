@@ -5,6 +5,7 @@ from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
+from fastapi import HTTPException
 
 from focusdive_api.core.jwt import get_token_service
 from focusdive_api.core.redis import get_redis
@@ -90,10 +91,13 @@ class FakeTokenService:
     def create_access_token(self, *, user_id: str) -> str:
         return f"access:{user_id}"
 
-    def decode_access_token(self, token: str) -> dict:
+    def create_refresh_token(self, *, user_id: str) -> str:
+        return f"access:{user_id}"
+
+    def decode_token(self, token: str) -> dict:
         if token.startswith("access:"):
             return {"sub": token[len("access:"):]}
-        raise ValueError("Invalid token")
+        raise HTTPException(status_code=401, detail="Invalid token")
 
     def issue_token_pair(self, *, user_id: str):
         return TokenPair(
@@ -221,6 +225,39 @@ class TestVerify:
         assert asyncio.run(fake_redis.get(attempts_key)) is None
 
         assert fake_repo.upserted == [EMAIL]
+
+
+class TestRefreshToken:
+
+    def test_refresh_token_missing_authorization(self, client):
+        c, *_ = client
+
+        res = c.post("/v1/users/refresh-token")
+        assert res.status_code in (401, 403)
+
+    def test_refresh_token_invalid_token(self, client):
+        c, *_ = client
+
+        res = c.post(
+            "/v1/users/refresh-token",
+            headers={"Authorization": "Bearer invalid-token"},
+        )
+        assert res.status_code == 401
+
+    def test_refresh_token_success_returns_new_tokens(self, client):
+        client, _, _, fake_tokens, _ = client
+
+        token = fake_tokens.create_access_token(user_id="user_123")
+
+        res = client.post(
+            "/v1/users/refresh-token",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert res.status_code == 200
+
+        data = res.json()
+        assert "access_token" in data
+        assert "refresh_token" in data
 
 
 class TestMe:
