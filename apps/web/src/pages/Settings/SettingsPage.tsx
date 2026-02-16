@@ -1,10 +1,10 @@
 import { Loader2 } from 'lucide-react';
 import Navigation from '@/components/Navigation';
-import { useSettingsQuery } from '@focusdive/settings';
+import { usePreferences } from '@focusdive/settings';
 import SettingsCards from './components/SettingsCards';
 
 const Settings = () => {
-  const { isLoading } = useSettingsQuery();
+  const { isLoading } = usePreferences();
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-background p-4 transition-colors duration-300">

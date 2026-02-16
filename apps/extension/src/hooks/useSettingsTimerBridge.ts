@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { useSettingsQuery } from "@focusdive/settings";
+import { usePreferences } from "@focusdive/settings";
 import { useTimerStore } from "@focusdive/timer";
 
 export function useSettingsTimerBridge() {
-  const { data: settings } = useSettingsQuery();
+  const { data: settings } = usePreferences();
 
   useEffect(() => {
     if (!settings) return;

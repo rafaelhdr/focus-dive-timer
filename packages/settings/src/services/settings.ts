@@ -1,6 +1,6 @@
 import { apiUrl } from "@focusdive/config";
 import { getAccessToken } from "@focusdive/auth";
-import { Settings } from "../types";
+import { Preferences } from "../types";
 import { fromSettingsApi, toSettingsApiPatch } from "../mappers";
 
 async function authHeaders() {
@@ -11,7 +11,7 @@ async function authHeaders() {
   };
 }
 
-export async function fetchSettings(): Promise<Settings> {
+export async function fetchSettings(): Promise<Preferences> {
   const res = await fetch(`${apiUrl}/preferences`, {
     method: "GET",
     headers: await authHeaders(),
@@ -27,8 +27,8 @@ export async function fetchSettings(): Promise<Settings> {
 }
 
 export async function updateSettings(
-  patch: Partial<Settings>
-): Promise<Settings> {
+  patch: Partial<Preferences>
+): Promise<Preferences> {
   const res = await fetch(`${apiUrl}/preferences`, {
     method: "PUT",
     headers: await authHeaders(),

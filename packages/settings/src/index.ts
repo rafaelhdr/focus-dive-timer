@@ -1,2 +1,2 @@
-export { useSettingsQuery, useUpdateSettingsMutation } from "./hooks/settings";
-export { type Settings } from "./types";
+export { usePreferences, useUpdatePreferences } from "./hooks/preferences";
+export { type Preferences } from "./types";

@@ -580,6 +580,9 @@ importers:
       '@focusdive/config':
         specifier: workspace:*
         version: link:../config
+      '@focusdive/storage':
+        specifier: workspace:*
+        version: link:../storage
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.90.16(react@18.3.1)

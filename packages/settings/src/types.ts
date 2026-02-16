@@ -1,4 +1,4 @@
-export interface Settings {
+export interface Preferences {
   focusBeepEnabled: boolean;
   focusBeepVolume: number;
   alarmSound: string;

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { sendMessage } from "../browser";
 import { useTimerStore } from "@focusdive/timer";
-import { useSettingsQuery } from "@focusdive/settings";
+import { usePreferences } from "@focusdive/settings";
 import { useShallow } from 'zustand/react/shallow'
 import { type TimerSyncMessage } from "../types";
 
@@ -16,7 +16,7 @@ export function useTimerWorkerBridge() {
       }),
     ));
   
-  const { data: settings } = useSettingsQuery();
+  const { data: settings } = usePreferences();
 
   useEffect(() => {
     if (!settings) return;

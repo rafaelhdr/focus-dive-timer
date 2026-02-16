@@ -9,7 +9,8 @@
   "dependencies": {
     "@tanstack/react-query": "catalog:",
     "@focusdive/config": "workspace:*",
-    "@focusdive/auth": "workspace:*"
+    "@focusdive/auth": "workspace:*",
+    "@focusdive/storage": "workspace:*"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"

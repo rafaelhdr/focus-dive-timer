@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { playAlarm, type AlarmSoundId } from "@focusdive/alarm";
-import { useSettingsQuery } from "@focusdive/settings";
+import { usePreferences } from "@focusdive/settings";
 import { timerEvents } from "@focusdive/timer";
 
 export function useTimerFinishedAlarm() {
-  const { data: settings } = useSettingsQuery();
+  const { data: settings } = usePreferences();
 
   useEffect(() => {
     if (!settings) return;

@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { useSettingsQuery, useUpdateSettingsMutation, type Settings } from "@focusdive/settings";
+import { usePreferences, useUpdatePreferences, type Preferences } from "@focusdive/settings";
 
-function toDraft(s: Settings) {
+function toDraft(s: Preferences) {
   return {
     focusBeepEnabled: s.focusBeepEnabled,
     focusBeepVolume: s.focusBeepVolume,
@@ -15,14 +15,14 @@ function toDraft(s: Settings) {
 }
 
 export function useAutoSaveSettings() {
-  const { data: settings } = useSettingsQuery();
-  const update = useUpdateSettingsMutation();
+  const { data: settings } = usePreferences();
+  const update = useUpdatePreferences();
 
   const [draft, setDraft] = useState<ReturnType<typeof toDraft> | null>(null);
   const lastSavedRef = useRef<string>("");
   const skipNextRef = useRef(true);
 
-  function patchDraft(patch: Partial<Settings>) {
+  function patchDraft(patch: Partial<Preferences>) {
     setDraft((d) => (d ? { ...d, ...patch } : d));
   }
 
@@ -47,7 +47,7 @@ export function useAutoSaveSettings() {
       try {
         await update.mutateAsync(draft);
         lastSavedRef.current = serialized;
-        toast.success("Settings saved");
+        toast.success("Preferences saved");
       } catch {
         toast.error("Failed to save settings");
       }

@@ -1,6 +1,6 @@
-import type { Settings, SettingsApi } from "./types";
+import type { Preferences, SettingsApi } from "./types";
 
-export function fromSettingsApi(data: SettingsApi): Settings {
+export function fromSettingsApi(data: SettingsApi): Preferences {
   return {
     focusBeepEnabled: data.focus_beep_enabled,
     focusBeepVolume: data.focus_beep_volume,
@@ -12,7 +12,7 @@ export function fromSettingsApi(data: SettingsApi): Settings {
   };
 }
 
-export function toSettingsApiPatch(patch: Partial<Settings>): Partial<SettingsApi> {
+export function toSettingsApiPatch(patch: Partial<Preferences>): Partial<SettingsApi> {
   const out: Partial<SettingsApi> = {};
 
   if ("focusBeepEnabled" in patch) out.focus_beep_enabled = patch.focusBeepEnabled!;
