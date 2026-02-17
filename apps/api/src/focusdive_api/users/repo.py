@@ -10,14 +10,11 @@ class User:
     id: str
     email: str
     is_beta_user: bool
+    preferences: dict
 
 
 class UserRepo(Protocol):
-    async def get_user(self, subject: str) -> User | None:
-        """
-        subject = value from JWT 'sub'
-        """
-        ...
+    async def get_user(self, subject: str) -> User | None: ...
 
     async def upsert_by_email(self, email: str) -> User: ...
 
@@ -33,6 +30,7 @@ class MongoUserRepo:
             id=str(doc.id),
             email=doc.email,
             is_beta_user=bool(getattr(doc, "is_beta_user", False)),
+            preferences=getattr(doc, "preferences", {}) or {},
         )
 
     async def upsert_by_email(self, email: str) -> User:
@@ -50,6 +48,7 @@ class MongoUserRepo:
             id=str(doc.id),
             email=doc.email,
             is_beta_user=bool(getattr(doc, "is_beta_user", False)),
+            preferences=getattr(doc, "preferences", {}) or {},
         )
 
 

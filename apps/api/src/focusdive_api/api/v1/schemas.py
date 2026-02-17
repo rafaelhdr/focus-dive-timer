@@ -1,3 +1,6 @@
+from decimal import Decimal
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
@@ -29,3 +32,13 @@ class VerifyOut(BaseModel):
 class RefreshOut(BaseModel):
     access_token: str
     refresh_token: str
+
+
+class UserPreferencesInOut(BaseModel):
+    alarm_sound: Literal["minimalistic", "wooden", "snappy", "level"] = "minimalistic"
+    focus_beep_enabled: bool = True
+    focus_beep_volume: float = Field(1.0, ge=0, le=1)
+    autostart_focus: bool = True
+    autostart_break: bool = True
+    default_focus_duration: int = Field(25, ge=1)
+    default_break_duration: int = Field(5, ge=1)

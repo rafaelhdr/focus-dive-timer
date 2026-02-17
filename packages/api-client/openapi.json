@@ -139,6 +139,32 @@
         ]
       }
     },
+    "/v1/preferences": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Get Preferences",
+        "operationId": "get_preferences_v1_preferences_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPreferencesInOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -243,6 +269,57 @@
           "refresh_token"
         ],
         "title": "RefreshOut"
+      },
+      "UserPreferencesInOut": {
+        "properties": {
+          "alarm_sound": {
+            "type": "string",
+            "enum": [
+              "minimalistic",
+              "wooden",
+              "snappy",
+              "level"
+            ],
+            "title": "Alarm Sound",
+            "default": "minimalistic"
+          },
+          "focus_beep_enabled": {
+            "type": "boolean",
+            "title": "Focus Beep Enabled",
+            "default": true
+          },
+          "focus_beep_volume": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Focus Beep Volume",
+            "default": 1.0
+          },
+          "autostart_focus": {
+            "type": "boolean",
+            "title": "Autostart Focus",
+            "default": true
+          },
+          "autostart_break": {
+            "type": "boolean",
+            "title": "Autostart Break",
+            "default": true
+          },
+          "default_focus_duration": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Default Focus Duration",
+            "default": 25
+          },
+          "default_break_duration": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Default Break Duration",
+            "default": 5
+          }
+        },
+        "type": "object",
+        "title": "UserPreferencesInOut"
       },
       "ValidationError": {
         "properties": {

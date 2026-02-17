@@ -38,6 +38,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/users/refresh-token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refresh Token */
+        post: operations["refresh_token_v1_users_refresh_token_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/users/me": {
         parameters: {
             query?: never;
@@ -47,6 +64,23 @@ export interface paths {
         };
         /** Me */
         get: operations["me_v1_users_me_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Preferences */
+        get: operations["get_preferences_v1_preferences_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -105,6 +139,52 @@ export interface components {
             email: string;
             /** Is Beta User */
             is_beta_user: boolean;
+        };
+        /** RefreshOut */
+        RefreshOut: {
+            /** Access Token */
+            access_token: string;
+            /** Refresh Token */
+            refresh_token: string;
+        };
+        /** UserPreferencesInOut */
+        UserPreferencesInOut: {
+            /**
+             * Alarm Sound
+             * @default minimalistic
+             * @enum {string}
+             */
+            alarm_sound: "minimalistic" | "wooden" | "snappy" | "level";
+            /**
+             * Focus Beep Enabled
+             * @default true
+             */
+            focus_beep_enabled: boolean;
+            /**
+             * Focus Beep Volume
+             * @default 1
+             */
+            focus_beep_volume: number;
+            /**
+             * Autostart Focus
+             * @default true
+             */
+            autostart_focus: boolean;
+            /**
+             * Autostart Break
+             * @default true
+             */
+            autostart_break: boolean;
+            /**
+             * Default Focus Duration
+             * @default 25
+             */
+            default_focus_duration: number;
+            /**
+             * Default Break Duration
+             * @default 5
+             */
+            default_break_duration: number;
         };
         /** ValidationError */
         ValidationError: {
@@ -211,6 +291,26 @@ export interface operations {
             };
         };
     };
+    refresh_token_v1_users_refresh_token_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RefreshOut"];
+                };
+            };
+        };
+    };
     me_v1_users_me_get: {
         parameters: {
             query?: never;
@@ -227,6 +327,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MeOut"];
+                };
+            };
+        };
+    };
+    get_preferences_v1_preferences_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserPreferencesInOut"];
                 };
             };
         };

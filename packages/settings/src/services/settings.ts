@@ -1,3 +1,4 @@
+import { fdFetch } from "@focusdive/api-client";
 import { apiUrl } from "@focusdive/config";
 import { getAccessToken } from "@focusdive/auth";
 import { Preferences } from "../types";
@@ -12,18 +13,13 @@ async function authHeaders() {
 }
 
 export async function fetchSettings(): Promise<Preferences> {
-  const res = await fetch(`${apiUrl}/preferences`, {
-    method: "GET",
-    headers: await authHeaders(),
-    cache: "no-cache",
-    credentials: "include",
-  });
+  const { data, error } = await fdFetch.GET("/v1/preferences")
 
-  if (!res.ok) {
-    throw new Error(`Failed to fetch settings: ${res.status}`);
+  if (error) {
+    throw new Error("Failed to fetch preferences");
   }
 
-  return fromSettingsApi(await res.json());
+  return fromSettingsApi(data);
 }
 
 export async function updateSettings(

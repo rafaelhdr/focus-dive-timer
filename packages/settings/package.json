@@ -7,10 +7,11 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@tanstack/react-query": "catalog:",
-    "@focusdive/config": "workspace:*",
+    "@focusdive/api-client": "workspace:*",
     "@focusdive/auth": "workspace:*",
-    "@focusdive/storage": "workspace:*"
+    "@focusdive/config": "workspace:*",
+    "@focusdive/storage": "workspace:*",
+    "@tanstack/react-query": "catalog:"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
