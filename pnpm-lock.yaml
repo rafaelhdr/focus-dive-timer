@@ -574,6 +574,9 @@ importers:
 
   packages/settings:
     dependencies:
+      '@focusdive/alarm':
+        specifier: workspace:*
+        version: link:../alarm
       '@focusdive/api-client':
         specifier: workspace:*
         version: link:../api-client

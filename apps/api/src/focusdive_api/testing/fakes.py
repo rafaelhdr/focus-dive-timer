@@ -4,7 +4,7 @@ from typing import Any
 from fastapi import HTTPException
 
 from focusdive_api.emails.deps import Mailer
-from focusdive_api.users.repo import User, UserRepo
+from focusdive_api.users.repo import DEFAULT_PREFERENCES, User, UserRepo
 
 
 @dataclass(frozen=True)
@@ -68,7 +68,7 @@ class FakeUserRepo(UserRepo):
             id=subject,
             email=self.email,
             is_beta_user=False,
-            preferences={},
+            preferences=DEFAULT_PREFERENCES,
         )
 
     async def upsert_by_email(self, email: str) -> User:
@@ -77,7 +77,15 @@ class FakeUserRepo(UserRepo):
             id="user_123",
             email=email,
             is_beta_user=False,
-            preferences={},
+            preferences=DEFAULT_PREFERENCES,
+        )
+
+    async def update_preferences(self, user: User, new_prefs: dict) -> User:
+        return User(
+            id=user.id,
+            email=user.email,
+            is_beta_user=user.is_beta_user,
+            preferences=new_prefs,
         )
 
 

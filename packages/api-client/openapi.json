@@ -142,7 +142,7 @@
     "/v1/preferences": {
       "get": {
         "tags": [
-          "users"
+          "preferences"
         ],
         "summary": "Get Preferences",
         "operationId": "get_preferences_v1_preferences_get",
@@ -153,6 +153,50 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UserPreferencesInOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "preferences"
+        ],
+        "summary": "Update Preferences",
+        "operationId": "update_preferences_v1_preferences_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserPreferencesInOut"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPreferencesInOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }

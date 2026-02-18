@@ -57,7 +57,7 @@ const SettingsCards = () => {
             </Label>
             <Select
               value={draft.alarmSound || 'minimalistic'}
-              onValueChange={(value) => patchDraft({ alarmSound: value })}
+              onValueChange={(value) => patchDraft({ alarmSound: value as AlarmSoundId })}
               disabled={!draft.focusBeepEnabled}
             >
               <SelectTrigger id="alarm-sound" className="w-full">

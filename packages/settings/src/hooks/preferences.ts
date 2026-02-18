@@ -51,7 +51,7 @@ export function useUpdatePreferences() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: (patch: Partial<Preferences>) =>
+    mutationFn: (patch: Preferences) =>
       isAuthenticated ? updateSettings(patch) : updatePreferencesLocal(patch),
 
     onMutate: async (patch) => {

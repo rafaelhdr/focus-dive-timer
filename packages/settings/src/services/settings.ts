@@ -1,16 +1,6 @@
 import { fdFetch } from "@focusdive/api-client";
-import { apiUrl } from "@focusdive/config";
-import { getAccessToken } from "@focusdive/auth";
 import { Preferences } from "../types";
 import { fromSettingsApi, toSettingsApiPatch } from "../mappers";
-
-async function authHeaders() {
-  const accessToken = await getAccessToken();
-  return {
-    "Content-Type": "application/json",
-    ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-  };
-}
 
 export async function fetchSettings(): Promise<Preferences> {
   const { data, error } = await fdFetch.GET("/v1/preferences")
@@ -23,18 +13,15 @@ export async function fetchSettings(): Promise<Preferences> {
 }
 
 export async function updateSettings(
-  patch: Partial<Preferences>
+  patch: Preferences
 ): Promise<Preferences> {
-  const res = await fetch(`${apiUrl}/preferences`, {
-    method: "PUT",
-    headers: await authHeaders(),
-    body: JSON.stringify(toSettingsApiPatch(patch)),
-    credentials: "include",
+  const { data, error } = await fdFetch.PUT("/v1/preferences", {
+    body: toSettingsApiPatch(patch),
   });
 
-  if (!res.ok) {
-    throw new Error(`Failed to save settings: ${res.status}`);
+  if (error) {
+    throw new Error("Failed to save preferences");
   }
 
- return fromSettingsApi(await res.json());
+  return fromSettingsApi(data);
 }

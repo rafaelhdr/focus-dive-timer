@@ -81,7 +81,8 @@ export interface paths {
         };
         /** Get Preferences */
         get: operations["get_preferences_v1_preferences_get"];
-        put?: never;
+        /** Update Preferences */
+        put: operations["update_preferences_v1_preferences_put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -347,6 +348,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserPreferencesInOut"];
+                };
+            };
+        };
+    };
+    update_preferences_v1_preferences_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserPreferencesInOut"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserPreferencesInOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
