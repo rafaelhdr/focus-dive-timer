@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./contexts/ThemeProvider";
 import SentryErrorBoundary from "./components/SentryErrorBoundary";
 import Index from "./pages/Index";
-import Settings from "./pages/Settings/SettingsPage";
+import Preferences from "./pages/Preferences/PreferencesPage";
 import Integrations from "./pages/Integrations";
 import SlackConnect from "./pages/SlackConnect";
 import Login from "./pages/Login";
@@ -17,7 +17,7 @@ import Support from "./pages/Support";
 import TermsOfService from "./pages/TermsOfService";
 import SubProcessors from "./pages/SubProcessors";
 import AboutPomodoro from "./pages/AboutPomodoro";
-import { useSettingsTimerBridge } from "@/hooks/useSettingsTimerBridge";
+import { usePreferencesTimerBridge } from "@/hooks/usePreferencesTimerBridge";
 import { useTimerFinishedAlarm } from "@/hooks/useTimerFinishedAlarm";
 import { useOnTimerFinished } from "@/hooks/useOnTimerFinished";
 import { useDocumentTitleTimer } from "@/hooks/useDocumentTitleTimer";
@@ -35,7 +35,7 @@ function TimerEffects() {
   useTimerRealtime();
   useTimerElapsedDetector();
   useOnTimerFinished();
-  useSettingsTimerBridge();
+  usePreferencesTimerBridge();
   useTimerFinishedAlarm();
   useDocumentTitleTimer();
   return null;
@@ -57,7 +57,7 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/" element={<Index />} />
               <Route path="/about-pomodoro" element={<AboutPomodoro />} />
-              <Route path="/settings" element={<Settings />} />
+              <Route path="/preferences" element={<Preferences />} />
               <Route path="/integrations" element={<Integrations />} />
               <Route path="/integrations/slack" element={<Integrations />} />
               <Route path="/slack/connect" element={<SlackConnect />} />

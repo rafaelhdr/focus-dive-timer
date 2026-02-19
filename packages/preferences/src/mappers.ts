@@ -1,6 +1,6 @@
-import type { Preferences, SettingsApi } from "./types";
+import type { Preferences, PreferencesApi } from "./types";
 
-export function fromSettingsApi(data: SettingsApi): Preferences {
+export function fromPreferencesApi(data: PreferencesApi): Preferences {
   return {
     focusBeepEnabled: data.focus_beep_enabled,
     focusBeepVolume: data.focus_beep_volume,
@@ -12,7 +12,7 @@ export function fromSettingsApi(data: SettingsApi): Preferences {
   };
 }
 
-export function toSettingsApiPatch(patch: Preferences): SettingsApi {
+export function toPreferencesApiPatch(patch: Preferences): PreferencesApi {
   return {
     focus_beep_enabled: patch.focusBeepEnabled,
     focus_beep_volume: patch.focusBeepVolume,

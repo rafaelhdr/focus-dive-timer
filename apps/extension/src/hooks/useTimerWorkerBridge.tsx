@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { sendMessage } from "../browser";
 import { useTimerStore } from "@focusdive/timer";
-import { usePreferences } from "@focusdive/settings";
+import { usePreferences } from "@focusdive/preferences";
 import { useShallow } from 'zustand/react/shallow'
 import { type TimerSyncMessage } from "../types";
 
@@ -16,10 +16,10 @@ export function useTimerWorkerBridge() {
       }),
     ));
   
-  const { data: settings } = usePreferences();
+  const { data: preferences } = usePreferences();
 
   useEffect(() => {
-    if (!settings) return;
+    if (!preferences) return;
 
     const message: TimerSyncMessage = {
       type: "TIMER/SYNC_BACKGROUND",
@@ -27,14 +27,14 @@ export function useTimerWorkerBridge() {
       mode,
       isRunning,
       remainingTime,
-      focusBeepEnabled: settings.focusBeepEnabled,
-      focusBeepVolume: settings.focusBeepVolume,
-      alarmSound: settings.alarmSound,
-      autostartFocus: settings.autostartFocus,
-      autostartBreak: settings.autostartBreak,
-      defaultFocusDuration: settings.defaultFocusDuration,
-      defaultBreakDuration: settings.defaultBreakDuration,
+      focusBeepEnabled: preferences.focusBeepEnabled,
+      focusBeepVolume: preferences.focusBeepVolume,
+      alarmSound: preferences.alarmSound,
+      autostartFocus: preferences.autostartFocus,
+      autostartBreak: preferences.autostartBreak,
+      defaultFocusDuration: preferences.defaultFocusDuration,
+      defaultBreakDuration: preferences.defaultBreakDuration,
     }
     sendMessage(message);
-  }, [endsAt, mode, isRunning, remainingTime, settings]);
+  }, [endsAt, mode, isRunning, remainingTime, preferences]);
 }

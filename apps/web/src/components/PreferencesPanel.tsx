@@ -2,15 +2,15 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
-import { useAutoSaveSettings } from '@/hooks/useAutoSaveSettings';
+import { useAutoSavePreferences } from '@/hooks/useAutoSavePreferences';
 
-const SettingsPanel: React.FC = () => {
-  const { draft, patchDraft } = useAutoSaveSettings();
+const PreferencesPanel: React.FC = () => {
+  const { draft, patchDraft } = useAutoSavePreferences();
 
   return (
     <Card className="mt-6">
       <CardHeader>
-        <CardTitle className="text-xl">Timer Settings</CardTitle>
+        <CardTitle className="text-xl">Timer Preferences</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
@@ -49,4 +49,4 @@ const SettingsPanel: React.FC = () => {
   );
 };
 
-export default SettingsPanel;
+export default PreferencesPanel;

@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@focusdive/auth";
-import { fetchSettings, updateSettings } from "../services/settings";
+import { fetchPreferences, updatePreferences } from "../services/preferences";
 import { Preferences } from "../types";
 import { getJSON, setJSON } from "@focusdive/storage";
 
-export const settingsQueryKey = ["settings"] as const;
+export const preferencesQueryKey = ["preferences"] as const;
 
 const PREFERENCES_STORAGE_KEY = "focusdive:preferences";
 
@@ -39,8 +39,8 @@ async function updatePreferencesLocal(patch: Partial<Preferences>): Promise<Pref
 export function usePreferences() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useQuery({
-    queryKey: [settingsQueryKey, isAuthenticated],
-    queryFn: isAuthenticated ? fetchSettings : fetchPreferencesLocal,
+    queryKey: [preferencesQueryKey, isAuthenticated],
+    queryFn: isAuthenticated ? fetchPreferences : fetchPreferencesLocal,
     staleTime: 1000 * 60 * 30,
     refetchOnWindowFocus: false,
   });
@@ -52,14 +52,14 @@ export function useUpdatePreferences() {
 
   return useMutation({
     mutationFn: (patch: Preferences) =>
-      isAuthenticated ? updateSettings(patch) : updatePreferencesLocal(patch),
+      isAuthenticated ? updatePreferences(patch) : updatePreferencesLocal(patch),
 
     onMutate: async (patch) => {
-      await qc.cancelQueries({ queryKey: settingsQueryKey });
+      await qc.cancelQueries({ queryKey: preferencesQueryKey });
 
-      const prev = qc.getQueryData<Preferences>(settingsQueryKey);
+      const prev = qc.getQueryData<Preferences>(preferencesQueryKey);
 
-      qc.setQueryData<Preferences>(settingsQueryKey, (old) => {
+      qc.setQueryData<Preferences>(preferencesQueryKey, (old) => {
         const base = old ?? ({} as Preferences);
         return { ...base, ...patch } as Preferences;
       });
@@ -68,12 +68,12 @@ export function useUpdatePreferences() {
     },
 
     onError: (_err, _patch, ctx) => {
-      if (ctx?.prev) qc.setQueryData(settingsQueryKey, ctx.prev);
-      else qc.removeQueries({ queryKey: settingsQueryKey });
+      if (ctx?.prev) qc.setQueryData(preferencesQueryKey, ctx.prev);
+      else qc.removeQueries({ queryKey: preferencesQueryKey });
     },
 
     onSuccess: (data) => {
-      qc.setQueryData(settingsQueryKey, data);
+      qc.setQueryData(preferencesQueryKey, data);
     },
   });
 }

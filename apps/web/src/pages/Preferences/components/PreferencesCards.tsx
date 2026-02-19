@@ -13,10 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useAutoSaveSettings } from '@/hooks/useAutoSaveSettings';
+import { useAutoSavePreferences } from '@/hooks/useAutoSavePreferences';
 
-const SettingsCards = () => {
-  const { draft, patchDraft } = useAutoSaveSettings();
+const PreferencesCards = () => {
+  const { draft, patchDraft } = useAutoSavePreferences();
   const handleToggleSound = console.log
 
   const getVolumeIcon = () => {
@@ -37,7 +37,7 @@ const SettingsCards = () => {
     <div className="w-full max-w-md space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-xl">Sound Settings</CardTitle>
+          <CardTitle className="text-xl">Sound Preferences</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-center justify-between">
@@ -107,7 +107,7 @@ const SettingsCards = () => {
       <Card>
         <CardHeader>
           <CardTitle className="text-xl flex items-center gap-2">
-            <Clock className="h-5 w-5" /> Timer Settings
+            <Clock className="h-5 w-5" /> Timer Preferences
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -138,4 +138,4 @@ const SettingsCards = () => {
   );
 }
 
-export default SettingsCards;
+export default PreferencesCards;

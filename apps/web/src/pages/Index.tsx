@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Timer, TimerControls } from '@focusdive/timer';
 import { get, set } from "@focusdive/storage";
-import SettingsPanel from '@/components/SettingsPanel';
+import PreferencesPanel from '@/components/PreferencesPanel';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 
@@ -9,7 +9,7 @@ import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
 import { SiSlack } from 'react-icons/si';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@focusdive/ui";
-import { getIntegrationSettings } from '@/services/integrationService';
+import { getIntegrationPreferences } from '@/services/integrationService';
 import { useMe } from '@focusdive/auth';
 
 const Index = () => {
@@ -28,22 +28,22 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
-    const loadIntegrationSettings = async () => {
+    const loadIntegrationPreferences = async () => {
       if (!user) {
         setSlackEnabled(false);
         return;
       }
 
       try {
-        const settings = await getIntegrationSettings();
-        setSlackEnabled(settings.slack_enabled || false);
+        const preferences = await getIntegrationPreferences();
+        setSlackEnabled(preferences.slack_enabled || false);
       } catch (error) {
-        console.error('Error loading integration settings:', error);
+        console.error('Error loading integration preferences:', error);
         setSlackEnabled(false);
       }
     };
 
-    loadIntegrationSettings();
+    loadIntegrationPreferences();
   }, [user]);
 
   const handleSlackClick = () => {
@@ -108,7 +108,7 @@ const Index = () => {
             <TimerControls />
           </div>
 
-          <SettingsPanel />
+          <PreferencesPanel />
         </div>
       </div>
 

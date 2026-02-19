@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { getIntegrationSettings, saveIntegrationSettings } from "@/services/integrationService";
+import { getIntegrationPreferences, saveIntegrationPreferences } from "@/services/integrationService";
 import { Card, CardContent } from "@/components/ui/card";
 import { apiUrl } from "@focusdive/config";
 import { getAccessToken } from "@focusdive/auth";
@@ -34,27 +34,27 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
   const [isTestingStop, setIsTestingStop] = useState<boolean>(false);
   const { toast } = useToast();
 
-  // Only load settings if user is both authenticated and connected to Slack
+  // Only load preferences if user is both authenticated and connected to Slack
   useEffect(() => {
     if (isConnected && isAuthenticated) {
-      loadSettings();
+      loadPreferences();
     }
   }, [isConnected, isAuthenticated]);
 
-  const loadSettings = async () => {
+  const loadPreferences = async () => {
     try {
-      const settings = await getIntegrationSettings();
-      if (settings.slack_enabled !== undefined) {
-        setSlackEnabled(settings.slack_enabled);
+      const preferences = await getIntegrationPreferences();
+      if (preferences.slack_enabled !== undefined) {
+        setSlackEnabled(preferences.slack_enabled);
       }
-      if (settings.slack_dnd_emoji) {
-        setSelectedEmoji(settings.slack_dnd_emoji);
+      if (preferences.slack_dnd_emoji) {
+        setSelectedEmoji(preferences.slack_dnd_emoji);
       }
-      if (settings.slack_dnd_text) {
-        setStatusText(settings.slack_dnd_text);
+      if (preferences.slack_dnd_text) {
+        setStatusText(preferences.slack_dnd_text);
       }
     } catch (error) {
-      console.error("Error loading slack settings:", error);
+      console.error("Error loading slack preferences:", error);
     }
   };
 
@@ -65,9 +65,9 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
 
     setIsSaving(true);
     try {
-      console.log("Saving settings:", { emoji: selectedEmoji, text: statusText });
+      console.log("Saving preferences:", { emoji: selectedEmoji, text: statusText });
       
-      const success = await saveIntegrationSettings({
+      const success = await saveIntegrationPreferences({
         slack_enabled: slackEnabled,
         slack_dnd_emoji: selectedEmoji,
         slack_dnd_text: statusText,
@@ -78,20 +78,20 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
       if (success) {
         toast({
           title: "Success",
-          description: "Slack settings saved successfully.",
+          description: "Slack preferences saved successfully.",
         });
       } else {
         toast({
           title: "Error",
-          description: "Failed to save Slack settings.",
+          description: "Failed to save Slack preferences.",
           variant: "destructive",
         });
       }
     } catch (error) {
-      console.error("Error saving slack settings:", error);
+      console.error("Error saving slack preferences:", error);
       toast({
         title: "Error",
-        description: "An error occurred while saving settings.",
+        description: "An error occurred while saving preferences.",
         variant: "destructive",
       });
     } finally {
@@ -122,7 +122,7 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
       if (response.ok) {
         toast({
           title: "Test Started",
-          description: "Slack status has been set with your test settings.",
+          description: "Slack status has been set with your test preferences.",
         });
       } else {
         toast({
@@ -333,7 +333,7 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
         className="mt-4"
         type="button"
       >
-        {isSaving ? "Saving..." : "Save Slack Settings"}
+        {isSaving ? "Saving..." : "Save Slack Preferences"}
       </Button>
       </div>
     </div>

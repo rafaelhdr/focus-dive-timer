@@ -9,7 +9,7 @@
     { "path": "packages/auth-token" },
     { "path": "packages/auth" },
     { "path": "packages/timer" },
-    { "path": "packages/settings" },
+    { "path": "packages/preferences" },
 
     { "path": "apps/extension" },
     { "path": "apps/web" }

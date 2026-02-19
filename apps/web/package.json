@@ -15,7 +15,7 @@
     "@focusdive/alarm": "workspace:*",
     "@focusdive/auth": "workspace:*",
     "@focusdive/config": "workspace:*",
-    "@focusdive/settings": "workspace:*",
+    "@focusdive/preferences": "workspace:*",
     "@focusdive/storage": "workspace:*",
     "@focusdive/timer": "workspace:*",
     "@focusdive/ui": "workspace:*",

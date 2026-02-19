@@ -10,7 +10,7 @@ export interface Preferences {
   defaultBreakDuration: number;
 }
 
-export interface SettingsApi {
+export interface PreferencesApi {
   focus_beep_enabled: boolean;
   focus_beep_volume: number;
   alarm_sound: AlarmSoundId;

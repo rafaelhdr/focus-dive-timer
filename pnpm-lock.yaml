@@ -1,6 +1,6 @@
 lockfileVersion: '9.0'
 
-settings:
+preferences:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
@@ -68,9 +68,9 @@ importers:
       '@focusdive/auth':
         specifier: workspace:*
         version: link:../../packages/auth
-      '@focusdive/settings':
+      '@focusdive/preferences':
         specifier: workspace:*
-        version: link:../../packages/settings
+        version: link:../../packages/preferences
       '@focusdive/storage':
         specifier: workspace:*
         version: link:../../packages/storage
@@ -300,9 +300,9 @@ importers:
       '@focusdive/config':
         specifier: workspace:*
         version: link:../../packages/config
-      '@focusdive/settings':
+      '@focusdive/preferences':
         specifier: workspace:*
-        version: link:../../packages/settings
+        version: link:../../packages/preferences
       '@focusdive/storage':
         specifier: workspace:*
         version: link:../../packages/storage
@@ -572,7 +572,7 @@ importers:
         specifier: ^7.3.1
         version: 7.3.1(@types/node@22.18.0)(jiti@1.21.7)(yaml@2.8.1)
 
-  packages/settings:
+  packages/preferences:
     dependencies:
       '@focusdive/alarm':
         specifier: workspace:*

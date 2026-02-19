@@ -37,8 +37,8 @@ export const analytics = {
     trackEvent('mode_toggled', { fromMode, toMode });
   },
   
-  settingsChanged: (setting: string, value: number) => {
-    trackEvent('settings_changed', { setting, value });
+  preferencesChanged: (setting: string, value: number) => {
+    trackEvent('preferences_changed', { setting, value });
   },
   
   onboardingCompleted: () => {

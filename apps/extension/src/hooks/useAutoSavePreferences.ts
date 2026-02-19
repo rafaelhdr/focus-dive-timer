@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { usePreferences, useUpdatePreferences, type Preferences } from "@focusdive/settings";
+import { usePreferences, useUpdatePreferences, type Preferences } from "@focusdive/preferences";
 
 function toDraft(s: Preferences) {
   return {
@@ -14,8 +14,8 @@ function toDraft(s: Preferences) {
   };
 }
 
-export function useAutoSaveSettings() {
-  const { data: settings } = usePreferences();
+export function useAutoSavePreferences() {
+  const { data: preferences } = usePreferences();
   const update = useUpdatePreferences();
 
   const [draft, setDraft] = useState<ReturnType<typeof toDraft> | null>(null);
@@ -27,11 +27,11 @@ export function useAutoSaveSettings() {
   }
 
   useEffect(() => {
-    if (!settings) return;
-    setDraft(toDraft(settings));
-    lastSavedRef.current = JSON.stringify(toDraft(settings));
+    if (!preferences) return;
+    setDraft(toDraft(preferences));
+    lastSavedRef.current = JSON.stringify(toDraft(preferences));
     skipNextRef.current = true;
-  }, [settings]);
+  }, [preferences]);
 
   useEffect(() => {
     if (!draft) return;
@@ -49,7 +49,7 @@ export function useAutoSaveSettings() {
         lastSavedRef.current = serialized;
         toast.success("Preferences saved");
       } catch {
-        toast.error("Failed to save settings");
+        toast.error("Failed to save preferences");
       }
     }, 600);
 

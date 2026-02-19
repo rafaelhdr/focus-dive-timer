@@ -5,20 +5,20 @@ import { playAlarm } from "../../browser";
 import { syncBackgroundFromState } from "../timer";
 import { type TimerSyncPayload } from "../../types";
 
-const restartTimer = async (settings: TimerSyncPayload, mode: TimerMode) => {
+const restartTimer = async (preferences: TimerSyncPayload, mode: TimerMode) => {
   if (mode === "focus") {
-    if (!settings.autostartBreak) return;
+    if (!preferences.autostartBreak) return;
 
-    const { endsAt } = await restartTimerStore("break", settings.defaultBreakDuration);
+    const { endsAt } = await restartTimerStore("break", preferences.defaultBreakDuration);
     syncBackgroundFromState();
     updateTimer({ endsAt, mode: "break", isRunning: true, remainingTime: null });
     return;
   }
 
   if (mode === "break") {
-    if (!settings.autostartFocus) return;
+    if (!preferences.autostartFocus) return;
 
-    const { endsAt } = await restartTimerStore("focus", settings.defaultFocusDuration);
+    const { endsAt } = await restartTimerStore("focus", preferences.defaultFocusDuration);
     syncBackgroundFromState();
     updateTimer({ endsAt, mode: "focus", isRunning: true, remainingTime: null });
     return;

@@ -1,11 +1,11 @@
 import { useTimerFinished } from "@focusdive/timer";
-import { usePreferences } from "@focusdive/settings";
+import { usePreferences } from "@focusdive/preferences";
 
 export function useOnTimerFinished() {
-  const { data: settings } = usePreferences();
+  const { data: preferences } = usePreferences();
 
-  const autostartBreak = settings?.autostartBreak ?? false;
-  const autostartFocus = settings?.autostartFocus ?? false;
+  const autostartBreak = preferences?.autostartBreak ?? false;
+  const autostartFocus = preferences?.autostartFocus ?? false;
 
   useTimerFinished({ autostartBreak, autostartFocus });
 }
