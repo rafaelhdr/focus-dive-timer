@@ -105,3 +105,10 @@ class FakeTokenService:
         return TokenPair(
             access_token=f"access:{user_id}", refresh_token=f"refresh:{user_id}"
         )
+
+
+class FakeSlackService:
+    connected_for_user_id: dict[str, bool] = {}
+
+    async def get_is_connected(self, user) -> bool:
+        return self.connected_for_user_id.get(user.email, False)

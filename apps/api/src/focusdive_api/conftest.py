@@ -7,9 +7,11 @@ from focusdive_api.core.jwt import get_token_service
 from focusdive_api.core.redis import get_redis
 from focusdive_api.emails.deps import get_mailer
 from focusdive_api.main import app
+from focusdive_api.services.slack.service import get_slack_service
 from focusdive_api.testing.fakes import (
     FakeMailer,
     FakeRedis,
+    FakeSlackService,
     FakeTokenService,
     FakeUserRepo,
 )
@@ -29,6 +31,7 @@ class TestContext:
     redis: FakeRedis
     mailer: FakeMailer
     tokens: FakeTokenService
+    slack: FakeSlackService
     user_repo: FakeUserRepo
 
 
@@ -37,11 +40,13 @@ def ctx():
     fake_redis = FakeRedis()
     fake_mailer = FakeMailer()
     fake_tokens = FakeTokenService()
+    fake_slack = FakeSlackService()
     fake_user_repo = FakeUserRepo(EMAIL)
 
     app.dependency_overrides[get_redis] = lambda: fake_redis
     app.dependency_overrides[get_mailer] = lambda: fake_mailer
     app.dependency_overrides[get_token_service] = lambda: fake_tokens
+    app.dependency_overrides[get_slack_service] = lambda: fake_slack
     app.dependency_overrides[get_user_repo] = lambda: fake_user_repo
 
     with TestClient(app) as c:
@@ -50,6 +55,7 @@ def ctx():
             redis=fake_redis,
             mailer=fake_mailer,
             tokens=fake_tokens,
+            slack=fake_slack,
             user_repo=fake_user_repo,
         )
 

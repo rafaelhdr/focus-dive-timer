@@ -16,12 +16,22 @@ DEFAULT_PREFERENCES = {
 
 
 @dataclass(frozen=True)
+class SlackIntegration:
+    slack_token: str
+
+
+@dataclass(frozen=True)
+class Integrations:
+    slack: SlackIntegration | None = None
+
+
+@dataclass(frozen=True)
 class User:
     id: str
     email: str
     is_beta_user: bool
     preferences: dict
-    slack_token: str | None = None
+    integrations: Integrations = Integrations()
 
 
 class UserRepo(Protocol):
@@ -39,9 +49,15 @@ class MongoUserRepo:
         except MongoUser.DoesNotExist:
             return None
 
+        slack = None
+        if doc.slack_token:
+            slack = SlackIntegration(slack_token=doc.slack_token)
         return User(
             id=str(doc.id),
             email=doc.email,
+            integrations=Integrations(
+                slack=slack,
+            ),
             is_beta_user=bool(getattr(doc, "is_beta_user", False)),
             preferences=getattr(doc, "preferences", {}) or {},
         )
