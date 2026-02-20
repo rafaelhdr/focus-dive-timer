@@ -209,6 +209,32 @@
         ]
       }
     },
+    "/v1/integrations/slack/status": {
+      "get": {
+        "tags": [
+          "integrations:slack"
+        ],
+        "summary": "Slack Status",
+        "operationId": "slack_status_v1_integrations_slack_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlackStatusOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -313,6 +339,19 @@
           "refresh_token"
         ],
         "title": "RefreshOut"
+      },
+      "SlackStatusOut": {
+        "properties": {
+          "is_connected": {
+            "type": "boolean",
+            "title": "Is Connected"
+          }
+        },
+        "type": "object",
+        "required": [
+          "is_connected"
+        ],
+        "title": "SlackStatusOut"
       },
       "UserPreferencesInOut": {
         "properties": {

@@ -28,4 +28,5 @@ export const fdApi = createClient(fdFetch);
 
 export const fdKeys = {
   me: () => fdApi.queryOptions("get", "/v1/users/me").queryKey,
+  slackStatus: () => fdApi.queryOptions("get", "/v1/integrations/slack/status").queryKey,
 };

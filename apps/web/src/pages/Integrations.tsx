@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { slackAuthUrl } from '@focusdive/config';
-import { checkSlackConnection } from '@/services/slackService';
+import { useAuthStore } from "@focusdive/auth";
 import { Button } from "@focusdive/ui";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { CheckCircle, Info } from 'lucide-react';
 import { SiSlack } from 'react-icons/si';
 import { useToast } from '@/hooks/use-toast';
+import { useSlackConnectionStatus } from '@/hooks/useSlack';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { useMe } from '@focusdive/auth';
@@ -20,43 +20,17 @@ import { Tabs, TabsContent } from '@/components/ui/tabs';
 
 const Integrations = () => {
   const navigate = useNavigate();
-  const [isSlackConnected, setIsSlackConnected] = useState<boolean | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const { data: user } = useMe();
+  const { data: slackData, isPending: isSlackPending } = useSlackConnectionStatus();
+  const isSlackConnected = slackData?.is_connected ?? false;
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   const getActiveTab = () => {
     return 'slack'; // Default to slack for /integrations and /integrations/slack
   };
 
   const activeTab = getActiveTab();
-
-  useEffect(() => {
-    const checkConnections = async () => {
-      try {
-        setIsLoading(true);
-        if (user) {
-          const [slackConnected] = await Promise.all([
-            checkSlackConnection(),
-          ]);
-          setIsSlackConnected(slackConnected);
-        } else {
-          setIsSlackConnected(false);
-        }
-      } catch (error) {
-        console.error('Error checking connections:', error);
-        toast({
-          title: 'Connection Error',
-          description: 'Failed to check integration status.',
-          variant: 'destructive',
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkConnections();
-  }, [toast, user]);
 
   const handleTabChange = (value: string) => {
     if (value === 'slack') {
@@ -69,7 +43,6 @@ const Integrations = () => {
   };
 
   const handleSlackDisconnected = () => {
-    setIsSlackConnected(false);
     toast({
       title: 'Disconnected',
       description: 'Your Slack account has been disconnected from Focus Dive.',
@@ -91,21 +64,6 @@ const Integrations = () => {
           </p>
         </header>
 
-        {!user && (
-          <Alert className="mb-6 bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-900">
-            <Info className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            <AlertTitle>Authentication Required</AlertTitle>
-            <AlertDescription className="flex flex-col gap-2">
-              <p>You need to be logged in to use the integrations.</p>
-              <Link to="/login" className="self-start">
-                <Button size="sm" variant="outline" className="mt-1">
-                  Go to Login
-                </Button>
-              </Link>
-            </AlertDescription>
-          </Alert>
-        )}
-
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
 
           <TabsContent value="slack" className="mt-6">
@@ -119,8 +77,25 @@ const Integrations = () => {
                   When you start a focus session, we'll update your Slack status to let your team know you're focusing.
                 </CardDescription>
               </CardHeader>
+
               <CardContent>
-                {isLoading ? (
+                {!isAuthenticated && (
+                  <Alert className="mb-6 bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-900">
+                    <Info className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    <AlertTitle>Authentication Required</AlertTitle>
+                    <AlertDescription className="flex flex-col gap-2">
+                      <p>You need to be logged in to use the integrations.</p>
+                      <Link to="/login" className="self-start">
+                        <Button size="sm" variant="outline" className="mt-1">
+                          Go to Login
+                        </Button>
+                      </Link>
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </CardContent>
+              {isAuthenticated && <CardContent>
+                {isSlackPending ? (
                   <div className="flex justify-center py-4">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                   </div>
@@ -177,7 +152,7 @@ const Integrations = () => {
                     />
                   </div>
                 )}
-              </CardContent>
+              </CardContent>}
             </Card>
           </TabsContent>
         </Tabs>

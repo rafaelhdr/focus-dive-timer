@@ -21,6 +21,7 @@ class User:
     email: str
     is_beta_user: bool
     preferences: dict
+    slack_token: str | None = None
 
 
 class UserRepo(Protocol):

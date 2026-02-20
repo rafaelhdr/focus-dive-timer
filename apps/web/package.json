@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@focusdive/alarm": "workspace:*",
+    "@focusdive/api-client": "workspace:*",
     "@focusdive/auth": "workspace:*",
     "@focusdive/config": "workspace:*",
     "@focusdive/preferences": "workspace:*",

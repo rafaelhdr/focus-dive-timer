@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Clock, Preferences, Link2, UserRound, LogOut, HelpCircle, Menu } from 'lucide-react';
+import { Clock, Settings, Link2, UserRound, LogOut, HelpCircle, Menu } from 'lucide-react';
 import { Button } from "@focusdive/ui";
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -65,7 +65,7 @@ const Navigation: React.FC = () => {
           size="sm"
           className="gap-2 w-full justify-start"
         >
-          <Preferences className="h-4 w-4" />
+          <Settings className="h-4 w-4" />
           Preferences
         </Button>
       </Link>

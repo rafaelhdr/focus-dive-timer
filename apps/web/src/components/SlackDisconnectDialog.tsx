@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@focusdive/ui";
 import {
   AlertDialog,
@@ -15,12 +16,14 @@ import { Unlink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiUrl } from '@focusdive/config';
 import { getAccessToken } from '@focusdive/auth'
+import { fdKeys } from '@focusdive/api-client';
 
 interface SlackDisconnectDialogProps {
   onDisconnected: () => void;
 }
 
 const SlackDisconnectDialog: React.FC<SlackDisconnectDialogProps> = ({ onDisconnected }) => {
+  const queryClient = useQueryClient();
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
@@ -43,6 +46,7 @@ const SlackDisconnectDialog: React.FC<SlackDisconnectDialogProps> = ({ onDisconn
         throw new Error('Failed to disconnect from Slack');
       }
 
+      await queryClient.invalidateQueries({ queryKey: fdKeys.me() });
       setIsOpen(false);
       onDisconnected();
     } catch (error) {
