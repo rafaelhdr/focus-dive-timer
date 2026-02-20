@@ -7,41 +7,29 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Mail, ArrowRight, Loader2, ArrowLeft } from 'lucide-react';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useRequestLoginToken, useVerifyLoginToken } from '@focusdive/auth';
 
-// Schema for email form validation
-const emailSchema = z.object({
-  email: z.string().email({ message: 'Please enter a valid email address' }),
-});
 
-// Schema for verification token validation
-const verificationSchema = z.object({
-  token: z.string().length(6, { message: 'Verification code must be 6 digits' }),
-});
-
-type EmailFormValues = z.infer<typeof emailSchema>;
-type VerificationFormValues = z.infer<typeof verificationSchema>;
+type EmailFormValues = { email: string };
+type VerificationFormValues = { token: string };
 
 const Login = () => {
   const [currentStep, setCurrentStep] = useState<'email' | 'verification'>('email');
   const [email, setEmail] = useState('');
   const navigate = useNavigate();
 
-  // Email form
   const emailForm = useForm<EmailFormValues>({
-    resolver: zodResolver(emailSchema),
     defaultValues: { email: '' },
+    mode: 'onSubmit',
   });
+
   const requestLoginToken = useRequestLoginToken();
   const verifyLoginToken = useVerifyLoginToken();
 
-  // Verification form
   const verificationForm = useForm<VerificationFormValues>({
-    resolver: zodResolver(verificationSchema),
     defaultValues: { token: '' },
+    mode: 'onSubmit',
   });
 
   const onEmailSubmit = async (values: EmailFormValues) => {
@@ -94,6 +82,13 @@ const Login = () => {
                 <FormField
                   control={emailForm.control}
                   name="email"
+                  rules={{
+                    required: 'Email is required',
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: 'Please enter a valid email address',
+                    },
+                  }}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email</FormLabel>
@@ -142,6 +137,12 @@ const Login = () => {
                 <FormField
                   control={verificationForm.control}
                   name="token"
+                  rules={{
+                    required: 'Verification code is required',
+                    minLength: { value: 6, message: 'Verification code must be 6 digits' },
+                    maxLength: { value: 6, message: 'Verification code must be 6 digits' },
+                    pattern: { value: /^\d{6}$/, message: 'Verification code must be 6 digits' },
+                  }}
                   render={({ field }) => (
                     <FormItem className="text-center">
                       <FormLabel className="text-center block">Verification Code</FormLabel>
