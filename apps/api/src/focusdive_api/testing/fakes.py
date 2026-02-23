@@ -4,7 +4,7 @@ from typing import Any
 from fastapi import HTTPException
 
 from focusdive_api.emails.deps import Mailer
-from focusdive_api.users.repo import DEFAULT_PREFERENCES, User, UserRepo
+from focusdive_api.users.repo import DEFAULT_PREFERENCES, User, UserRepo, Integrations, SlackIntegration
 
 
 @dataclass(frozen=True)
@@ -59,9 +59,14 @@ class FakeMailer(Mailer):
 
 
 class FakeUserRepo(UserRepo):
-    def __init__(self, email: str) -> None:
+    def __init__(self, email: str, slack_token: str) -> None:
         self.upserted = []
         self.email = email
+        self.slack_token = slack_token
+
+    def _integrations(self) -> Integrations:
+        slack = SlackIntegration(slack_token=self.slack_token) if self.slack_token else None
+        return Integrations(slack=slack)
 
     async def get_user(self, subject: str) -> User | None:
         return User(
@@ -69,6 +74,7 @@ class FakeUserRepo(UserRepo):
             email=self.email,
             is_beta_user=False,
             preferences=DEFAULT_PREFERENCES,
+            integrations=self._integrations(),
         )
 
     async def upsert_by_email(self, email: str) -> User:
@@ -78,6 +84,7 @@ class FakeUserRepo(UserRepo):
             email=email,
             is_beta_user=False,
             preferences=DEFAULT_PREFERENCES,
+            integrations=self._integrations(),
         )
 
     async def update_preferences(self, user: User, new_prefs: dict) -> User:
@@ -86,6 +93,7 @@ class FakeUserRepo(UserRepo):
             email=user.email,
             is_beta_user=user.is_beta_user,
             preferences=new_prefs,
+            integrations=self._integrations(),
         )
 
 
@@ -110,5 +118,18 @@ class FakeTokenService:
 class FakeSlackService:
     connected_for_user_id: dict[str, bool] = {}
 
+    def __init__(self):
+        self.connected_for_user_id = {}
+        self.start_calls = []
+        self.stop_calls = []
+
     async def get_is_connected(self, user) -> bool:
         return self.connected_for_user_id.get(user.email, False)
+
+    async def start_focus(self, **kwargs) -> bool:
+        self.start_calls.append(kwargs)
+        return True
+
+    async def stop_focus(self, **kwargs) -> bool:
+        self.stop_calls.append(kwargs)
+        return True

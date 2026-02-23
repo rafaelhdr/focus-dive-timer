@@ -15,3 +15,12 @@ export function useSlackConnectionStatus() {
     },
   );
 }
+
+
+export function useSlackTest() {
+  return fdApi.useMutation(
+    "post",
+    "/v1/integrations/slack/test",
+    {},
+  );
+}

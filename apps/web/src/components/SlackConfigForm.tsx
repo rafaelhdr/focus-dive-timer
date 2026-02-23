@@ -6,12 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { useSlackTest } from "@/hooks/useSlack";
 import { getIntegrationPreferences, saveIntegrationPreferences } from "@/services/integrationService";
 import { Card, CardContent } from "@/components/ui/card";
-import { apiUrl } from "@focusdive/config";
-import { getAccessToken } from "@focusdive/auth";
 
-// Available emoji options
 const emojiOptions = [
   { value: ":person_in_lotus_position:", label: "Meditation", icon: "🧘" },
   { value: ":computer:", label: "Computer", icon: "💻" },
@@ -30,9 +28,8 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
   const [selectedEmoji, setSelectedEmoji] = useState<string>(":person_in_lotus_position:");
   const [statusText, setStatusText] = useState<string>("Focus time");
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [isTestingStart, setIsTestingStart] = useState<boolean>(false);
-  const [isTestingStop, setIsTestingStop] = useState<boolean>(false);
   const { toast } = useToast();
+  const slackTestMutation = useSlackTest();
 
   // Only load preferences if user is both authenticated and connected to Slack
   useEffect(() => {
@@ -102,86 +99,50 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
   const handleTestStart = async () => {
     if (!isConnected || !isAuthenticated) return;
 
-    setIsTestingStart(true);
-    try {
-      const accessToken = await getAccessToken();
-      const response = await fetch(`${apiUrl}/slack/test`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          action: 'start',
-          test_dnd_text: statusText,
-          test_dnd_emoji: selectedEmoji,
-        }),
-      });
-
-      if (response.ok) {
-        toast({
-          title: "Test Started",
-          description: "Slack status has been set with your test preferences.",
-        });
-      } else {
-        toast({
-          title: "Test Failed",
-          description: "Failed to start Slack test.",
-          variant: "destructive",
-        });
+    const response = await slackTestMutation.mutateAsync({
+      body: {
+        action: 'start',
+        dnd_text: statusText,
+        dnd_emoji: selectedEmoji,
       }
-    } catch (error) {
-      console.error("Error starting Slack test:", error);
+    });
+
+    if (response.success) {
       toast({
-        title: "Error",
-        description: "An error occurred while starting the test.",
+        title: "Test Started",
+        description: "Slack status has been set with your test preferences.",
+      });
+    } else {
+      toast({
+        title: "Test Failed",
+        description: response.message || "Failed to start Slack test.",
         variant: "destructive",
       });
-    } finally {
-      setIsTestingStart(false);
     }
   };
 
   const handleTestStop = async () => {
     if (!isConnected || !isAuthenticated) return;
 
-    setIsTestingStop(true);
-    try {
-      const accessToken = await getAccessToken();
-      const response = await fetch(`${apiUrl}/slack/test`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          action: 'stop',
-        }),
-      });
-
-      if (response.ok) {
-        toast({
-          title: "Test Stopped",
-          description: "Slack status has been cleared.",
-        });
-      } else {
-        toast({
-          title: "Test Failed",
-          description: "Failed to stop Slack test.",
-          variant: "destructive",
-        });
+    const response = await slackTestMutation.mutateAsync({
+      body: {
+        action: 'stop',
+        dnd_text: statusText,
+        dnd_emoji: selectedEmoji,
       }
-    } catch (error) {
-      console.error("Error stopping Slack test:", error);
+    });
+
+    if (response.success) {
       toast({
-        title: "Error",
-        description: "An error occurred while stopping the test.",
+        title: "Test Stopped",
+        description: "Slack status has been cleared.",
+      });
+    } else {
+      toast({
+        title: "Test Failed",
+        description: response.message || "Failed to start Slack test.",
         variant: "destructive",
       });
-    } finally {
-      setIsTestingStop(false);
     }
   };
 
@@ -306,21 +267,21 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
             <div className="flex gap-2">
               <Button
                 onClick={handleTestStart}
-                disabled={isFormDisabled || isTestingStart || !isConnected}
+                disabled={isFormDisabled || slackTestMutation.isPending || !isConnected}
                 size="sm"
                 variant="outline"
                 type="button"
               >
-                {isTestingStart ? "Testing..." : "Test Start"}
+                {slackTestMutation.isPending ? "Testing..." : "Test Start"}
               </Button>
               <Button
                 onClick={handleTestStop}
-                disabled={isFormDisabled || isTestingStop || !isConnected}
+                disabled={isFormDisabled || slackTestMutation.isPending || !isConnected}
                 size="sm"
                 variant="outline"
                 type="button"
               >
-                {isTestingStop ? "Stopping..." : "Test Stop"}
+                {slackTestMutation.isPending ? "Stopping..." : "Test Stop"}
               </Button>
             </div>
           </CardContent>

@@ -18,6 +18,7 @@ from focusdive_api.testing.fakes import (
 from focusdive_api.users.repo import get_user_repo
 
 EMAIL = "test@focusdive.app"
+SLACK_TOKEN = "xoxp-fake-token-for-testing"
 
 
 @pytest.fixture
@@ -41,7 +42,7 @@ def ctx():
     fake_mailer = FakeMailer()
     fake_tokens = FakeTokenService()
     fake_slack = FakeSlackService()
-    fake_user_repo = FakeUserRepo(EMAIL)
+    fake_user_repo = FakeUserRepo(EMAIL, SLACK_TOKEN)
 
     app.dependency_overrides[get_redis] = lambda: fake_redis
     app.dependency_overrides[get_mailer] = lambda: fake_mailer

@@ -235,6 +235,52 @@
         ]
       }
     },
+    "/v1/integrations/slack/test": {
+      "post": {
+        "tags": [
+          "integrations:slack"
+        ],
+        "summary": "Slack Test",
+        "operationId": "slack_test_v1_integrations_slack_test_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SlackTestIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlackTestOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -352,6 +398,69 @@
           "is_connected"
         ],
         "title": "SlackStatusOut"
+      },
+      "SlackTestIn": {
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "start",
+              "stop"
+            ],
+            "title": "Action"
+          },
+          "dnd_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dnd Text"
+          },
+          "dnd_emoji": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dnd Emoji"
+          }
+        },
+        "type": "object",
+        "required": [
+          "action"
+        ],
+        "title": "SlackTestIn"
+      },
+      "SlackTestOut": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "success"
+        ],
+        "title": "SlackTestOut"
       },
       "UserPreferencesInOut": {
         "properties": {

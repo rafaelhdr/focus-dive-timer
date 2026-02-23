@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -20,6 +21,10 @@ async def lifespan(app: FastAPI):
 
 
 def create_app() -> FastAPI:
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+    )
     app = FastAPI(
         title="FocusDive API",
         lifespan=lifespan,

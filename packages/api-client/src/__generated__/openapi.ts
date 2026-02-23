@@ -107,6 +107,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/integrations/slack/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Slack Test */
+        post: operations["slack_test_v1_integrations_slack_test_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -169,6 +186,25 @@ export interface components {
         SlackStatusOut: {
             /** Is Connected */
             is_connected: boolean;
+        };
+        /** SlackTestIn */
+        SlackTestIn: {
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "start" | "stop";
+            /** Dnd Text */
+            dnd_text?: string | null;
+            /** Dnd Emoji */
+            dnd_emoji?: string | null;
+        };
+        /** SlackTestOut */
+        SlackTestOut: {
+            /** Success */
+            success: boolean;
+            /** Message */
+            message?: string | null;
         };
         /** UserPreferencesInOut */
         UserPreferencesInOut: {
@@ -423,6 +459,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SlackStatusOut"];
+                };
+            };
+        };
+    };
+    slack_test_v1_integrations_slack_test_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SlackTestIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SlackTestOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
