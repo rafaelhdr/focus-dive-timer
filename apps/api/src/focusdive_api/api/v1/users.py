@@ -1,9 +1,9 @@
 import asyncio
 import secrets
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from redis.asyncio import Redis
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from fastapi.security import HTTPBearer
+from redis.asyncio import Redis
 
 from focusdive_api.core.auth import get_current_subject
 from focusdive_api.core.jwt import TokenService, get_token_service
@@ -23,6 +23,7 @@ router = APIRouter(tags=["users"])
 @router.post("/login")
 async def login(
     payload: LoginIn,
+    background_tasks: BackgroundTasks,
     redis: Redis = Depends(get_redis),
     mailer: Mailer = Depends(get_mailer),
 ) -> LoginOut:
@@ -35,7 +36,7 @@ async def login(
         ex=settings.login_code_ttl_seconds,
     )
 
-    await mailer.send_login_code(email, code)
+    background_tasks.add_task(mailer.send_login_code, email, code)
 
     return LoginOut(message="Verification code sent")
 
