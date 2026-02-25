@@ -9,7 +9,10 @@ COPY packages/ ./packages/
 RUN pnpm install --frozen-lockfile
 
 COPY . .
-RUN mv .env.production .env && pnpm web:build
+RUN mv .env.production .env && \
+    pnpm --filter ./packages/config build && \
+    mv tsconfig.web-build.json tsconfig.json && \
+    pnpm web:build
 
 FROM nginx:alpine
 
