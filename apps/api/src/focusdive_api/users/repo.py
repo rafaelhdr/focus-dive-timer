@@ -6,7 +6,7 @@ from .mongoengine import User as MongoUser
 
 DEFAULT_PREFERENCES = {
     "focus_beep_enabled": True,
-    "focus_beep_volume": 1.0,
+    "focus_beep_volume": 100,
     "alarm_sound": "minimalistic",
     "autostart_break": True,
     "autostart_focus": True,

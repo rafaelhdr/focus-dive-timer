@@ -36,7 +36,7 @@ class RefreshOut(BaseModel):
 class UserPreferencesInOut(BaseModel):
     alarm_sound: Literal["minimalistic", "wooden", "snappy", "level"] = "minimalistic"
     focus_beep_enabled: bool = True
-    focus_beep_volume: float = Field(1.0, ge=0, le=1)
+    focus_beep_volume: int = Field(1, ge=0, le=100)
     autostart_focus: bool = True
     autostart_break: bool = True
     default_focus_duration: int = Field(25, ge=1)

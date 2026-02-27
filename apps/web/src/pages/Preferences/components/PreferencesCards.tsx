@@ -21,7 +21,7 @@ const PreferencesCards = () => {
 
   const getVolumeIcon = () => {
     if (draft.focusBeepVolume === 0) return <VolumeX className="h-5 w-5" />;
-    if (draft.focusBeepVolume < 0.5) return <Volume className="h-5 w-5" />;
+    if (draft.focusBeepVolume < 50) return <Volume className="h-5 w-5" />;
     return <Volume2 className="h-5 w-5" />;
   };
 
@@ -78,13 +78,13 @@ const PreferencesCards = () => {
               <Label htmlFor="volume-slider" className="flex items-center gap-2">
                 {getVolumeIcon()} Volume
               </Label>
-              <span className="font-medium">{Math.round(draft.focusBeepVolume * 100)}%</span>
+              <span className="font-medium">{Math.round(draft.focusBeepVolume)}%</span>
             </div>
             <Slider
               id="volume-slider"
               min={0}
-              max={1}
-              step={0.01}
+              max={100}
+              step={1}
               value={[draft?.focusBeepVolume]}
               onValueChange={(values => patchDraft({ focusBeepVolume: values[0] }))}
               className="py-4"

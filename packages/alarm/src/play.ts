@@ -31,7 +31,7 @@ export async function play(
   const el = getOrCreate(src);
   if (!el) return false;
 
-  el.volume = clamp01(opts.volume ?? 1);
+  el.volume = clamp01(((opts.volume ?? 0) / 100));
   el.currentTime = 0;
   await el.play();
   return true;

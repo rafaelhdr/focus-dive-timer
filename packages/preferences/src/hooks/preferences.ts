@@ -15,7 +15,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
   defaultBreakDuration: 5,
   defaultFocusDuration: 25,
   focusBeepEnabled: true,
-  focusBeepVolume: 1,
+  focusBeepVolume: 100,
 };
 
 async function fetchPreferencesLocal(): Promise<Preferences> {
