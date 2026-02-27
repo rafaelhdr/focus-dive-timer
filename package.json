@@ -12,6 +12,7 @@
     "test": "pnpm -r --no-bail test",
     "lint": "pnpm -r --no-bail lint",
     "lint:fix": "pnpm -r --no-bail lint --fix",
+    "config:build": "dotenv -e .env -- pnpm --filter @focusdive/config build",
     "web:dev": "dotenv -e .env -- pnpm --filter @focusdive/webapp dev",
     "web:build": "dotenv -e .env -- pnpm --filter @focusdive/webapp build",
     "web:start": "pnpm --filter @focusdive/webapp start",

@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "name": "FocusDive Firefox Extension",
+  "name": "FocusDive Pomodoro Timer Extension",
   "version": "1.0.3",
   "description": "Block distractions and enable deep work with FocusDive",
 
