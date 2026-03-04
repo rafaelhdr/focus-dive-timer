@@ -4,9 +4,9 @@ import { fetchPreferences, updatePreferences } from "../services/preferences";
 import { Preferences } from "../types";
 import { getJSON, setJSON } from "@focusdive/storage";
 
-export const preferencesQueryKey = ["preferences"] as const;
-
 const PREFERENCES_STORAGE_KEY = "focusdive:preferences";
+
+const preferencesQueryKey = (isAuth: boolean) => ["preferences", isAuth] as const;
 
 export const DEFAULT_PREFERENCES: Preferences = {
   alarmSound: "minimalistic",
@@ -39,7 +39,7 @@ async function updatePreferencesLocal(patch: Partial<Preferences>): Promise<Pref
 export function usePreferences() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useQuery({
-    queryKey: [preferencesQueryKey, isAuthenticated],
+    queryKey: preferencesQueryKey(isAuthenticated),
     queryFn: isAuthenticated ? fetchPreferences : fetchPreferencesLocal,
     staleTime: 1000 * 60 * 30,
     refetchOnWindowFocus: false,
@@ -55,11 +55,11 @@ export function useUpdatePreferences() {
       isAuthenticated ? updatePreferences(patch) : updatePreferencesLocal(patch),
 
     onMutate: async (patch) => {
-      await qc.cancelQueries({ queryKey: preferencesQueryKey });
+      await qc.invalidateQueries({ queryKey: preferencesQueryKey(isAuthenticated) });
 
-      const prev = qc.getQueryData<Preferences>(preferencesQueryKey);
+      const prev = qc.getQueryData<Preferences>(preferencesQueryKey(isAuthenticated));
 
-      qc.setQueryData<Preferences>(preferencesQueryKey, (old) => {
+      qc.setQueryData<Preferences>(preferencesQueryKey(isAuthenticated), (old) => {
         const base = old ?? ({} as Preferences);
         return { ...base, ...patch } as Preferences;
       });
@@ -68,12 +68,12 @@ export function useUpdatePreferences() {
     },
 
     onError: (_err, _patch, ctx) => {
-      if (ctx?.prev) qc.setQueryData(preferencesQueryKey, ctx.prev);
-      else qc.removeQueries({ queryKey: preferencesQueryKey });
+      if (ctx?.prev) qc.setQueryData(preferencesQueryKey(isAuthenticated), ctx.prev);
+      else qc.removeQueries({ queryKey: preferencesQueryKey(isAuthenticated) });
     },
 
     onSuccess: (data) => {
-      qc.setQueryData(preferencesQueryKey, data);
+      qc.setQueryData(preferencesQueryKey(isAuthenticated), data);
     },
   });
 }
