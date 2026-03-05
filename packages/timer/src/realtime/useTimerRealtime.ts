@@ -18,10 +18,9 @@ export function useTimerRealtime() {
 
         const ch = attachTimerChannel(socket);
 
+        ch.requestTimer();
+
         unsubscribers.push(
-          ch.onConnected(() => {
-            ch.requestTimer();
-          }),
           ch.onTimerState((data: TimerData) => {
             setFromServer(data);
           }),

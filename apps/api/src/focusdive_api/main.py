@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from focusdive_api.api.v1.router import router as v1_router
+from focusdive_api.ws.timer import router as timer_router
 from focusdive_api.core.mongo import connect_mongo, disconnect_mongo
 
 origins = [
@@ -31,6 +32,7 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(v1_router)
+    app.include_router(timer_router)
     app.add_middleware(
         CORSMiddleware,
         allow_origin_regex=r"^(chrome-extension|moz-extension)://[a-z0-9-]+$",

@@ -1,7 +1,15 @@
 from datetime import datetime
 
-from mongoengine import (BooleanField, DateTimeField, DictField, Document,
-                         EmailField, StringField)
+from mongoengine import (
+    BooleanField,
+    DateTimeField,
+    DictField,
+    Document,
+    EmailField,
+    StringField,
+)
+
+from focusdive_api.timer.schemas import TimerState
 
 from .utils_crypto import decrypt_token, encrypt_token
 
@@ -59,7 +67,7 @@ class User(Document):
         )
         return cls.objects.get(email=email)
 
-    def update_timer(self, new_timer: dict):
+    def update_timer(self, new_timer: TimerState):
         self.timer.update(new_timer)
         self.save()
 

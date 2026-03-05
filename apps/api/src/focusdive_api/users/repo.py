@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Protocol
@@ -13,6 +14,8 @@ DEFAULT_PREFERENCES = {
     "default_focus_duration": 25,
     "default_break_duration": 5,
 }
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -31,6 +34,7 @@ class User:
     email: str
     is_beta_user: bool
     preferences: dict
+    timer: dict
     integrations: Integrations = Integrations()
 
 
@@ -41,11 +45,14 @@ class UserRepo(Protocol):
 
     async def update_preferences(self, user: User, new_prefs: dict) -> User: ...
 
+    async def update_timer(self, user: User, new_timer: dict) -> User: ...
+
 
 class MongoUserRepo:
     async def get_user(self, user_email: str) -> User | None:
         try:
             doc = MongoUser.objects.get(email=user_email)
+            logger.info(f"Found user in DB: {doc.email} (beta: {getattr(doc, 'is_beta_user', False)})")
         except MongoUser.DoesNotExist:
             return None
 
@@ -60,6 +67,7 @@ class MongoUserRepo:
             ),
             is_beta_user=bool(getattr(doc, "is_beta_user", False)),
             preferences=getattr(doc, "preferences", {}) or {},
+            timer=getattr(doc, "timer", {}) or {},
         )
 
     async def upsert_by_email(self, email: str) -> User:
@@ -79,11 +87,16 @@ class MongoUserRepo:
             email=doc.email,
             is_beta_user=bool(getattr(doc, "is_beta_user", False)),
             preferences=getattr(doc, "preferences", {}) or {},
+            timer=getattr(doc, "timer", {}) or {},
         )
 
     async def update_preferences(self, user: User, new_prefs: dict) -> User:
         MongoUser.objects(id=user.id).update(set__preferences=new_prefs)
         return MongoUser.objects.get(id=user.id)
+
+    async def update_timer(self, user: User, new_timer: dict) -> User:
+        MongoUser.objects(id=user.id).update(set__timer=new_timer)
+        return await self.get_user(user.email)
 
 
 def get_user_repo() -> MongoUserRepo:
