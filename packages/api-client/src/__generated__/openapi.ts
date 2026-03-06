@@ -124,6 +124,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/timer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update Timer */
+        put: operations["update_timer_v1_timer_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -205,6 +222,20 @@ export interface components {
             success: boolean;
             /** Message */
             message?: string | null;
+        };
+        /** TimerInOut */
+        TimerInOut: {
+            /** Is Running */
+            is_running: boolean;
+            /** Ends At */
+            ends_at: number | null;
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "focus" | "break";
+            /** Remaining Time */
+            remaining_time: number | null;
         };
         /** UserPreferencesInOut */
         UserPreferencesInOut: {
@@ -483,6 +514,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SlackTestOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_timer_v1_timer_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TimerInOut"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimerInOut"];
                 };
             };
             /** @description Validation Error */

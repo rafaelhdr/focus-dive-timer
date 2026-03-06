@@ -99,6 +99,16 @@ class FakeUserRepo(UserRepo):
             timer={},
         )
 
+    async def update_timer(self, user: User, new_timer: dict) -> User:
+        return User(
+            id=user.id,
+            email=user.email,
+            is_beta_user=user.is_beta_user,
+            preferences=user.preferences,
+            integrations=self._integrations(),
+            timer=new_timer,
+        )
+
 
 class FakeTokenService:
     def create_access_token(self, *, user_id: str) -> str:

@@ -17,6 +17,7 @@
   },
   "packageManager": "pnpm@10.15.1",
   "dependencies": {
+    "@focusdive/api-client": "workspace:*",
     "@focusdive/auth": "workspace:*",
     "@focusdive/auth-token": "workspace:*",
     "@focusdive/config": "workspace:*",
