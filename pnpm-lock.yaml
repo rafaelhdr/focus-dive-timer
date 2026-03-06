@@ -588,6 +588,9 @@ importers:
 
   packages/timer:
     dependencies:
+      '@focusdive/api-client':
+        specifier: workspace:*
+        version: link:../api-client
       '@focusdive/auth':
         specifier: workspace:*
         version: link:../auth
