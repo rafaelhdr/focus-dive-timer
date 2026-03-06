@@ -281,6 +281,52 @@
         ]
       }
     },
+    "/v1/timer": {
+      "put": {
+        "tags": [
+          "timer"
+        ],
+        "summary": "Update Timer",
+        "operationId": "update_timer_v1_timer_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimerInOut"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimerInOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -462,6 +508,52 @@
         ],
         "title": "SlackTestOut"
       },
+      "TimerInOut": {
+        "properties": {
+          "is_running": {
+            "type": "boolean",
+            "title": "Is Running"
+          },
+          "ends_at": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ends At"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "focus",
+              "break"
+            ],
+            "title": "Mode"
+          },
+          "remaining_time": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remaining Time"
+          }
+        },
+        "type": "object",
+        "required": [
+          "is_running",
+          "ends_at",
+          "mode",
+          "remaining_time"
+        ],
+        "title": "TimerInOut"
+      },
       "UserPreferencesInOut": {
         "properties": {
           "alarm_sound": {
@@ -481,11 +573,11 @@
             "default": true
           },
           "focus_beep_volume": {
-            "type": "number",
-            "maximum": 1.0,
+            "type": "integer",
+            "maximum": 100.0,
             "minimum": 0.0,
             "title": "Focus Beep Volume",
-            "default": 1.0
+            "default": 1
           },
           "autostart_focus": {
             "type": "boolean",

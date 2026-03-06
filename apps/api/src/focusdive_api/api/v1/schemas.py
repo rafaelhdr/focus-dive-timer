@@ -41,3 +41,10 @@ class UserPreferencesInOut(BaseModel):
     autostart_break: bool = True
     default_focus_duration: int = Field(25, ge=1)
     default_break_duration: int = Field(5, ge=1)
+
+
+class TimerInOut(BaseModel):
+    is_running: bool
+    ends_at: int | None
+    mode: Literal["focus", "break"]
+    remaining_time: int | None
