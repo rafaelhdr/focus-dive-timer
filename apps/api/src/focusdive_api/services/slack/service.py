@@ -98,7 +98,11 @@ class SlackService:
         )
 
 
+def build_slack_service(slack_client: SlackClientProtocol) -> SlackServiceProtocol:
+    return SlackService(slack_client=slack_client)
+
+
 def get_slack_service(
     slack_client: SlackClientProtocol = Depends(get_slack_client),
 ) -> SlackServiceProtocol:
-    return SlackService(slack_client=slack_client)
+    return build_slack_service(slack_client)

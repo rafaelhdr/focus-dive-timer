@@ -75,6 +75,7 @@ class FakeUserRepo(UserRepo):
             is_beta_user=False,
             preferences=DEFAULT_PREFERENCES,
             integrations=self._integrations(),
+            timer={},
         )
 
     async def upsert_by_email(self, email: str) -> User:
@@ -85,6 +86,7 @@ class FakeUserRepo(UserRepo):
             is_beta_user=False,
             preferences=DEFAULT_PREFERENCES,
             integrations=self._integrations(),
+            timer={},
         )
 
     async def update_preferences(self, user: User, new_prefs: dict) -> User:
@@ -94,6 +96,7 @@ class FakeUserRepo(UserRepo):
             is_beta_user=user.is_beta_user,
             preferences=new_prefs,
             integrations=self._integrations(),
+            timer={},
         )
 
 

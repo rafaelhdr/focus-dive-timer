@@ -7,6 +7,8 @@ from focusdive_api.core.settings import settings
 
 logger = logging.getLogger(__name__)
 
+SLACK_API_BASE_URL = "https://slack.com/api"
+
 
 class SlackClientProtocol(Protocol):
     async def dnd_start(
@@ -45,7 +47,7 @@ class SlackClient:
         async with httpx.AsyncClient() as client:
             logger.info(dnd_emoji)
             response_profile_set = await client.post(
-                "https://slack.com/api/users.profile.set",
+                f"{SLACK_API_BASE_URL}/users.profile.set",
                 headers=headers,
                 json={
                     "profile": {
@@ -57,7 +59,7 @@ class SlackClient:
             )
 
             response_dnd_start = await client.post(
-                "https://slack.com/api/dnd.setSnooze",
+                f"{SLACK_API_BASE_URL}/dnd.setSnooze",
                 headers={"Authorization": f"Bearer {user_token}"},
                 data={"num_minutes": duration_minutes},
             )
@@ -86,7 +88,7 @@ class SlackClient:
 
         async with httpx.AsyncClient() as client:
             response_profile_set = await client.post(
-                "https://slack.com/api/users.profile.set",
+                f"{SLACK_API_BASE_URL}/users.profile.set",
                 headers=headers,
                 json={
                     "profile": {
@@ -98,7 +100,7 @@ class SlackClient:
             )
 
             response_dnd_end = await client.post(
-                "https://slack.com/api/dnd.endDnd",
+                f"{SLACK_API_BASE_URL}/dnd.endDnd",
                 headers={"Authorization": f"Bearer {user_token}"},
             )
 

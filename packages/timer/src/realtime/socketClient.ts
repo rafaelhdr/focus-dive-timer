@@ -1,12 +1,11 @@
-import { io, Socket } from "socket.io-client";
-import { apiUrl } from "@focusdive/config";
-import { getAccessToken } from "@focusdive/auth";
+import { apiNewUrl } from "@focusdive/config";
+import { getAccessToken } from "@focusdive/auth-token";
 
-let socket: Socket | null = null;
-let connecting: Promise<Socket> | null = null;
+let socket: WebSocket | null = null;
+let connecting: Promise<WebSocket> | null = null;
 
-export async function getTimerSocket(): Promise<Socket> {
-  if (socket) return socket;
+export async function getTimerSocket(): Promise<WebSocket> {
+  if (socket && socket.readyState === WebSocket.OPEN) return socket;
   if (connecting) return connecting;
 
   connecting = (async () => {
@@ -15,9 +14,12 @@ export async function getTimerSocket(): Promise<Socket> {
       throw new Error("Not authenticated: missing access token");
     }
 
-    const s = io(`${apiUrl}/timer`, {
-      withCredentials: true,
-      query: { token },
+    const wsUrl = apiNewUrl.replace(/^http/, "ws");
+    const s = new WebSocket(`${wsUrl}/ws/timer?token=${encodeURIComponent(token)}`);
+
+    await new Promise<void>((resolve, reject) => {
+      s.onopen = () => resolve();
+      s.onerror = (err) => reject(err);
     });
 
     socket = s;
@@ -30,17 +32,17 @@ export async function getTimerSocket(): Promise<Socket> {
 }
 
 export function disconnectTimerSocket(): void {
-  socket?.disconnect();
+  socket?.close();
   socket = null;
   connecting = null;
 }
 
-export async function reconnectTimerSocket(): Promise<Socket> {
+export async function reconnectTimerSocket(): Promise<WebSocket> {
   disconnectTimerSocket();
   return getTimerSocket();
 }
 
-export function getExistingTimerSocket(): Socket | null {
+export function getExistingTimerSocket(): WebSocket | null {
   return socket;
 }
 

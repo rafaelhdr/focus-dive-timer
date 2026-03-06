@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, WebSocket
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError
 
@@ -23,3 +23,30 @@ async def get_current_subject(
         raise HTTPException(status_code=401, detail="Invalid token")
 
     return str(subject)
+
+
+async def get_current_subject_ws(
+    websocket: WebSocket,
+    tokens: TokenService = Depends(get_token_service),
+) -> str:
+    token = websocket.query_params.get("token")
+
+    if not token:
+        auth = websocket.headers.get("authorization")
+        if auth and auth.lower().startswith("bearer "):
+            token = auth.split(" ", 1)[1]
+
+    if not token:
+        await websocket.close(code=4401)
+        raise RuntimeError("Missing token")
+
+    try:
+        payload = tokens.decode_token(token)
+        subject = payload.get("sub")
+        if not subject:
+            await websocket.close(code=4401)
+            raise RuntimeError("Missing sub")
+        return subject
+    except Exception:
+        await websocket.close(code=4401)
+        raise

@@ -1,39 +1,61 @@
-import type { Socket } from "socket.io-client";
 import type { TimerData } from "../types";
 
-export function attachTimerChannel(socket: Socket) {
+type Listener<T = unknown> = (data: T) => void;
+
+function send(socket: WebSocket, event: string, data?: unknown) {
+  socket.send(JSON.stringify({ event, data }));
+}
+
+function onEvent<T>(
+  socket: WebSocket,
+  event: string,
+  cb: Listener<T>
+): () => void {
+  const handler = (msg: MessageEvent) => {
+    try {
+      const parsed = JSON.parse(msg.data);
+      console.log("[WS] incoming message:", parsed);
+      if (parsed.event === event) cb(parsed.data as T);
+    } catch {
+      // ignore non-JSON messages
+    }
+  };
+  socket.addEventListener("message", handler);
+  return () => socket.removeEventListener("message", handler);
+}
+
+export function attachTimerChannel(socket: WebSocket) {
   return {
     requestTimer() {
-      socket.emit("get_timer");
+      send(socket, "get_timer");
     },
 
     sendTimerData(data: TimerData) {
-      socket.emit("timer_data", data);
+      send(socket, "timer_data", data);
     },
 
-    onTimerState(cb: (data: TimerData) => void) {
-      socket.on("timer_state", cb);
-      return () => socket.off("timer_state", cb);
+    onTimerState(cb: Listener<TimerData>) {
+      return onEvent<TimerData>(socket, "timer_state", cb);
     },
 
-    onTimerUpdated(cb: (data: TimerData) => void) {
-      socket.on("timer_updated", cb);
-      return () => socket.off("timer_updated", cb);
+    onTimerUpdated(cb: Listener<TimerData>) {
+      return onEvent<TimerData>(socket, "timer_updated", cb);
     },
 
     onConnected(cb: () => void) {
-      socket.on("connect", cb);
-      return () => socket.off("connect", cb);
+      socket.addEventListener("open", cb);
+      return () => socket.removeEventListener("open", cb);
     },
 
-    onDisconnected(cb: (reason: string) => void) {
-      socket.on("disconnect", cb);
-      return () => socket.off("disconnect", cb);
+    onDisconnected(cb: (event: CloseEvent) => void) {
+      socket.addEventListener("close", cb);
+      return () => socket.removeEventListener("close", cb);
     },
 
-    onConnectionError(cb: (error: unknown) => void) {
-      socket.on("connect_error", cb);
-      return () => socket.off("connect_error", cb);
+    onConnectionError(cb: (event: Event) => void) {
+      socket.addEventListener("error", cb);
+      return () => socket.removeEventListener("error", cb);
     },
   };
 }
+

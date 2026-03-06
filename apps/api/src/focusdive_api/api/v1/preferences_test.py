@@ -36,7 +36,7 @@ class TestUpdatePreferences:
 
         NEW_PREFERENCES = {
             "focus_beep_enabled": False,
-            "focus_beep_volume": 0.5,
+            "focus_beep_volume": 50,
             "alarm_sound": "level",
             "autostart_break": False,
             "autostart_focus": False,
