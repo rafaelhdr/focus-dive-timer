@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.websocket("/ws/timer")
+@router.websocket("/timer")
 async def ws_timer(
     ws: WebSocket,
     subject: str = Depends(get_current_subject_ws),
