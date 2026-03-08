@@ -107,6 +107,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/integrations/slack/disconnect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Slack Disconnect */
+        post: operations["slack_disconnect_v1_integrations_slack_disconnect_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/integrations/slack/status": {
         parameters: {
             query?: never;
@@ -223,6 +240,11 @@ export interface components {
         };
         /** SlackConnectOut */
         SlackConnectOut: {
+            /** Status */
+            status: string;
+        };
+        /** SlackDisconnectOut */
+        SlackDisconnectOut: {
             /** Status */
             status: string;
         };
@@ -530,6 +552,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    slack_disconnect_v1_integrations_slack_disconnect_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SlackDisconnectOut"];
                 };
             };
         };

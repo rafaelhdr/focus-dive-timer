@@ -52,8 +52,6 @@ class UserRepo(Protocol):
         self,
         user: User,
         slack_token: str,
-        slack_user_id: str,
-        slack_team_id: str,
     ) -> User: ...
 
 
@@ -111,13 +109,10 @@ class MongoUserRepo:
         self,
         user: User,
         slack_token: str,
-        slack_user_id: str,
-        slack_team_id: str,
     ) -> User:
+        encrypted_token = encrypt_token(slack_token) if slack_token else ""
         MongoUser.objects(id=user.id).update(
-            set___slack_token=encrypt_token(slack_token),
-            set__slack_user_id=slack_user_id,
-            set__slack_team_id=slack_team_id,
+            set___slack_token=encrypted_token,
         )
         return await self.get_user(user.email)
 

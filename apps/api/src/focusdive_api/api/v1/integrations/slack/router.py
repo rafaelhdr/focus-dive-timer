@@ -5,7 +5,7 @@ from focusdive_api.core.auth import get_current_subject
 from focusdive_api.services.slack.service import SlackServiceProtocol, get_slack_service
 from focusdive_api.users.repo import UserRepo, get_user_repo
 
-from .schemas import SlackStatusOut, SlackTestIn, SlackTestOut, SlackConnectIn, SlackConnectOut
+from .schemas import SlackStatusOut, SlackTestIn, SlackTestOut, SlackConnectIn, SlackConnectOut, SlackDisconnectOut
 
 
 logger = logging.getLogger(__name__)
@@ -52,11 +52,39 @@ async def slack_connect(
     await repo.update_slack_connection(
         user=user,
         slack_token=user_token,
-        slack_user_id=authed_user_id,
-        slack_team_id=team_id,
     )
 
     return SlackConnectOut(status="ok")
+
+
+@router.post("/disconnect", response_model=SlackDisconnectOut)
+async def slack_disconnect(
+    subject: str = Depends(get_current_subject),
+    repo: UserRepo = Depends(get_user_repo),
+) -> SlackDisconnectOut:
+    user = await repo.get_user(subject)
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+
+    slack = user.integrations.slack if user.integrations else None
+    is_connected = bool(slack and slack.slack_token)
+
+    if not is_connected:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Slack is not connected",
+        )
+
+    await repo.update_slack_connection(
+        user=user,
+        slack_token="",
+    )
+
+    return SlackDisconnectOut(status="ok")
 
 
 @router.get("/status", response_model=SlackStatusOut)

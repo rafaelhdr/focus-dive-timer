@@ -255,6 +255,32 @@
         ]
       }
     },
+    "/v1/integrations/slack/disconnect": {
+      "post": {
+        "tags": [
+          "integrations:slack"
+        ],
+        "summary": "Slack Disconnect",
+        "operationId": "slack_disconnect_v1_integrations_slack_disconnect_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlackDisconnectOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/v1/integrations/slack/status": {
       "get": {
         "tags": [
@@ -503,6 +529,19 @@
           "status"
         ],
         "title": "SlackConnectOut"
+      },
+      "SlackDisconnectOut": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "SlackDisconnectOut"
       },
       "SlackStatusOut": {
         "properties": {

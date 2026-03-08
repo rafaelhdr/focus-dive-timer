@@ -59,13 +59,21 @@ class FakeMailer(Mailer):
 
 
 class FakeUserRepo(UserRepo):
-    def __init__(self, email: str, slack_token: str) -> None:
+    def __init__(
+        self,
+        email: str,
+        slack_token: str = "",
+    ) -> None:
         self.upserted = []
         self.email = email
         self.slack_token = slack_token
 
     def _integrations(self) -> Integrations:
-        slack = SlackIntegration(slack_token=self.slack_token) if self.slack_token else None
+        slack = None
+        if self.slack_token:
+            slack = SlackIntegration(
+                slack_token=self.slack_token,
+            )
         return Integrations(slack=slack)
 
     async def get_user(self, subject: str) -> User | None:
@@ -107,6 +115,22 @@ class FakeUserRepo(UserRepo):
             preferences=user.preferences,
             integrations=self._integrations(),
             timer=new_timer,
+        )
+
+    async def update_slack_connection(
+        self,
+        user: User,
+        slack_token: str,
+    ) -> User:
+        self.slack_token = slack_token
+
+        return User(
+            id=user.id,
+            email=user.email,
+            is_beta_user=user.is_beta_user,
+            preferences=user.preferences,
+            integrations=self._integrations(),
+            timer=user.timer,
         )
 
 

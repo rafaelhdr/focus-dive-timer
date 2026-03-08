@@ -37,3 +37,19 @@ export function useSlackConnect() {
     },
   );
 }
+
+export function useSlackDisconnect() {
+  const queryClient = useQueryClient();
+
+  return fdApi.useMutation(
+    "post",
+    "/v1/integrations/slack/disconnect",
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: fdKeys.slackStatus(),
+        });
+      },
+    },
+  );
+}
