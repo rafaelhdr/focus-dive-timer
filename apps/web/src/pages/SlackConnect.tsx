@@ -1,81 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useSlackConnect } from '@/hooks/useSlackConnect';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
-import { apiUrl } from '@focusdive/config';
 import { Button } from "@focusdive/ui";
+import { SiSlack } from 'react-icons/si';
 import { Home } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { useMe, getAccessToken } from "@focusdive/auth";
 
 const SlackConnect = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const { data: user } = useMe();
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-  const [message, setMessage] = useState('Connecting to Slack...');
-
-  useEffect(() => {
-    const connectToSlack = async () => {
-      try {
-        // Get the code from URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        const error = urlParams.get('error');
-
-        if (error) {
-          console.error('Slack OAuth error:', error);
-          setStatus('error');
-          setMessage('Failed to connect to Slack.');
-          toast({
-            title: 'Connection Failed',
-            description: 'Failed to connect to Slack. Please try again.',
-            variant: 'destructive',
-          });
-          return;
-        }
-
-        if (!code) {
-          setStatus('error');
-          setMessage('No authorization code provided.');
-          return;
-        }
-
-        // Send the code to our backend with proper headers
-        const accessToken = await getAccessToken();
-        const response = await fetch(`${apiUrl}/slack/connect`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({ code }),
-          credentials: 'include',
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to connect to Slack: ${response.statusText}`);
-        }
-
-        setStatus('success');
-        setMessage('Successfully connected to Slack!');
-        toast({
-          title: 'Success',
-          description: 'Connected to Slack successfully!',
-        });
-      } catch (error) {
-        console.error('Error connecting to Slack:', error);
-        setStatus('error');
-        setMessage('An error occurred while connecting to Slack.');
-        toast({
-          title: 'Connection Error',
-          description: 'Failed to connect to Slack. Please try again later.',
-          variant: 'destructive',
-        });
-      }
-    };
-
-    connectToSlack();
-  }, [toast, user]);
+  const { status, message } = useSlackConnect();
 
   return (
     <div className="h-screen flex flex-col items-center justify-center p-4">
@@ -119,6 +51,15 @@ const SlackConnect = () => {
               </AlertDescription>
             </Alert>
             
+            <Button 
+              className="gap-2" 
+              size="lg" 
+              onClick={() => navigate('/integrations/slack')}
+            >
+              <SiSlack className="h-4 w-4" /> 
+              Return to Slack Integration
+            </Button>
+
             <Button 
               className="gap-2" 
               size="lg" 

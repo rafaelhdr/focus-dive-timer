@@ -7,6 +7,10 @@ class Settings(BaseSettings):
 
     debug: bool = False
 
+    slack_client_id: str
+    slack_client_secret: SecretStr
+    slack_redirect_uri: str
+
     jwt_secret: SecretStr
     jwt_algorithm: str = "HS256"
     jwt_access_exp_minutes: int = 15

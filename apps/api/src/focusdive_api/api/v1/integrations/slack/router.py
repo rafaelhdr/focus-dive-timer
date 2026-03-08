@@ -1,12 +1,62 @@
-from fastapi import APIRouter, Depends
+import logging
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from focusdive_api.core.auth import get_current_subject
 from focusdive_api.services.slack.service import SlackServiceProtocol, get_slack_service
 from focusdive_api.users.repo import UserRepo, get_user_repo
 
-from .schemas import SlackStatusOut, SlackTestIn, SlackTestOut
+from .schemas import SlackStatusOut, SlackTestIn, SlackTestOut, SlackConnectIn, SlackConnectOut
+
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/slack", tags=["integrations:slack"])
+
+
+@router.post("/connect", response_model=SlackConnectOut)
+async def slack_connect(
+    payload: SlackConnectIn,
+    subject: str = Depends(get_current_subject),
+    repo: UserRepo = Depends(get_user_repo),
+    slack_service: SlackServiceProtocol = Depends(get_slack_service),
+) -> SlackConnectOut:
+    user = await repo.get_user(subject)
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+
+    tokens = await slack_service.exchange_code_for_token(payload.code)
+
+    if not tokens.get("ok"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid Slack code",
+        )
+
+    authed_user = tokens.get("authed_user") or {}
+    team = tokens.get("team") or {}
+
+    user_token = authed_user.get("access_token")
+    authed_user_id = authed_user.get("id")
+    team_id = team.get("id")
+
+    if not user_token or not authed_user_id or not team_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Missing Slack token data",
+        )
+
+    await repo.update_slack_connection(
+        user=user,
+        slack_token=user_token,
+        slack_user_id=authed_user_id,
+        slack_team_id=team_id,
+    )
+
+    return SlackConnectOut(status="ok")
 
 
 @router.get("/status", response_model=SlackStatusOut)

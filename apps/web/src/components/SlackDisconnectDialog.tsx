@@ -46,7 +46,7 @@ const SlackDisconnectDialog: React.FC<SlackDisconnectDialogProps> = ({ onDisconn
         throw new Error('Failed to disconnect from Slack');
       }
 
-      await queryClient.invalidateQueries({ queryKey: fdKeys.me() });
+      await queryClient.invalidateQueries({ queryKey: fdKeys.slackStatus() });
       setIsOpen(false);
       onDisconnected();
     } catch (error) {

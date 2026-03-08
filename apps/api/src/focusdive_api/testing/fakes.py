@@ -135,6 +135,19 @@ class FakeSlackService:
         self.connected_for_user_id = {}
         self.start_calls = []
         self.stop_calls = []
+        self.exchange_calls = []
+        self.exchange_response = {
+            "ok": True,
+            "team": {"id": "T123"},
+            "authed_user": {
+                "id": "U123",
+                "access_token": "xoxp-user-token",
+            },
+        }
+
+    async def exchange_code_for_token(self, code: str) -> dict:
+        self.exchange_calls.append(code)
+        return self.exchange_response
 
     async def get_is_connected(self, user) -> bool:
         return self.connected_for_user_id.get(user.email, False)
