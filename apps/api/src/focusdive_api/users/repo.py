@@ -3,8 +3,10 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Protocol
 
-from .utils_crypto import encrypt_token
 from .mongoengine import User as MongoUser
+from .utils_crypto import encrypt_token
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_PREFERENCES = {
     "focus_beep_enabled": True,
@@ -16,12 +18,20 @@ DEFAULT_PREFERENCES = {
     "default_break_duration": 5,
 }
 
-logger = logging.getLogger(__name__)
+
+DEFAULT_SLACK_INTEGRATION = {
+    "slack_enabled": True,
+    "slack_dnd_emoji": ":no_bell:",
+    "slack_dnd_text": "Focus time!",
+}
 
 
 @dataclass(frozen=True)
 class SlackIntegration:
     slack_token: str
+    enabled: bool = True
+    dnd_emoji: str = ":no_bell:"
+    dnd_text: str = "Focus time!"
 
 
 @dataclass(frozen=True)
@@ -56,16 +66,26 @@ class UserRepo(Protocol):
 
 
 class MongoUserRepo:
+    
     async def get_user(self, subject: str) -> User:
         try:
             doc = MongoUser.objects.get(email=subject)
-            logger.info(f"Found user in DB: {doc.email} (beta: {getattr(doc, 'is_beta_user', False)})")
+            logger.info(
+                f"Found user in DB: {doc.email} (beta: {getattr(doc, 'is_beta_user', False)})"
+            )
         except MongoUser.DoesNotExist:
             raise ValueError("User not found")
 
-        slack = None
-        if doc.slack_token:
-            slack = SlackIntegration(slack_token=doc.slack_token)
+        raw_integrations = getattr(doc, "integrations", {}) or {}
+        slack_token = doc.slack_token or ""
+
+        slack = SlackIntegration(
+            slack_token=slack_token,
+            enabled=raw_integrations.get("slack_enabled", True),
+            dnd_emoji=raw_integrations.get("slack_dnd_emoji", ":no_bell:"),
+            dnd_text=raw_integrations.get("slack_dnd_text", "Focus time!"),
+        )
+
         return User(
             id=str(doc.id),
             email=doc.email,

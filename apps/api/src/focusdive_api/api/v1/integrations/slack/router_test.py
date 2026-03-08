@@ -139,6 +139,46 @@ class TestSlackStatus:
         assert res.json() == {"is_connected": True}
 
 
+class TestSlackPreferences:
+    def test_slack_preferences_requires_auth(self, ctx) -> None:
+        res = ctx.client.get("/v1/integrations/slack/preferences")
+        assert res.status_code in (401, 403)
+
+    def test_slack_preferences_returns_defaults(self, ctx) -> None:
+        token = ctx.tokens.create_access_token(user_id="user_123")
+
+        res = ctx.client.get(
+            "/v1/integrations/slack/preferences",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+        assert res.status_code == 200
+        assert res.json() == {
+            "slack_enabled": True,
+            "slack_dnd_emoji": ":no_bell:",
+            "slack_dnd_text": "Focus time!",
+        }
+
+    def test_slack_preferences_returns_saved_values(self, ctx) -> None:
+        token = ctx.tokens.create_access_token(user_id="user_123")
+
+        ctx.user_repo.slack_enabled = False
+        ctx.user_repo.slack_dnd_emoji = ":tomato:"
+        ctx.user_repo.slack_dnd_text = "Deep work"
+
+        res = ctx.client.get(
+            "/v1/integrations/slack/preferences",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+        assert res.status_code == 200
+        assert res.json() == {
+            "slack_enabled": False,
+            "slack_dnd_emoji": ":tomato:",
+            "slack_dnd_text": "Deep work",
+        }
+
+
 class TestSlackTestEndpoint:
     def test_slack_test_requires_auth(self, ctx) -> None:
         res = ctx.client.post("/v1/integrations/slack/test", json={"action": "start"})

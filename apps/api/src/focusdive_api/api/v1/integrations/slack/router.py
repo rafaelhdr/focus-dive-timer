@@ -1,12 +1,20 @@
 import logging
+
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from focusdive_api.core.auth import get_current_subject
 from focusdive_api.services.slack.service import SlackServiceProtocol, get_slack_service
 from focusdive_api.users.repo import UserRepo, get_user_repo
 
-from .schemas import SlackStatusOut, SlackTestIn, SlackTestOut, SlackConnectIn, SlackConnectOut, SlackDisconnectOut
-
+from .schemas import (
+    SlackConnectIn,
+    SlackConnectOut,
+    SlackDisconnectOut,
+    SlackPreferencesOut,
+    SlackStatusOut,
+    SlackTestIn,
+    SlackTestOut,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +29,7 @@ async def slack_connect(
     slack_service: SlackServiceProtocol = Depends(get_slack_service),
 ) -> SlackConnectOut:
     user = await repo.get_user(subject)
-    
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -100,6 +108,28 @@ async def slack_status(
     )
 
 
+@router.get("/preferences", response_model=SlackPreferencesOut)
+async def slack_preferences(
+    subject: str = Depends(get_current_subject),
+    repo: UserRepo = Depends(get_user_repo),
+) -> SlackPreferencesOut:
+    user = await repo.get_user(subject)
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+
+    slack = user.integrations.slack
+
+    return SlackPreferencesOut(
+        slack_enabled=slack.enabled if slack else False,
+        slack_dnd_emoji=slack.dnd_emoji if slack else ":no_bell:",
+        slack_dnd_text=slack.dnd_text if slack else "Focus time!",
+    )
+
+
 @router.post("/test", response_model=SlackTestOut)
 async def slack_test(
     body: SlackTestIn,
@@ -110,12 +140,21 @@ async def slack_test(
     user = await repo.get_user(subject)
     if not await slack_service.get_is_connected(user):
         return SlackTestOut(success=False, message="Slack integration not connected")
-    if not user or not user.integrations.slack or not user.integrations.slack.slack_token:
-        return SlackTestOut(success=False, message="Slack integration not properly configured")
+    if (
+        not user
+        or not user.integrations.slack
+        or not user.integrations.slack.slack_token
+    ):
+        return SlackTestOut(
+            success=False, message="Slack integration not properly configured"
+        )
 
     if body.action == "start":
         if not body.dnd_text or not body.dnd_emoji:
-            return SlackTestOut(success=False, message="dnd_text and dnd_emoji are required for testing focus mode")
+            return SlackTestOut(
+                success=False,
+                message="dnd_text and dnd_emoji are required for testing focus mode",
+            )
         await slack_service.start_focus(
             user_reference=subject,
             duration_minutes=5,

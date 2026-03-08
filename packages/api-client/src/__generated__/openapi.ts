@@ -141,6 +141,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/integrations/slack/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Slack Preferences */
+        get: operations["slack_preferences_v1_integrations_slack_preferences_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/integrations/slack/test": {
         parameters: {
             query?: never;
@@ -247,6 +264,15 @@ export interface components {
         SlackDisconnectOut: {
             /** Status */
             status: string;
+        };
+        /** SlackPreferencesOut */
+        SlackPreferencesOut: {
+            /** Slack Enabled */
+            slack_enabled: boolean;
+            /** Slack Dnd Emoji */
+            slack_dnd_emoji: string;
+            /** Slack Dnd Text */
+            slack_dnd_text: string;
         };
         /** SlackStatusOut */
         SlackStatusOut: {
@@ -592,6 +618,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SlackStatusOut"];
+                };
+            };
+        };
+    };
+    slack_preferences_v1_integrations_slack_preferences_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SlackPreferencesOut"];
                 };
             };
         };
