@@ -6,8 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { useSlackTest } from "@/hooks/useSlack";
-import { getIntegrationPreferences, saveIntegrationPreferences } from "@/services/integrationService";
+import { useSlackPreferences, useSlackTest } from "@/hooks/useSlack";
+import { saveIntegrationPreferences } from "@/services/integrationService";
 import { Card, CardContent } from "@/components/ui/card";
 
 const emojiOptions = [
@@ -30,30 +30,17 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const { toast } = useToast();
   const slackTestMutation = useSlackTest();
+  const { data: preferences } = useSlackPreferences();
 
-  // Only load preferences if user is both authenticated and connected to Slack
   useEffect(() => {
-    if (isConnected && isAuthenticated) {
-      loadPreferences();
-    }
-  }, [isConnected, isAuthenticated]);
+    if (!isConnected || !isAuthenticated || !preferences) return;
 
-  const loadPreferences = async () => {
-    try {
-      const preferences = await getIntegrationPreferences();
-      if (preferences.slack_enabled !== undefined) {
-        setSlackEnabled(preferences.slack_enabled);
-      }
-      if (preferences.slack_dnd_emoji) {
-        setSelectedEmoji(preferences.slack_dnd_emoji);
-      }
-      if (preferences.slack_dnd_text) {
-        setStatusText(preferences.slack_dnd_text);
-      }
-    } catch (error) {
-      console.error("Error loading slack preferences:", error);
-    }
-  };
+    setSlackEnabled(preferences.slack_enabled ?? false);
+    setSelectedEmoji(
+      preferences.slack_dnd_emoji ?? ":person_in_lotus_position:",
+    );
+    setStatusText(preferences.slack_dnd_text ?? "Focus time");
+  }, [isConnected, isAuthenticated, preferences]);
 
   const handleSave = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault(); // Prevent default button behavior

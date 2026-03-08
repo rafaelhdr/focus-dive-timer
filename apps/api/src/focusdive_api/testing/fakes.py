@@ -63,16 +63,25 @@ class FakeUserRepo(UserRepo):
         self,
         email: str,
         slack_token: str = "",
+        slack_enabled: bool = True,
+        slack_dnd_emoji: str = ":no_bell:",
+        slack_dnd_text: str = "Focus time!",
     ) -> None:
         self.upserted = []
         self.email = email
         self.slack_token = slack_token
+        self.slack_enabled = slack_enabled
+        self.slack_dnd_emoji = slack_dnd_emoji
+        self.slack_dnd_text = slack_dnd_text
 
     def _integrations(self) -> Integrations:
         slack = None
         if self.slack_token:
             slack = SlackIntegration(
                 slack_token=self.slack_token,
+                enabled=self.slack_enabled,
+                dnd_emoji=self.slack_dnd_emoji,
+                dnd_text=self.slack_dnd_text,
             )
         return Integrations(slack=slack)
 

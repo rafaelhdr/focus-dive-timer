@@ -16,6 +16,21 @@ export function useSlackConnectionStatus() {
   );
 }
 
+export function useSlackPreferences() {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
+  return fdApi.useQuery(
+    "get",
+    "/v1/integrations/slack/preferences",
+    {},
+    {
+      enabled: isAuthenticated,
+      staleTime: 60_000,
+      refetchOnWindowFocus: false,
+    },
+  );
+}
+
 export function useSlackTest() {
   return fdApi.useMutation(
     "post",

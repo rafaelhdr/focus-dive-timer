@@ -28,3 +28,9 @@ class SlackTestIn(BaseModel):
 class SlackTestOut(BaseModel):
     success: bool
     message: str | None = None
+
+
+class SlackPreferencesOut(BaseModel):
+    slack_enabled: bool
+    slack_dnd_emoji: str
+    slack_dnd_text: str

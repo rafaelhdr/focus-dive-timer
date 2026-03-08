@@ -9,15 +9,13 @@ import IntegrationsInfoDialog from '@/components/IntegrationsInfoDialog';
 import { SiSlack } from 'react-icons/si';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@focusdive/ui";
-import { getIntegrationPreferences } from '@/services/integrationService';
-import { useMe } from '@focusdive/auth';
+import { useSlackPreferences } from "@/hooks/useSlack";
 
 const Index = () => {
-  const { data: user } = useMe();
+  const { data: slackPreferences } = useSlackPreferences();
 
   const navigate = useNavigate();
 
-  const [slackEnabled, setSlackEnabled] = useState(false);
   const [showPomodoroButton, setShowPomodoroButton] = useState(true);
 
   useEffect(() => {
@@ -27,24 +25,7 @@ const Index = () => {
     })();
   }, []);
 
-  useEffect(() => {
-    const loadIntegrationPreferences = async () => {
-      if (!user) {
-        setSlackEnabled(false);
-        return;
-      }
-
-      try {
-        const preferences = await getIntegrationPreferences();
-        setSlackEnabled(preferences.slack_enabled || false);
-      } catch (error) {
-        console.error('Error loading integration preferences:', error);
-        setSlackEnabled(false);
-      }
-    };
-
-    loadIntegrationPreferences();
-  }, [user]);
+  const slackEnabled = slackPreferences?.slack_enabled ?? false;
 
   const handleSlackClick = () => {
     navigate('/integrations/slack');

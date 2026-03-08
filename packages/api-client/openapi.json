@@ -307,6 +307,32 @@
         ]
       }
     },
+    "/v1/integrations/slack/preferences": {
+      "get": {
+        "tags": [
+          "integrations:slack"
+        ],
+        "summary": "Slack Preferences",
+        "operationId": "slack_preferences_v1_integrations_slack_preferences_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlackPreferencesOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/v1/integrations/slack/test": {
       "post": {
         "tags": [
@@ -542,6 +568,29 @@
           "status"
         ],
         "title": "SlackDisconnectOut"
+      },
+      "SlackPreferencesOut": {
+        "properties": {
+          "slack_enabled": {
+            "type": "boolean",
+            "title": "Slack Enabled"
+          },
+          "slack_dnd_emoji": {
+            "type": "string",
+            "title": "Slack Dnd Emoji"
+          },
+          "slack_dnd_text": {
+            "type": "string",
+            "title": "Slack Dnd Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "slack_enabled",
+          "slack_dnd_emoji",
+          "slack_dnd_text"
+        ],
+        "title": "SlackPreferencesOut"
       },
       "SlackStatusOut": {
         "properties": {
