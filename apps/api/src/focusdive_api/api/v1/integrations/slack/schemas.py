@@ -11,6 +11,10 @@ class SlackConnectOut(BaseModel):
     status: str
 
 
+class SlackDisconnectOut(BaseModel):
+    status: str
+
+
 class SlackStatusOut(BaseModel):
     is_connected: bool
 

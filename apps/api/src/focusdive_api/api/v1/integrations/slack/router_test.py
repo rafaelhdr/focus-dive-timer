@@ -68,6 +68,49 @@ class TestSlackConnect:
         assert ctx.slack.exchange_calls == ["good-code"]
 
 
+class TestSlackDisconnect:
+    def test_slack_disconnect_requires_auth(self, ctx) -> None:
+        res = ctx.client.post("/v1/integrations/slack/disconnect")
+        assert res.status_code in (401, 403)
+
+    def test_slack_disconnect_returns_400_when_not_connected(self, ctx) -> None:
+        ctx.user_repo.slack_token = ""
+        token = ctx.tokens.create_access_token(user_id="user_123")
+
+        res = ctx.client.post(
+            "/v1/integrations/slack/disconnect",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+        assert res.status_code == 400
+        assert res.json() == {"detail": "Slack is not connected"}
+
+    def test_slack_disconnect_clears_slack_data_and_returns_ok(self, ctx) -> None:
+        token = ctx.tokens.create_access_token(user_id="user_123")
+
+        user = asyncio.run(ctx.user_repo.get_user("user_123"))
+        user = asyncio.run(
+            ctx.user_repo.update_slack_connection(
+                user=user,
+                slack_token="xoxp-999",
+            )
+        )
+
+        assert user.integrations.slack.slack_token
+
+        res = ctx.client.post(
+            "/v1/integrations/slack/disconnect",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+        assert res.status_code == 200
+        assert res.json() == {"status": "ok"}
+
+        user = asyncio.run(ctx.user_repo.get_user("user_123"))
+        assert user is not None
+        assert not user.integrations.slack
+
+
 class TestSlackStatus:
     def test_slack_status_requires_auth(self, ctx) -> None:
         res = ctx.client.get("/v1/integrations/slack/status")
