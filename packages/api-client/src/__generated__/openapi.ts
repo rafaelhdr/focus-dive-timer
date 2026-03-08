@@ -150,7 +150,8 @@ export interface paths {
         };
         /** Slack Preferences */
         get: operations["slack_preferences_v1_integrations_slack_preferences_get"];
-        put?: never;
+        /** Update Slack Preferences */
+        put: operations["update_slack_preferences_v1_integrations_slack_preferences_put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -265,8 +266,8 @@ export interface components {
             /** Status */
             status: string;
         };
-        /** SlackPreferencesOut */
-        SlackPreferencesOut: {
+        /** SlackPreferencesInOut */
+        SlackPreferencesInOut: {
             /** Slack Enabled */
             slack_enabled: boolean;
             /** Slack Dnd Emoji */
@@ -637,7 +638,40 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SlackPreferencesOut"];
+                    "application/json": components["schemas"]["SlackPreferencesInOut"];
+                };
+            };
+        };
+    };
+    update_slack_preferences_v1_integrations_slack_preferences_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SlackPreferencesInOut"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SlackPreferencesInOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

@@ -179,6 +179,73 @@ class TestSlackPreferences:
         }
 
 
+class TestUpdateSlackPreferences:
+    def test_update_slack_preferences_requires_auth(self, ctx) -> None:
+        res = ctx.client.put(
+            "/v1/integrations/slack/preferences",
+            json={
+                "slack_enabled": False,
+                "slack_dnd_emoji": ":tomato:",
+                "slack_dnd_text": "Deep work",
+            },
+        )
+        assert res.status_code in (401, 403)
+
+    def test_update_slack_preferences_updates_values(self, ctx) -> None:
+        token = ctx.tokens.create_access_token(user_id="user_123")
+
+        res = ctx.client.put(
+            "/v1/integrations/slack/preferences",
+            json={
+                "slack_enabled": False,
+                "slack_dnd_emoji": ":tomato:",
+                "slack_dnd_text": "Deep work",
+            },
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+        assert res.status_code == 200
+        assert res.json() == {
+            "slack_enabled": False,
+            "slack_dnd_emoji": ":tomato:",
+            "slack_dnd_text": "Deep work",
+        }
+
+    def test_update_slack_preferences_persists_values_in_repo(self, ctx) -> None:
+        token = ctx.tokens.create_access_token(user_id="user_123")
+
+        res = ctx.client.put(
+            "/v1/integrations/slack/preferences",
+            json={
+                "slack_enabled": True,
+                "slack_dnd_emoji": ":brain:",
+                "slack_dnd_text": "Heads down",
+            },
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+        assert res.status_code == 200
+
+        assert ctx.user_repo.slack_enabled is True
+        assert ctx.user_repo.slack_dnd_emoji == ":brain:"
+        assert ctx.user_repo.slack_dnd_text == "Heads down"
+
+    def test_update_slack_preferences_returns_422_for_invalid_payload(self, ctx) -> None:
+        token = ctx.tokens.create_access_token(user_id="user_123")
+
+        res = ctx.client.put(
+            "/v1/integrations/slack/preferences",
+            json={
+                "slack_enabled": True,
+                "slack_dnd_emoji": ":brain:",
+                # missing slack_dnd_text
+            },
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+        assert res.status_code == 422
+
+
 class TestSlackTestEndpoint:
     def test_slack_test_requires_auth(self, ctx) -> None:
         res = ctx.client.post("/v1/integrations/slack/test", json={"action": "start"})

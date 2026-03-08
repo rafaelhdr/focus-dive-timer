@@ -10,7 +10,7 @@ from .schemas import (
     SlackConnectIn,
     SlackConnectOut,
     SlackDisconnectOut,
-    SlackPreferencesOut,
+    SlackPreferencesInOut,
     SlackStatusOut,
     SlackTestIn,
     SlackTestOut,
@@ -108,11 +108,11 @@ async def slack_status(
     )
 
 
-@router.get("/preferences", response_model=SlackPreferencesOut)
+@router.get("/preferences", response_model=SlackPreferencesInOut)
 async def slack_preferences(
     subject: str = Depends(get_current_subject),
     repo: UserRepo = Depends(get_user_repo),
-) -> SlackPreferencesOut:
+) -> SlackPreferencesInOut:
     user = await repo.get_user(subject)
 
     if not user:
@@ -123,7 +123,37 @@ async def slack_preferences(
 
     slack = user.integrations.slack
 
-    return SlackPreferencesOut(
+    return SlackPreferencesInOut(
+        slack_enabled=slack.enabled if slack else False,
+        slack_dnd_emoji=slack.dnd_emoji if slack else ":no_bell:",
+        slack_dnd_text=slack.dnd_text if slack else "Focus time!",
+    )
+
+
+@router.put("/preferences", response_model=SlackPreferencesInOut)
+async def update_slack_preferences(
+    payload: SlackPreferencesInOut,
+    subject: str = Depends(get_current_subject),
+    repo: UserRepo = Depends(get_user_repo),
+) -> SlackPreferencesInOut:
+    user = await repo.get_user(subject)
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+
+    updated_user = await repo.update_slack_preferences(
+        user,
+        slack_enabled=payload.slack_enabled,
+        slack_dnd_emoji=payload.slack_dnd_emoji,
+        slack_dnd_text=payload.slack_dnd_text,
+    )
+
+    slack = updated_user.integrations.slack
+
+    return SlackPreferencesInOut(
         slack_enabled=slack.enabled if slack else False,
         slack_dnd_emoji=slack.dnd_emoji if slack else ":no_bell:",
         slack_dnd_text=slack.dnd_text if slack else "Focus time!",

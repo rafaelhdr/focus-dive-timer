@@ -6,8 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { useSlackPreferences, useSlackTest } from "@/hooks/useSlack";
-import { saveIntegrationPreferences } from "@/services/integrationService";
+import {
+  useSlackPreferences,
+  useSlackTest,
+  useUpdateSlackPreferences,
+} from "@/hooks/useSlack";
 import { Card, CardContent } from "@/components/ui/card";
 
 const emojiOptions = [
@@ -27,9 +30,9 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
   const [slackEnabled, setSlackEnabled] = useState<boolean>(false);
   const [selectedEmoji, setSelectedEmoji] = useState<string>(":person_in_lotus_position:");
   const [statusText, setStatusText] = useState<string>("Focus time");
-  const [isSaving, setIsSaving] = useState<boolean>(false);
   const { toast } = useToast();
   const slackTestMutation = useSlackTest();
+  const updateSlackPreferencesMutation = useUpdateSlackPreferences();
   const { data: preferences } = useSlackPreferences();
 
   useEffect(() => {
@@ -43,34 +46,23 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
   }, [isConnected, isAuthenticated, preferences]);
 
   const handleSave = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault(); // Prevent default button behavior
-    
+    e.preventDefault();
+
     if (!isConnected || !isAuthenticated) return;
 
-    setIsSaving(true);
     try {
-      console.log("Saving preferences:", { emoji: selectedEmoji, text: statusText });
-      
-      const success = await saveIntegrationPreferences({
-        slack_enabled: slackEnabled,
-        slack_dnd_emoji: selectedEmoji,
-        slack_dnd_text: statusText,
+      await updateSlackPreferencesMutation.mutateAsync({
+        body: {
+          slack_enabled: slackEnabled,
+          slack_dnd_emoji: selectedEmoji,
+          slack_dnd_text: statusText,
+        },
       });
 
-      console.log("Save result:", success);
-
-      if (success) {
-        toast({
-          title: "Success",
-          description: "Slack preferences saved successfully.",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to save Slack preferences.",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Success",
+        description: "Slack preferences saved successfully.",
+      });
     } catch (error) {
       console.error("Error saving slack preferences:", error);
       toast({
@@ -78,8 +70,6 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
         description: "An error occurred while saving preferences.",
         variant: "destructive",
       });
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -277,11 +267,11 @@ const SlackConfigForm: React.FC<SlackConfigFormProps> = ({ isConnected, isAuthen
 
       <Button
         onClick={handleSave}
-        disabled={!isAuthenticated || !isConnected || isSaving}
+        disabled={!isAuthenticated || !isConnected || updateSlackPreferencesMutation.isPending}
         className="mt-4"
         type="button"
       >
-        {isSaving ? "Saving..." : "Save Slack Preferences"}
+        {updateSlackPreferencesMutation.isPending ? "Saving..." : "Save Slack Preferences"}
       </Button>
       </div>
     </div>

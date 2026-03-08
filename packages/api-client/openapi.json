@@ -320,7 +320,51 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SlackPreferencesOut"
+                  "$ref": "#/components/schemas/SlackPreferencesInOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "integrations:slack"
+        ],
+        "summary": "Update Slack Preferences",
+        "operationId": "update_slack_preferences_v1_integrations_slack_preferences_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SlackPreferencesInOut"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlackPreferencesInOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -569,7 +613,7 @@
         ],
         "title": "SlackDisconnectOut"
       },
-      "SlackPreferencesOut": {
+      "SlackPreferencesInOut": {
         "properties": {
           "slack_enabled": {
             "type": "boolean",
@@ -590,7 +634,7 @@
           "slack_dnd_emoji",
           "slack_dnd_text"
         ],
-        "title": "SlackPreferencesOut"
+        "title": "SlackPreferencesInOut"
       },
       "SlackStatusOut": {
         "properties": {

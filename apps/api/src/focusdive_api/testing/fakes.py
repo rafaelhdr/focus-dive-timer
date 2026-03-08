@@ -4,7 +4,13 @@ from typing import Any
 from fastapi import HTTPException
 
 from focusdive_api.emails.deps import Mailer
-from focusdive_api.users.repo import DEFAULT_PREFERENCES, User, UserRepo, Integrations, SlackIntegration
+from focusdive_api.users.repo import (
+    DEFAULT_PREFERENCES,
+    Integrations,
+    SlackIntegration,
+    User,
+    UserRepo,
+)
 
 
 @dataclass(frozen=True)
@@ -132,6 +138,27 @@ class FakeUserRepo(UserRepo):
         slack_token: str,
     ) -> User:
         self.slack_token = slack_token
+
+        return User(
+            id=user.id,
+            email=user.email,
+            is_beta_user=user.is_beta_user,
+            preferences=user.preferences,
+            integrations=self._integrations(),
+            timer=user.timer,
+        )
+
+    async def update_slack_preferences(
+        self,
+        user: User,
+        *,
+        slack_enabled: bool,
+        slack_dnd_emoji: str,
+        slack_dnd_text: str,
+    ) -> User:
+        self.slack_enabled = slack_enabled
+        self.slack_dnd_emoji = slack_dnd_emoji
+        self.slack_dnd_text = slack_dnd_text
 
         return User(
             id=user.id,

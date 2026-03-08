@@ -31,6 +31,22 @@ export function useSlackPreferences() {
   );
 }
 
+export function useUpdateSlackPreferences() {
+  const queryClient = useQueryClient();
+
+  return fdApi.useMutation(
+    "put",
+    "/v1/integrations/slack/preferences",
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: fdKeys.slackPreferences(),
+        });
+      },
+    },
+  );
+}
+
 export function useSlackTest() {
   return fdApi.useMutation(
     "post",

@@ -64,9 +64,37 @@ class UserRepo(Protocol):
         slack_token: str,
     ) -> User: ...
 
+    async def update_slack_preferences(
+        self,
+        user: User,
+        *,
+        slack_enabled: bool,
+        slack_dnd_emoji: str,
+        slack_dnd_text: str,
+    ) -> User: ...
+
 
 class MongoUserRepo:
-    
+    def _build_slack_integration(self, doc: MongoUser) -> SlackIntegration:
+        raw_integrations = getattr(doc, "integrations", {}) or {}
+        slack_token = doc.slack_token or ""
+
+        return SlackIntegration(
+            slack_token=slack_token,
+            enabled=raw_integrations.get(
+                "slack_enabled",
+                DEFAULT_SLACK_INTEGRATION["slack_enabled"],
+            ),
+            dnd_emoji=raw_integrations.get(
+                "slack_dnd_emoji",
+                DEFAULT_SLACK_INTEGRATION["slack_dnd_emoji"],
+            ),
+            dnd_text=raw_integrations.get(
+                "slack_dnd_text",
+                DEFAULT_SLACK_INTEGRATION["slack_dnd_text"],
+            ),
+        )
+
     async def get_user(self, subject: str) -> User:
         try:
             doc = MongoUser.objects.get(email=subject)
@@ -76,21 +104,11 @@ class MongoUserRepo:
         except MongoUser.DoesNotExist:
             raise ValueError("User not found")
 
-        raw_integrations = getattr(doc, "integrations", {}) or {}
-        slack_token = doc.slack_token or ""
-
-        slack = SlackIntegration(
-            slack_token=slack_token,
-            enabled=raw_integrations.get("slack_enabled", True),
-            dnd_emoji=raw_integrations.get("slack_dnd_emoji", ":no_bell:"),
-            dnd_text=raw_integrations.get("slack_dnd_text", "Focus time!"),
-        )
-
         return User(
             id=str(doc.id),
             email=doc.email,
             integrations=Integrations(
-                slack=slack,
+                slack=self._build_slack_integration(doc),
             ),
             is_beta_user=bool(getattr(doc, "is_beta_user", False)),
             preferences=getattr(doc, "preferences", {}) or {},
@@ -112,6 +130,9 @@ class MongoUserRepo:
         return User(
             id=str(doc.id),
             email=doc.email,
+            integrations=Integrations(
+                slack=self._build_slack_integration(doc),
+            ),
             is_beta_user=bool(getattr(doc, "is_beta_user", False)),
             preferences=getattr(doc, "preferences", {}) or {},
             timer=getattr(doc, "timer", {}) or {},
@@ -133,6 +154,21 @@ class MongoUserRepo:
         encrypted_token = encrypt_token(slack_token) if slack_token else ""
         MongoUser.objects(id=user.id).update(
             set___slack_token=encrypted_token,
+        )
+        return await self.get_user(user.email)
+
+    async def update_slack_preferences(
+        self,
+        user: User,
+        *,
+        slack_enabled: bool,
+        slack_dnd_emoji: str,
+        slack_dnd_text: str,
+    ) -> User:
+        MongoUser.objects(id=user.id).update(
+            set__integrations__slack_enabled=slack_enabled,
+            set__integrations__slack_dnd_emoji=slack_dnd_emoji,
+            set__integrations__slack_dnd_text=slack_dnd_text,
         )
         return await self.get_user(user.email)
 

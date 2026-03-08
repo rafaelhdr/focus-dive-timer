@@ -30,7 +30,7 @@ class SlackTestOut(BaseModel):
     message: str | None = None
 
 
-class SlackPreferencesOut(BaseModel):
+class SlackPreferencesInOut(BaseModel):
     slack_enabled: bool
     slack_dnd_emoji: str
     slack_dnd_text: str
