@@ -1,18 +1,27 @@
 import logging
 from typing import Protocol
 
+import httpx
 from fastapi import Depends
 
+from focusdive_api.core.http import shared_http_client
+from focusdive_api.core.settings import settings
 from focusdive_api.users.repo import User
 
 from .client import SlackClientProtocol, get_slack_client
+from .schemas import SlackOAuthAccessResponse
 
 logger = logging.getLogger(__name__)
 
 
 class SlackServiceProtocol(Protocol):
-    def __init__(self, slack_client: SlackClientProtocol) -> None: ...
+    def __init__(
+        self,
+        slack_client: SlackClientProtocol,
+        http_client: httpx.AsyncClient,
+    ) -> None: ...
 
+    async def exchange_code_for_token(self, code: str) -> SlackOAuthAccessResponse: ...
     async def get_is_connected(self, user: User | None) -> bool: ...
     async def get_is_enabled(self, user: User) -> bool: ...
 
@@ -35,8 +44,28 @@ class SlackServiceProtocol(Protocol):
 
 
 class SlackService:
-    def __init__(self, slack_client: SlackClientProtocol) -> None:
+    def __init__(
+        self, slack_client: SlackClientProtocol, http_client: httpx.AsyncClient
+    ) -> None:
         self.slack_client = slack_client
+        self.http_client = http_client
+
+    async def exchange_code_for_token(
+        self,
+        code: str,
+    ) -> SlackOAuthAccessResponse:
+        response = await self.http_client.post(
+            "https://slack.com/api/oauth.v2.access",
+            data={
+                "client_id": settings.slack_client_id,
+                "client_secret": settings.slack_client_secret.get_secret_value(),
+                "code": code,
+                "redirect_uri": settings.slack_redirect_uri,
+            },
+        )
+        response.raise_for_status()
+        logger.info(f"Received response from Slack OAuth token exchange: {response.text}")
+        return response.json()
 
     async def get_is_connected(self, user: User | None) -> bool:
         return bool(
@@ -98,8 +127,13 @@ class SlackService:
         )
 
 
-def build_slack_service(slack_client: SlackClientProtocol) -> SlackServiceProtocol:
-    return SlackService(slack_client=slack_client)
+def build_slack_service(
+    slack_client: SlackClientProtocol,
+) -> SlackServiceProtocol:
+    return SlackService(
+        slack_client=slack_client,
+        http_client=shared_http_client,
+    )
 
 
 def get_slack_service(

@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Protocol
 
+from .utils_crypto import encrypt_token
 from .mongoengine import User as MongoUser
 
 DEFAULT_PREFERENCES = {
@@ -47,14 +48,22 @@ class UserRepo(Protocol):
 
     async def update_timer(self, user: User, new_timer: dict) -> User: ...
 
+    async def update_slack_connection(
+        self,
+        user: User,
+        slack_token: str,
+        slack_user_id: str,
+        slack_team_id: str,
+    ) -> User: ...
+
 
 class MongoUserRepo:
-    async def get_user(self, user_email: str) -> User | None:
+    async def get_user(self, subject: str) -> User:
         try:
-            doc = MongoUser.objects.get(email=user_email)
+            doc = MongoUser.objects.get(email=subject)
             logger.info(f"Found user in DB: {doc.email} (beta: {getattr(doc, 'is_beta_user', False)})")
         except MongoUser.DoesNotExist:
-            return None
+            raise ValueError("User not found")
 
         slack = None
         if doc.slack_token:
@@ -98,6 +107,20 @@ class MongoUserRepo:
         MongoUser.objects(id=user.id).update(set__timer=new_timer)
         return await self.get_user(user.email)
 
+    async def update_slack_connection(
+        self,
+        user: User,
+        slack_token: str,
+        slack_user_id: str,
+        slack_team_id: str,
+    ) -> User:
+        MongoUser.objects(id=user.id).update(
+            set___slack_token=encrypt_token(slack_token),
+            set__slack_user_id=slack_user_id,
+            set__slack_team_id=slack_team_id,
+        )
+        return await self.get_user(user.email)
 
-def get_user_repo() -> MongoUserRepo:
+
+def get_user_repo() -> UserRepo:
     return MongoUserRepo()

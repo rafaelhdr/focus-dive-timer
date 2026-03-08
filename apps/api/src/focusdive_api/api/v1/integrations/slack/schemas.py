@@ -3,6 +3,14 @@ from typing import Literal
 from pydantic import BaseModel
 
 
+class SlackConnectIn(BaseModel):
+    code: str
+
+
+class SlackConnectOut(BaseModel):
+    status: str
+
+
 class SlackStatusOut(BaseModel):
     is_connected: bool
 

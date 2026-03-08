@@ -209,6 +209,52 @@
         ]
       }
     },
+    "/v1/integrations/slack/connect": {
+      "post": {
+        "tags": [
+          "integrations:slack"
+        ],
+        "summary": "Slack Connect",
+        "operationId": "slack_connect_v1_integrations_slack_connect_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SlackConnectIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlackConnectOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/v1/integrations/slack/status": {
       "get": {
         "tags": [
@@ -431,6 +477,32 @@
           "refresh_token"
         ],
         "title": "RefreshOut"
+      },
+      "SlackConnectIn": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "title": "SlackConnectIn"
+      },
+      "SlackConnectOut": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "SlackConnectOut"
       },
       "SlackStatusOut": {
         "properties": {
