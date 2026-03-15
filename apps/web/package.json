@@ -81,7 +81,6 @@
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.20",
-    "lovable-tagger": "^1.1.7",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.11",
     "vite": "^5.4.1"

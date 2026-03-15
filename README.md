@@ -1,4 +1,4 @@
-# FocusDive Extension
+# FocusDive Timer
 
 ## Build requirements
 
@@ -15,7 +15,7 @@ pnpm web:dev
 
 ## Build for Extension
 
-pnpm extension:build:<chrome|firefox>
+pnpm extension:build:<chrome|firefox|firefox-dev>
 
 The build output will be generated in the `apps/extension/dist/` directory.
 

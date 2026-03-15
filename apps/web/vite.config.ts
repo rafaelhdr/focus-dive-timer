@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { componentTagger } from "lovable-tagger";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 
 // https://vitejs.dev/config/
@@ -11,13 +10,11 @@ export default defineConfig(({ mode }) => ({
   },
   server: {
     host: "::",
-    allowedHosts: ['staging.focusdive.app', 'focusdive.app', '867917a8-7dc5-4c33-8d1d-c97fe6b92624.lovableproject.com'],
+    allowedHosts: ['staging.focusdive.app', 'focusdive.app'],
     port: 8080,
   },
   plugins: [
     react(),
-    mode === 'development' &&
-    componentTagger(),
     sentryVitePlugin({
       authToken: process.env.SENTRY_AUTH_TOKEN,
       org: "focus-dive",
