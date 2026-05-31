@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Any, Dict, Set
+from typing import Any
 
 from fastapi import WebSocket
 from starlette.websockets import WebSocketState
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 class TimerConnections:
     def __init__(self) -> None:
-        self._by_room: Dict[str, Set[WebSocket]] = {}
+        self._by_room: dict[str, set[WebSocket]] = {}
         self._lock = asyncio.Lock()
 
     async def connect(self, ws: WebSocket, room: str) -> None:

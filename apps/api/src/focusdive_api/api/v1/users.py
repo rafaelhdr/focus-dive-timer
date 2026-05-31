@@ -88,9 +88,7 @@ async def verify(
     access = token_pair.access_token
     refresh = token_pair.refresh_token
 
-    await asyncio.gather(
-        redis.delete(code_key, attempts_key), repo.upsert_by_email(email)
-    )
+    await asyncio.gather(redis.delete(code_key, attempts_key), repo.upsert_by_email(email))
 
     return VerifyOut(access_token=access, refresh_token=refresh)
 
