@@ -1,26 +1,33 @@
 # FocusDive Timer
 
-## Build requirements
+Block distractions and enable deep work with a Pomodoro-style timer.
 
-- Node.js >= v24
+**[focusdive.app](https://focusdive.app)** · [Chrome extension](https://chromewebstore.google.com/detail/focusdive-pomodoro-timer/klihekakgnmpmpmmgkiiikbgmblcfknl) · [Firefox extension](https://addons.mozilla.org/en-US/firefox/addon/focus-dive-extension/)
+
+## Requirements
+
+- Node.js >= 24
 - pnpm >= 10
 
-## Install dependencies
+## Setup
 
+```bash
 pnpm install
+cp .env.example .env  # fill in your values
+pnpm web:dev          # http://localhost:8080
+```
 
-## Run web version
+## Build extension
 
-pnpm web:dev
+```bash
+pnpm extension:build:chrome
+pnpm extension:build:firefox
+```
 
-## Build for Extension
+## Authentication
 
-pnpm extension:build:<chrome|firefox|firefox-dev>
+Email OTP — no password needed.
 
-The build output will be generated in the `apps/extension/dist/` directory.
+## License
 
-# Authentication
-
-Authentication is done via email one-time token (OTP).
-Reviewers can log in using any email address they control and will receive a token by email to complete authentication.
-No pre-created test account is required.
+MIT
