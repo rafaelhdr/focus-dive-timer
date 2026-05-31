@@ -12,20 +12,30 @@ export function chromeAction() {
   return c?.action ?? c?.browserAction ?? null;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function chromePromisifyVoid(fn: Function, ctx: any, args: any[]): Promise<void> {
   return new Promise((resolve, reject) => {
     fn.call(ctx, ...args, () => {
       const msg = lastErrorMessage();
-      msg ? reject(new Error(msg)) : resolve();
+      if (msg) {
+        reject(new Error(msg));
+      } else {
+        resolve();
+      }
     });
   });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function chromePromisify<T>(fn: Function, ctx: any, args: any[]): Promise<T> {
   return new Promise((resolve, reject) => {
     fn.call(ctx, ...args, (result: T) => {
       const msg = lastErrorMessage();
-      msg ? reject(new Error(msg)) : resolve(result);
+      if (msg) {
+        reject(new Error(msg));
+      } else {
+        resolve(result);
+      }
     });
   });
 }
