@@ -14,9 +14,7 @@ class TestGetPreferences:
 
         token = fake_tokens.create_access_token(user_id="user_123")
 
-        res = client.get(
-            "/v1/preferences", headers={"Authorization": f"Bearer {token}"}
-        )
+        res = client.get("/v1/preferences", headers={"Authorization": f"Bearer {token}"})
         assert res.status_code == 200
 
         data = res.json()
@@ -34,7 +32,7 @@ class TestUpdatePreferences:
         client = ctx.client
         fake_tokens = ctx.tokens
 
-        NEW_PREFERENCES = {
+        new_preferences = {
             "focus_beep_enabled": False,
             "focus_beep_volume": 50,
             "alarm_sound": "level",
@@ -48,9 +46,9 @@ class TestUpdatePreferences:
         res = client.put(
             "/v1/preferences",
             headers={"Authorization": f"Bearer {token}"},
-            json=NEW_PREFERENCES,
+            json=new_preferences,
         )
         assert res.status_code == 200
 
         data = res.json()
-        assert data == NEW_PREFERENCES
+        assert data == new_preferences

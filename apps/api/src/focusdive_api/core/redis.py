@@ -1,5 +1,7 @@
 from functools import lru_cache
+
 from redis.asyncio import Redis
+
 from focusdive_api.core.settings import settings
 
 

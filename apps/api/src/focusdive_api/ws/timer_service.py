@@ -1,7 +1,6 @@
 import logging
 import math
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from focusdive_api.services.slack.client import get_slack_client
 from focusdive_api.services.slack.schemas import DEFAULT_DND_EMOJI, DEFAULT_DND_TEXT
@@ -18,15 +17,13 @@ slack_service = build_slack_service(slack_client)
 logger = logging.getLogger(__name__)
 
 
-async def load_timer(user: Optional[User]) -> TimerState:
+async def load_timer(user: User | None) -> TimerState:
     if user:
         return user.timer or DEFAULT_TIMER
     return DEFAULT_TIMER
 
 
-async def persist_timer(
-    repo: UserRepo, user: Optional[User], timer: TimerState
-) -> None:
+async def persist_timer(repo: UserRepo, user: User | None, timer: TimerState) -> None:
     if user:
         await repo.update_timer(user, timer)
 
@@ -53,7 +50,7 @@ async def on_trigger(
     dnd_emoji = slack_prefs.get("dnd_emoji", DEFAULT_DND_EMOJI)
 
     if mode == "focus" and ends_at is not None:
-        now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
+        now_ms = int(datetime.now(UTC).timestamp() * 1000)
         duration_minutes = max(1, math.ceil((ends_at - now_ms) / 1000 / 60))
         await slack_service.start_focus(
             user_reference=user.email,

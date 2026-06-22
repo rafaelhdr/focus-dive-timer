@@ -16,7 +16,7 @@ async def get_current_subject(
     try:
         payload = tokens.decode_token(token)
     except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+        raise HTTPException(status_code=401, detail="Invalid token") from None
 
     subject = payload.get("sub")
     if not subject:

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Protocol
 
 from jose import jwt
@@ -22,14 +22,12 @@ class TokenService(Protocol):
 
 class JwtTokenService:
     def create_access_token(self, *, user_id: str) -> str:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         payload = {
             "type": "access",
             "sub": user_id,
             "iat": int(now.timestamp()),
-            "exp": int(
-                (now + timedelta(minutes=settings.jwt_access_exp_minutes)).timestamp()
-            ),
+            "exp": int((now + timedelta(minutes=settings.jwt_access_exp_minutes)).timestamp()),
         }
         return jwt.encode(
             payload,
@@ -38,14 +36,12 @@ class JwtTokenService:
         )
 
     def create_refresh_token(self, *, user_id: str) -> str:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         payload = {
             "type": "refresh",
             "sub": user_id,
             "iat": int(now.timestamp()),
-            "exp": int(
-                (now + timedelta(days=settings.jwt_refresh_exp_days)).timestamp()
-            ),
+            "exp": int((now + timedelta(days=settings.jwt_refresh_exp_days)).timestamp()),
         }
         return jwt.encode(
             payload,
