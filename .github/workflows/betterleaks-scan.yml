@@ -1,0 +1,33 @@
+name: Betterleaks Secret Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:  # Allow manual trigger from GitHub UI
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  scan:
+    name: Betterleaks Secret Detection
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Full history on push (catch everything), shallow on PRs (only need diff)
+          fetch-depth: ${{ github.event_name == 'push' && 0 || 2 }}
+
+      - name: Run Betterleaks
+        uses: dortort/betterleaks-action@v0.1.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # Auto-mode: git scan on push, dir scan on PR
+          scan-mode: auto
+          # Validate secrets against live services to reduce false positives
+          validation: true
