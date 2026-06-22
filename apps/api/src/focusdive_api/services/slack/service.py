@@ -44,9 +44,7 @@ class SlackServiceProtocol(Protocol):
 
 
 class SlackService:
-    def __init__(
-        self, slack_client: SlackClientProtocol, http_client: httpx.AsyncClient
-    ) -> None:
+    def __init__(self, slack_client: SlackClientProtocol, http_client: httpx.AsyncClient) -> None:
         self.slack_client = slack_client
         self.http_client = http_client
 
@@ -68,9 +66,7 @@ class SlackService:
         return response.json()
 
     async def get_is_connected(self, user: User | None) -> bool:
-        return bool(
-            user and user.integrations.slack and user.integrations.slack.slack_token
-        )
+        return bool(user and user.integrations.slack and user.integrations.slack.slack_token)
 
     async def get_is_enabled(self, user: User) -> bool:
         return bool(user.integrations.slack and user.integrations.slack.slack_token)

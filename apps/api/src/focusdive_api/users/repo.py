@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Protocol
 
 from .mongoengine import User as MongoUser
@@ -101,8 +101,8 @@ class MongoUserRepo:
             logger.info(
                 f"Found user in DB: {doc.email} (beta: {getattr(doc, 'is_beta_user', False)})"
             )
-        except MongoUser.DoesNotExist:
-            raise ValueError("User not found")
+        except MongoUser.DoesNotExist as e:
+            raise ValueError("User not found") from e
 
         return User(
             id=str(doc.id),
@@ -116,7 +116,7 @@ class MongoUserRepo:
         )
 
     async def upsert_by_email(self, email: str) -> User:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         doc = MongoUser.objects(email=email).modify(
             new=True,
             upsert=True,
