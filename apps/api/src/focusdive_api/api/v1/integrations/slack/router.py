@@ -51,7 +51,9 @@ async def slack_connect(
     authed_user_id = authed_user.get("id")
     team_id = team.get("id")
 
-    if not user_token or not authed_user_id or not team_id:
+    if (
+        not user_token or not authed_user_id or not team_id
+    ):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Missing Slack token data",
