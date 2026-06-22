@@ -26,3 +26,9 @@ lint-frontend-fix:
 
 openapi:
     pnpm openapi:generate && pnpm openapi:convert
+
+betterleaks:
+    betterleaks dir .
+
+betterleaks-git:
+    betterleaks git .
