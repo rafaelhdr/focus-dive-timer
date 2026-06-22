@@ -1,4 +1,4 @@
-import { apiNewUrl } from '@focusdive/config';
+import { apiUrl } from '@focusdive/config';
 
 export interface AuthVerifyResponse {
   access_token: string;
@@ -8,7 +8,7 @@ export interface AuthVerifyResponse {
 
 export const refreshAccessToken = async (refreshToken: string): Promise<AuthVerifyResponse> => {
   try {
-    const response = await fetch(`${apiNewUrl}/v1/users/refresh-token`, {
+    const response = await fetch(`${apiUrl}/v1/users/refresh-token`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${refreshToken}`,

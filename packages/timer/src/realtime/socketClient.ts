@@ -1,4 +1,4 @@
-import { apiNewUrl } from "@focusdive/config";
+import { apiUrl } from "@focusdive/config";
 import { getAccessToken } from "@focusdive/auth-token";
 
 let socket: WebSocket | null = null;
@@ -14,7 +14,7 @@ export async function getTimerSocket(): Promise<WebSocket> {
       throw new Error("Not authenticated: missing access token");
     }
 
-    const wsUrl = apiNewUrl.replace(/^http/, "ws");
+    const wsUrl = apiUrl.replace(/^http/, "ws");
     const s = new WebSocket(`${wsUrl}/ws/timer?token=${encodeURIComponent(token)}`);
 
     await new Promise<void>((resolve, reject) => {

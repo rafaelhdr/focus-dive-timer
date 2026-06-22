@@ -7,6 +7,19 @@ web:
 api:
     cd apps/api && uv run fastapi dev src/focusdive_api/main.py
 
+# Docker Compose (local development with hot-reload)
+compose:
+    docker compose up --watch
+
+compose-build:
+    docker compose build
+
+compose-down:
+    docker compose down
+
+compose-logs:
+    docker compose logs -f
+
 [parallel]
 lint: lint-backend lint-frontend
 

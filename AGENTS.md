@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to AI coding agents when working with code in this repository.
 
 ## Overview
 
@@ -40,6 +40,29 @@ pnpm test              # All packages recursively
 # Regenerate API client from OpenAPI schema
 pnpm openapi:generate && pnpm openapi:convert
 ```
+
+### Docker Compose (local development)
+
+```bash
+# Start all services with hot-reload (watches for file changes)
+just compose
+
+# Build images without starting
+just compose-build
+
+# Stop all services
+just compose-down
+
+# View logs
+just compose-logs
+```
+
+Services:
+- **Web**: http://localhost:8080 (Vite with HMR)
+- **API**: http://localhost:5000 (FastAPI with auto-reload)
+- **MongoDB**: localhost:27017
+- **Redis**: localhost:6379
+- **Mailpit**: http://localhost:8025 (SMTP catch-all for dev emails)
 
 To run a single test file, cd into the package (e.g., `packages/timer`) and run `pnpm vitest run src/hooks/useTimer.test.ts`.
 
@@ -101,7 +124,7 @@ The extension (`apps/extension`) shares all packages with the web app. It adds:
 ### Environment Variables
 
 All `VITE_*` prefixed. Key ones:
-- `VITE_API_URL` / `VITE_API_NEW_URL` — API endpoints
+- `VITE_API_URL` — API endpoint
 - `VITE_APP_URL` — frontend URL
 - `VITE_SLACK_CLIENT_ID` — Slack OAuth
 - `VITE_SENTRY_DSN` — error tracking
