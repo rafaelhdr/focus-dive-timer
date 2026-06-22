@@ -43,7 +43,7 @@ const Login = () => {
       setEmail(values.email);
       setCurrentStep('verification');
       toast.success(res.message)
-    } catch (e) {
+    } catch (_e) {
       toast.error('Failed to request login code');
     }
   };
@@ -58,7 +58,7 @@ const Login = () => {
       });
 
       navigate('/');
-    } catch (e) {
+    } catch (_e) {
       toast.error('Failed to verify code');
     }
   };
