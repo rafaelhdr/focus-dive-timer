@@ -1,0 +1,30 @@
+name: API Lint
+
+on:
+  push:
+    paths:
+      - "apps/api/**"
+  pull_request:
+    paths:
+      - "apps/api/**"
+
+jobs:
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install dependencies
+        working-directory: apps/api
+        run: uv sync --dev
+
+      - name: Run ruff (lint)
+        working-directory: apps/api
+        run: uv run ruff check src/
+
+      - name: Run ruff (format check)
+        working-directory: apps/api
+        run: uv run ruff format --check src/

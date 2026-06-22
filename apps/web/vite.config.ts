@@ -4,7 +4,7 @@ import path from "path";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode: _mode }) => ({
   build: {
     sourcemap: true, // Source map generation must be turned on
   },

@@ -17,7 +17,7 @@ class TestUpdateTimer:
         client = ctx.client
         fake_tokens = ctx.tokens
 
-        TIMER_DATA = {
+        timer_data = {
             "is_running": True,
             "ends_at": None,
             "mode": "focus",
@@ -28,9 +28,9 @@ class TestUpdateTimer:
         res = client.put(
             "/v1/timer",
             headers={"Authorization": f"Bearer {token}"},
-            json=TIMER_DATA,
+            json=timer_data,
         )
         assert res.status_code == 200
 
         data = res.json()
-        assert data == TIMER_DATA
+        assert data == timer_data

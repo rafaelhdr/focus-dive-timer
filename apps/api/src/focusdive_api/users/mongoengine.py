@@ -47,18 +47,14 @@ class User(Document):
 
     @property
     def spotify_refresh_token(self):
-        return (
-            decrypt_token(self._spotify_refresh_token)
-            if self._spotify_refresh_token
-            else None
-        )
+        return decrypt_token(self._spotify_refresh_token) if self._spotify_refresh_token else None
 
     @spotify_refresh_token.setter
     def spotify_refresh_token(self, value):
         self._spotify_refresh_token = encrypt_token(value)
 
     @classmethod
-    def upsert_by_email(cls, email: str) -> "User":
+    def upsert_by_email(cls, email: str) -> User:
         cls.objects(email=email).update_one(
             set_on_insert__email=email,
             set_on_insert__created=datetime.utcnow(),

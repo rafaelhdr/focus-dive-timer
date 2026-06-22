@@ -170,14 +170,8 @@ async def slack_test(
     user = await repo.get_user(subject)
     if not await slack_service.get_is_connected(user):
         return SlackTestOut(success=False, message="Slack integration not connected")
-    if (
-        not user
-        or not user.integrations.slack
-        or not user.integrations.slack.slack_token
-    ):
-        return SlackTestOut(
-            success=False, message="Slack integration not properly configured"
-        )
+    if not user or not user.integrations.slack or not user.integrations.slack.slack_token:
+        return SlackTestOut(success=False, message="Slack integration not properly configured")
 
     if body.action == "start":
         if not body.dnd_text or not body.dnd_emoji:

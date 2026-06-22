@@ -183,9 +183,7 @@ class FakeTokenService:
         raise HTTPException(status_code=401, detail="Invalid token")
 
     def issue_token_pair(self, *, user_id: str):
-        return TokenPair(
-            access_token=f"access:{user_id}", refresh_token=f"refresh:{user_id}"
-        )
+        return TokenPair(access_token=f"access:{user_id}", refresh_token=f"refresh:{user_id}")
 
 
 class FakeSlackService:

@@ -12,13 +12,10 @@ export function ThemeToggle() {
       setTheme("light")
     } else {
       // If system, detect current and switch to opposite
-      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches
-      setTheme(isDark ? "light" : "dark")
+      const _isDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+      setTheme(_isDark ? "light" : "dark")
     }
   }
-
-  const isDark = theme === "dark" || 
-    (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches)
 
   return (
     <Button
