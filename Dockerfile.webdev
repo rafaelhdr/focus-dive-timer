@@ -1,0 +1,18 @@
+FROM node:22-alpine
+
+RUN corepack enable && corepack prepare pnpm@10.15.1 --activate
+
+WORKDIR /app
+
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY tsconfig.json tsconfig.base.json tsconfig.web-build.json ./
+COPY vite.config.ts index.html eslint.config.mjs ./
+
+COPY packages/ ./packages/
+COPY apps/web/ ./apps/web/
+
+RUN pnpm install --frozen-lockfile
+
+EXPOSE 8080
+
+CMD sh -c "pnpm --filter @focusdive/config build && pnpm --filter @focusdive/webapp dev --host 0.0.0.0"

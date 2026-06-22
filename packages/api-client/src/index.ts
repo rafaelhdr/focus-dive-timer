@@ -1,4 +1,4 @@
-import { apiNewUrl } from "@focusdive/config";
+import { apiUrl } from "@focusdive/config";
 import createFetchClient from "openapi-fetch";
 import createClient from "openapi-react-query";
 import type { paths } from "./__generated__/openapi";
@@ -21,7 +21,7 @@ const authFetch: CustomFetch = async (request) => {
 };
 
 export const fdFetch = createFetchClient<paths>({
-  baseUrl: apiNewUrl,
+  baseUrl: apiUrl,
   fetch: authFetch,
 });
 export const fdApi = createClient(fdFetch);

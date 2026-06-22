@@ -1,0 +1,120 @@
+services:
+  db:
+    image: mongo:8.0
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:8.0
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mail:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    environment:
+      MP_MAX_MESSAGES: "5000"
+      MP_SMTP_AUTH_ACCEPT_ANY: "true"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "true"
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    ports:
+      - "5000:8000"
+    environment:
+      FOCUSDIVE_DEBUG: "true"
+      FOCUSDIVE_JWT_SECRET: "${JWT_SECRET:-dev-secret-not-for-prod}"
+      FOCUSDIVE_MONGO_URI: "mongodb://db:27017"
+      FOCUSDIVE_MONGO_DB: "focusdive"
+      FOCUSDIVE_REDIS_URL: "redis://redis:6379/0"
+      FOCUSDIVE_SMTP_HOST: "mail"
+      FOCUSDIVE_SMTP_PORT: "1025"
+      FOCUSDIVE_SMTP_USER: "localtest"
+      FOCUSDIVE_SMTP_PASS: "localtest"
+      FOCUSDIVE_SMTP_FROM: "FocusDive <no-reply@focusdive.app>"
+      FOCUSDIVE_SMTP_TLS: "false"
+      FOCUSDIVE_SMTP_SSL: "false"
+      FOCUSDIVE_SLACK_CLIENT_ID: "${SLACK_CLIENT_ID:-dev-slack-client-id}"
+      FOCUSDIVE_SLACK_CLIENT_SECRET: "${SLACK_CLIENT_SECRET:-dev-slack-client-secret}"
+      FOCUSDIVE_SLACK_REDIRECT_URI: "http://localhost:8080/slack/connect"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    develop:
+      watch:
+        - action: sync
+          path: ./apps/api/src
+          target: /app/src
+        - action: rebuild
+          path: ./apps/api/pyproject.toml
+        - action: rebuild
+          path: ./apps/api/uv.lock
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.webdev
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      VITE_API_URL: "http://localhost:5000"
+      VITE_APP_URL: "http://localhost:8080"
+      VITE_DEBUG: "false"
+      VITE_SLACK_CLIENT_ID: "${SLACK_CLIENT_ID:-}"
+      VITE_SENTRY_DSN: "${SENTRY_DSN:-}"
+    depends_on:
+      - api
+    develop:
+      watch:
+        - action: sync
+          path: ./apps/web/src
+          target: /app/apps/web/src
+        - action: sync
+          path: ./apps/web/index.html
+          target: /app/apps/web/index.html
+        - action: sync
+          path: ./apps/web/vite.config.ts
+          target: /app/apps/web/vite.config.ts
+        - action: sync
+          path: ./index.html
+          target: /app/index.html
+        - action: sync
+          path: ./packages
+          target: /app/packages
+        - action: rebuild
+          path: ./package.json
+        - action: rebuild
+          path: ./pnpm-lock.yaml
+        - action: rebuild
+          path: ./pnpm-workspace.yaml
+        - action: rebuild
+          path: ./apps/web/package.json
+
+volumes:
+  mongodata:
+  redisdata:
